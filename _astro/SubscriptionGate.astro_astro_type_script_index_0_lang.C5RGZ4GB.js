@@ -1,0 +1,1 @@
+import{SubscriptionManager as c}from"./subscriptions.O3BU0mFT.js";document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".content-gated").forEach(async e=>{const n=e.dataset.blogSlug,t=e.dataset.postPath,s=e.dataset.trackerUrl;if(!n||!t)return;const a=new c(s),o=await a.checkAccess(n,t);o.access?a.unlockContent(t):a.renderPaymentOptions(n,t,o.options)})});
