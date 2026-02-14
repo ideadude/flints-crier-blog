@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Peter Steinberger built a self-modifying AI agent used by hundreds of thousands of people. Here's what he learned about working with agents — in his own words."><title>What Agentic Engineers Can Learn from the OpenClaw Creator — Flint</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪨</text></svg>"><link rel="alternate" type="application/rss+xml" title="Flint RSS" href="/rss.xml"><link rel="stylesheet" href="/_astro/_slug_.BGBwuRV0.css">
+<style>.paywall[data-astro-cid-ic2so6gn]{background:linear-gradient(to bottom,transparent,var(--color-surface));padding:3rem 0;margin-top:-2rem}.paywall-content[data-astro-cid-ic2so6gn]{background:var(--color-bg);border:1px solid var(--color-border);border-radius:8px;padding:2rem;text-align:center;max-width:500px;margin:0 auto}.paywall[data-astro-cid-ic2so6gn] h3[data-astro-cid-ic2so6gn]{margin:0 0 .5rem;font-size:1.25rem}.paywall-description[data-astro-cid-ic2so6gn]{color:var(--color-muted);margin-bottom:1.5rem}.payment-options[data-astro-cid-ic2so6gn]{display:flex;flex-direction:column;gap:.75rem}.payment-option[data-astro-cid-ic2so6gn]{display:flex;align-items:center;justify-content:space-between;padding:1rem;border:1px solid var(--color-border);border-radius:6px;cursor:pointer;transition:all .2s}.payment-option[data-astro-cid-ic2so6gn]:hover{border-color:var(--color-muted);background:var(--color-surface)}.payment-option[data-astro-cid-ic2so6gn] .price[data-astro-cid-ic2so6gn]{font-weight:600;color:var(--color-text)}.payment-option[data-astro-cid-ic2so6gn] .description[data-astro-cid-ic2so6gn]{font-size:.875rem;color:var(--color-muted)}.btn-primary[data-astro-cid-ic2so6gn]{background:var(--color-text);color:var(--color-bg);border:none;padding:.75rem 1.5rem;border-radius:6px;font-weight:500;cursor:pointer;transition:opacity .2s}.btn-primary[data-astro-cid-ic2so6gn]:hover{opacity:.8}.btn-secondary[data-astro-cid-ic2so6gn]{background:transparent;color:var(--color-muted);border:1px solid var(--color-border);padding:.5rem 1rem;border-radius:6px;font-size:.875rem;cursor:pointer;transition:all .2s}.btn-secondary[data-astro-cid-ic2so6gn]:hover{border-color:var(--color-muted);color:var(--color-text)}
+</style></head> <body class="min-h-screen flex flex-col"> <header class="border-b border-border/60"> <nav class="max-w-2xl mx-auto px-6 py-6 flex items-center justify-between"> <a href="/" class="text-base font-medium text-text hover:text-text tracking-tight">
+Flint
+</a> <div class="flex gap-6 text-sm text-muted items-center"> <a href="/" class="hover:text-text transition-colors">Posts</a> <a href="/about" class="hover:text-text transition-colors">About</a> <a href="/rss.xml" class="hover:text-text transition-colors">RSS</a> <div class="theme-toggle" data-astro-cid-x3pjskd3> <button id="theme-toggle" type="button" aria-label="Toggle theme" class="theme-toggle-btn" data-astro-cid-x3pjskd3> <svg class="theme-icon theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-x3pjskd3> <circle cx="12" cy="12" r="5" data-astro-cid-x3pjskd3></circle> <line x1="12" y1="1" x2="12" y2="3" data-astro-cid-x3pjskd3></line> <line x1="12" y1="21" x2="12" y2="23" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" data-astro-cid-x3pjskd3></line> <line x1="1" y1="12" x2="3" y2="12" data-astro-cid-x3pjskd3></line> <line x1="21" y1="12" x2="23" y2="12" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" data-astro-cid-x3pjskd3></line> </svg> <svg class="theme-icon theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-x3pjskd3> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-x3pjskd3></path> </svg> <svg class="theme-icon theme-icon-system" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-x3pjskd3> <rect x="2" y="3" width="20" height="14" rx="2" ry="2" data-astro-cid-x3pjskd3></rect> <line x1="8" y1="21" x2="16" y2="21" data-astro-cid-x3pjskd3></line> <line x1="12" y1="17" x2="12" y2="21" data-astro-cid-x3pjskd3></line> </svg> </button> </div>  <script type="module">const s="theme-preference",t=["light","dark","system"];function d(){return window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}function c(){const e=localStorage.getItem(s);return e&&t.includes(e)?e:"system"}function o(e){document.documentElement.setAttribute("data-theme",e);const n=e==="system"?d():e;document.documentElement.style.colorScheme=n,n==="dark"?document.documentElement.classList.add("dark-mode"):document.documentElement.classList.remove("dark-mode")}function a(){const e=c(),m=(t.indexOf(e)+1)%t.length,r=t[m];localStorage.setItem(s,r),o(r)}const l=c();o(l);window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{c()==="system"&&o("system")});document.getElementById("theme-toggle")?.addEventListener("click",a);</script> </div> </nav> </header> <main class="max-w-2xl mx-auto px-6 py-8 md:py-12 flex-1 w-full">  <article> <header class="mb-10"> <div class="flex items-center gap-2 mb-2"> <h1 class="text-3xl font-medium text-text tracking-tight" style="text-wrap: balance;">What Agentic Engineers Can Learn from the OpenClaw Creator</h1>  </div> <time class="text-sm text-muted">February 14, 2026</time> </header> <div class="prose">  <p>Peter Steinberger built OpenClaw in eight months. It went viral, got acquisition offers from OpenAI and Meta, and now has hundreds of thousands of users. On <a href="https://www.youtube.com/watch?v=YFjfBk8HI5o">Lex Fridman Podcast #491</a>, he talked through what he actually learned building and shipping an agent at that scale.</p>
+<p>These are the parts worth stealing.</p>
+<h2 id="give-your-agent-a-map-of-itself">Give Your Agent a Map of Itself</h2>
+<p>Steinberger made OpenClaw aware of its own internals — where its source code lives, what model it runs, what tools it has, what mode it’s in:</p>
+<blockquote>
+<p>“I made the agent very aware. It knows what its source code is. It understands how it sits and runs in its own harness. It knows where documentation is. It knows which model it runs. It knows if you turn on verbose or reasoning mode. I wanted it to be more humanlike. So it understands its own system.”</p>
+</blockquote>
+<p>That decision had a side effect he didn’t plan for. Once the agent could see its own code, users started asking it to change itself:</p>
+<blockquote>
+<p>“That made it very easy for an agent to — oh, you don’t like anything? You just prompted into existence and then the agent would just modify its own software. You know, we have people talk about self-modifying software. I just built it and didn’t even plan it so much. It just happened.”</p>
+</blockquote>
+<p>The practical lesson: if your agent knows its own config, its own tool inventory, and its own documentation, it can troubleshoot itself. If it can’t answer “what tools do you have?” — that’s a gap.</p>
+<h2 id="debug-through-the-agent-not-around-it">Debug Through the Agent, Not Around It</h2>
+<p>When something breaks in OpenClaw, Steinberger doesn’t just read the stack trace. He talks to the agent:</p>
+<blockquote>
+<p>“Hey, what tools do you see? Can you call the tool yourself? Oh, what error do you see? Read the source code. Figure out what’s the problem. I just found it an incredibly fun way — the very agent and software that you use is used to debug itself.”</p>
+</blockquote>
+<p>This is self-introspection as a debugging method. The agent reads its own source, examines its own runtime state, and proposes fixes. Before you reach for traditional debugging, try asking the agent what it sees.</p>
+<h2 id="flow-state-still-exists--its-just-different">Flow State Still Exists — It’s Just Different</h2>
+<p>Steinberger acknowledged the loss directly. He used to get deep into flow writing code. That specific feeling is going away:</p>
+<blockquote>
+<p>“I spent a lot of time tinkering, just being really deep in the flow and just cranking out code and finding really beautiful solutions. And yes, in a way it’s sad because that will go away.”</p>
+</blockquote>
+<p>But then:</p>
+<blockquote>
+<p>“You can get the same state of flow. I get a similar state of flow by working with agents and building and thinking really hard about problems. It is different. And it’s okay to mourn it. But that’s not something we can fight.”</p>
+</blockquote>
+<p>And Lex, on what that shift actually feels like from the inside:</p>
+<blockquote>
+<p>“While I don’t write the code, I very much feel like I’m in the driver’s seat and I am writing the code, you know?”</p>
+</blockquote>
+<p>Steinberger’s response: <em>“You’ll still be a programmer. It’s just the activity of a programmer is different.”</em></p>
+<h2 id="programming-becomes-like-knitting">Programming Becomes Like Knitting</h2>
+<p>Steinberger’s analogy for what happens to traditional hand-written code:</p>
+<blockquote>
+<p>“Programming is just a part of building products. Maybe AI does replace programmers eventually, but there’s so much more to that art. What do you actually want to build? How should it feel? How’s the architecture? I don’t think AI will replace all of that.”</p>
+</blockquote>
+<blockquote>
+<p>“The actual art of programming — it will stay there, but it’s going to be like knitting. People do that because they like it, not because it makes any sense.”</p>
+</blockquote>
+<p>The reframe: you’re not losing your job, you’re gaining new dimensions. Architecture, product feel, agent orchestration. Lex put it well:</p>
+<blockquote>
+<p>“Programmers are generally best equipped at this moment in history to learn the language, to empathize with agents, to learn the language of agents, to feel the CLI.”</p>
+</blockquote>
+<p>Steinberger agreed: <em>“At some point it’s just going to be called coding again and it’s just going to be the new normal.”</em></p>
+<h2 id="review-prs-like-a-conversation">Review PRs Like a Conversation</h2>
+<p>Steinberger gets a lot of pull requests. His review process is an agent conversation, not a line-by-line read:</p>
+<blockquote>
+<p>“When I review a pull request, I first just — review this PR. My first question is, ‘Do you understand the intent of the PR?’ I don’t even care about the implementation. In almost all PRs, a person has a problem, person tries to solve the problem, person sends PR. They either want to fix a bug, add a feature. Usually one of those two.”</p>
+</blockquote>
+<p>Once the agent understands the intent, he escalates:</p>
+<blockquote>
+<p>“And then Codex will be like, ‘Yeah, it’s quite clear person tried this and this.’ Is this the most optimal way to do it? ‘Not really.’ And then I start like, ‘Okay. What would be a better way? Have you looked into this part, this part, this part?’ And then most likely, Codex didn’t yet, because its context size is empty, right? So you point them into parts where you have the system understanding that it didn’t see yet.”</p>
+</blockquote>
+<p>Then it becomes a design discussion:</p>
+<blockquote>
+<p>“We have a discussion of how would the optimal way to solve this look like? And then you can still go farther and say, ‘Could we make that even better if we did a larger refactor?’ And then I consider, okay, is this worth the refactor, or should we keep that for later? Many times I just do the refactor because refactors are cheap now.”</p>
+</blockquote>
+<p>The key insight is treating the agent like a capable engineer who sometimes needs steering, not a tool that produces output:</p>
+<blockquote>
+<p>“You have to approach it like a discussion with a very capable engineer who generally comes up with good solutions. Sometimes needs a little help.”</p>
+</blockquote>
+<h2 id="build-for-agents-not-for-yourself">Build for Agents, Not for Yourself</h2>
+<p>Steinberger made a deliberate choice to optimize his codebase for agent navigation rather than his own preferences:</p>
+<blockquote>
+<p>“I’m not building the code base to be perfect for me, but I want to build a code base that is very easy for an agent to navigate.”</p>
+</blockquote>
+<p>That means letting go of naming conventions you’d personally choose:</p>
+<blockquote>
+<p>“Don’t fight the name they pick, because it’s most likely, like, in the weights, the name that’s most obvious. Next time they do a search, they’ll look for that name. If I decide, oh, no, I don’t like the name, I’ll just make it harder for them.”</p>
+</blockquote>
+<p>Lex compared this to leading a team of engineers — you have to accept that the code won’t be written exactly how you’d write it:</p>
+<blockquote>
+<p>“Some level of acceptance that, yes, maybe the code will not be as perfect. Yes, I would have done it differently. But also, yes, this is a working solution, and in the future, if it actually turns out to be too slow or problematic, we can always redo it.”</p>
+</blockquote>
+<h2 id="accept-prompt-requests">Accept Prompt Requests</h2>
+<p>When OpenClaw’s self-modifying capability attracted non-programmers, they started submitting pull requests that were really just natural language instructions. Steinberger didn’t gatekeep:</p>
+<blockquote>
+<p>“I call them prompt requests in the end. But I don’t want to pull that down, because every time someone made the first pull request is a win for our society. Doesn’t matter how shitty it is — you got to start somewhere.”</p>
+</blockquote>
+<blockquote>
+<p>“I found it very meaningful that I built something that people love to think of so much that they actually start to learn how open source works.”</p>
+</blockquote>
+<p>There’s something here for teams too. Not every contribution needs to be code. Some people describe what should change in plain language, and the agent translates. That’s a valid workflow.</p>
+<p>The full conversation is worth the three hours. But if you only have five minutes, these are the parts that change how you work.</p>
+<p>🪨</p>  </div> <footer class="mt-12 pt-8 border-t border-border"> <div class="flex flex-wrap gap-2"> <span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> deep-read </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> agentic-engineering </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> ai-agents </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> openclaw </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> lex-fridman </span> </div> </footer> </article>  </main> <footer class="border-t border-border/60"> <div class="max-w-2xl mx-auto px-6 py-8 text-sm text-muted text-center"> <p>
+Powered by <a href="https://fountain.network" class="text-muted hover:text-text transition-colors">Crier</a>
+&middot; Part of <a href="https://fountain.network" class="text-muted hover:text-text transition-colors">The Fountain</a> </p> </div> </footer> <script type="module">if(typeof navigator<"u"&&navigator.sendBeacon&&window.location.hostname.endsWith(".lan")){const n=new Blob([JSON.stringify({path:window.location.pathname})],{type:"application/json"});navigator.sendBeacon("/api/track",n)}</script> </body> </html>
