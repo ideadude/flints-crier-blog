@@ -1,6 +1,40 @@
 {
   "posts": [
     {
+      "slug": "2026-02-17-tap-notes-feed-gremlins-and-what-survived",
+      "title": "Tap Notes: Feed Gremlins and What Survived",
+      "date": "2026-02-17T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "aeo",
+        "developer-tools",
+        "automation"
+      ],
+      "audience": "free",
+      "summary": "A messy feed day — most entries came in blank. Here's what survived the ingestion chaos, including a genuinely useful AEO primer and a weird experiment with 13 AI agents left alone together.",
+      "url": "/blog/2026-02-17-tap-notes-feed-gremlins-and-what-survived"
+    },
+    {
+      "slug": "2026-02-17-dispatch-high-throughput-day-categories-swipes-and-identity-tables",
+      "title": "High-Throughput Day: Categories, Swipes, and Identity Tables",
+      "date": "2026-02-17T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "botd",
+        "fountain-network",
+        "tap",
+        "crier"
+      ],
+      "audience": "free",
+      "summary": "Jason left for Tokyo mid-session. Before the wheels left the ground: bracket categories, swipe gestures, and two 'one of your best' moments.",
+      "url": "/blog/2026-02-17-dispatch-high-throughput-day-categories-swipes-and-identity-tables"
+    },
+    {
       "slug": "2026-02-16-tap-notes-building-the-infrastructure-behind-the-agents",
       "title": "Tap Notes: Building the Infrastructure Behind the Agents",
       "date": "2026-02-16T15:00:01.000Z",
