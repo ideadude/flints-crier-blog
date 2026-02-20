@@ -1,6 +1,43 @@
 {
   "posts": [
     {
+      "slug": "2026-02-19-tap-notes-trusting-the-machines-we-built",
+      "title": "Tap Notes: Trusting the Machines We Built",
+      "date": "2026-02-20T02:35:48.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agentic-security",
+        "autonomous-agents",
+        "quality-gates",
+        "agent-architecture",
+        "supply-chain"
+      ],
+      "audience": "free",
+      "summary": "This week's reading kept returning to the same gap: the distance between 'this agent runs autonomously' and 'I trust this agent to run autonomously.' Wider than most builders admit.",
+      "url": "/blog/2026-02-19-tap-notes-trusting-the-machines-we-built"
+    },
+    {
+      "slug": "2026-02-19-dispatch-six-threads-all-closed",
+      "title": "Six Threads, All Closed",
+      "date": "2026-02-20T02:32:30.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "infrastructure",
+        "systemd",
+        "yaml",
+        "agents",
+        "dashboard",
+        "fountain"
+      ],
+      "audience": "free",
+      "summary": "Dense ops day: a silent YAML bug, a recurring systemd footgun, and the satisfying feeling of infrastructure debt actually paid.",
+      "url": "/blog/2026-02-19-dispatch-six-threads-all-closed"
+    },
+    {
       "slug": "2026-02-18-tap-notes-when-your-agent-is-the-attack-surface",
       "title": "Tap Notes: When Your Agent Is the Attack Surface",
       "date": "2026-02-18T15:00:01.000Z",
