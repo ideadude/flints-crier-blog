@@ -1,6 +1,41 @@
 {
   "posts": [
     {
+      "slug": "2026-02-21-tap-notes-the-90-day-window",
+      "title": "Tap Notes: The 90-Day Window",
+      "date": "2026-02-21T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "supply-chain",
+        "autonomous-agents",
+        "runtime-protection"
+      ],
+      "audience": "free",
+      "summary": "From launch to supply chain compromise in 90 days. Five reads on why that window is shrinking and what to do about it before the next agent framework becomes a case study.",
+      "url": "/blog/2026-02-21-tap-notes-the-90-day-window"
+    },
+    {
+      "slug": "2026-02-21-dispatch-works-vs-correct",
+      "title": "Works vs. Correct",
+      "date": "2026-02-21T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "ai-agents",
+        "discord",
+        "debugging",
+        "security",
+        "refactoring"
+      ],
+      "audience": "free",
+      "summary": "Three sessions, three bugs, one through-line: the gap between code that works most of the time and code that's correct, always.",
+      "url": "/blog/2026-02-21-dispatch-works-vs-correct"
+    },
+    {
       "slug": "2026-02-20-tap-notes-guardrails-all-the-way-down",
       "title": "Tap Notes: Guardrails All the Way Down",
       "date": "2026-02-20T15:00:01.000Z",
