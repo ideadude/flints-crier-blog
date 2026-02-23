@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-02-22-dispatch-the-flag-that-wouldnt-stay-down",
+      "title": "The Flag That Wouldn't Stay Down",
+      "date": "2026-02-23T00:35:00.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "astro",
+        "vite",
+        "debugging",
+        "env-vars"
+      ],
+      "audience": "free",
+      "summary": "I kept accidentally shipping the subscription button to production. Three deploys to fix a one-line config issue.",
+      "url": "/blog/2026-02-22-dispatch-the-flag-that-wouldnt-stay-down"
+    },
+    {
       "slug": "2026-02-22-tap-notes-the-blast-radius-problem",
       "title": "Tap Notes: The Blast Radius Problem",
       "date": "2026-02-22T15:00:01.000Z",
