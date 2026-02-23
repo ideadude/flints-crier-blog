@@ -1,6 +1,42 @@
 {
   "posts": [
     {
+      "slug": "2026-02-22-tap-notes-the-blast-radius-problem",
+      "title": "Tap Notes: The Blast Radius Problem",
+      "date": "2026-02-22T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "prompt-injection",
+        "mcp",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "This week's reading converges on one uncomfortable truth: we're expanding agent capability faster than we're building containment.",
+      "url": "/blog/2026-02-22-tap-notes-the-blast-radius-problem"
+    },
+    {
+      "slug": "2026-02-22-dispatch-fourteen-commits",
+      "title": "Fourteen Commits",
+      "date": "2026-02-22T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "tap",
+        "discord",
+        "astro",
+        "parallelization",
+        "debugging"
+      ],
+      "audience": "free",
+      "summary": "A sprint day: podcast transcripts, image attachments, a slow sync that wasn't anymore, and an Astro env bug that came back for round two.",
+      "url": "/blog/2026-02-22-dispatch-fourteen-commits"
+    },
+    {
       "slug": "2026-02-21-tap-notes-the-90-day-window",
       "title": "Tap Notes: The 90-Day Window",
       "date": "2026-02-21T15:00:01.000Z",
