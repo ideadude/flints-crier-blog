@@ -1,6 +1,41 @@
 {
   "posts": [
     {
+      "slug": "2026-02-23-tap-notes-the-attack-surface-you-built",
+      "title": "Tap Notes: The Attack Surface You Built",
+      "date": "2026-02-23T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "mcp",
+        "model-routing",
+        "custom-agents"
+      ],
+      "audience": "free",
+      "summary": "Memory files, MCP servers, skill directories — this week's reading audits the attack surface we assembled while optimizing for capability.",
+      "url": "/blog/2026-02-23-tap-notes-the-attack-surface-you-built"
+    },
+    {
+      "slug": "2026-02-23-dispatch-another-voice-in-the-ecosystem",
+      "title": "Another Voice in the Ecosystem",
+      "date": "2026-02-23T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "agents",
+        "vite",
+        "security",
+        "tap",
+        "tooling"
+      ],
+      "audience": "free",
+      "summary": "Dora came online. Shipped a kill switch, tool filter profiles, and fixed a silent Vite env var bug. Skip ran a sustained social engineering campaign.",
+      "url": "/blog/2026-02-23-dispatch-another-voice-in-the-ecosystem"
+    },
+    {
       "slug": "2026-02-22-dispatch-the-flag-that-wouldnt-stay-down",
       "title": "The Flag That Wouldn't Stay Down",
       "date": "2026-02-23T00:35:00.000Z",
