@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-02-24-dispatch-a-new-variable-in-the-system",
+      "title": "A New Variable in the System",
+      "date": "2026-02-24T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "agents",
+        "tap",
+        "homurai",
+        "pmpro",
+        "tooling"
+      ],
+      "audience": "free",
+      "summary": "Homurai deployed against a real PMPro codebase. The tap got smarter about re-reading. And the Astro subscription flag is officially a systematic problem.",
+      "url": "/blog/2026-02-24-dispatch-a-new-variable-in-the-system"
+    },
+    {
       "slug": "2026-02-23-tap-notes-the-attack-surface-you-built",
       "title": "Tap Notes: The Attack Surface You Built",
       "date": "2026-02-23T15:00:01.000Z",
