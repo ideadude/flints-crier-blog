@@ -66,6 +66,11 @@ select {
   letter-spacing: 0.12em; cursor: pointer;
 }
 #share-btn:hover { color: #c0b0ff; border-color: rgba(140,70,255,0.55); background: rgba(55,20,130,0.5); }
+#dice-btn {
+  float: right; background: none; border: none; color: #5c4e88;
+  cursor: pointer; font-size: 14px; padding: 0; line-height: 1;
+}
+#dice-btn:hover { color: #b0a0e0; }
 #hint {
   position: fixed; bottom: 12px; left: 14px;
   font-family: 'Courier New', monospace; font-size: 10px;
@@ -81,7 +86,7 @@ select {
 <div id="ui">
   <button id="toggle-btn">⚙ settings</button>
   <div id="panel">
-    <div class="section-title">Indigo Empire v5</div>
+    <div class="section-title">Indigo Empire v5 <button id="dice-btn" title="Randomize all settings">🎲</button></div>
 
     <!-- Field -->
     <div class="row">
@@ -169,6 +174,7 @@ select {
         <option value="0">halftone dots</option>
         <option value="1">grain dither</option>
         <option value="2">scanlines</option>
+        <option value="3">crosshatch</option>
       </select>
     </div>
     <button id="share-btn">⇧ share settings</button>
@@ -457,13 +463,29 @@ const BLOOM_FS = `
         float noise = fract(52.9829189 * fract(dot(dPos, vec2(0.06711056, 0.00583715))));
         mask = step(noise, lum);
 
-      } else {
+      } else if (uHalftoneMode == 2) {
         // ── Scanlines ───────────────────────────────────────
         // Horizontal bands. uDotSize controls line spacing.
-        // At dotSize=1: every other pixel (tight TV scan)
-        // At dotSize=4: visible CRT-style bands
-        // At dotSize=12: bold editorial stripes
         mask = mod(floor(gl_FragCoord.y / uDotSize), 2.0);
+
+      } else {
+        // ── Crosshatch ──────────────────────────────────────
+        // Engraving-style diagonal hatching. Bright areas are
+        // clean, medium gets one set of lines, dark gets both.
+        float ca = 0.7071; float sa = 0.7071;
+        vec2 fc = gl_FragCoord.xy;
+        float d1 = abs(fract((fc.x * ca - fc.y * sa) / uDotSize) - 0.5) * 2.0;
+        float d2 = abs(fract((fc.x * ca + fc.y * sa) / uDotSize) - 0.5) * 2.0;
+        float lw = 0.38;
+        float h1 = step(lw, d1);
+        float h2 = step(lw, d2);
+        if (lum > 0.65) {
+          mask = 1.0;
+        } else if (lum > 0.3) {
+          mask = h1;
+        } else {
+          mask = min(h1, h2);
+        }
       }
 
       // The halftone mask is binary (0 or 1). We preserve hue from
@@ -585,6 +607,10 @@ const PALETTES = [
   // Six tones from near-black to white give full tonal range.
   [[1.00,1.00,1.00,0.78],[0.78,0.78,0.78,0.72],[0.52,0.52,0.52,0.68],
    [0.32,0.32,0.32,0.80],[0.88,0.86,0.84,0.60],[0.08,0.08,0.10,0.90]],
+  // 6: Aurora — northern lights: green curtains, teal ribbons, violet
+  // flares. Deep navy base layer anchors the sky.
+  [[0.15,0.92,0.35,0.82],[0.00,0.78,0.88,0.75],[0.50,0.10,0.90,0.68],
+   [0.30,0.95,0.65,0.62],[0.88,0.20,0.58,0.55],[0.04,0.15,0.45,0.82]],
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -843,7 +869,7 @@ document.getElementById('s-htmode').addEventListener('change', e => {
 
 // Palette swatches
 const palStrip = document.getElementById('pal-strip');
-const palNames = ['Indigo Empire','Bioluminescence','Ember Field','Void Garden','Sakura Night','Monochrome'];
+const palNames = ['Indigo Empire','Bioluminescence','Ember Field','Void Garden','Sakura Night','Monochrome','Aurora'];
 PALETTES.forEach((pal, pi) => {
   const sw = document.createElement('canvas');
   sw.width = 28; sw.height = 12;
@@ -925,6 +951,32 @@ document.getElementById('share-btn').addEventListener('click', () => {
     copied();
   }
 });
+
+// Randomize all settings
+function randomizeCfg() {
+  const r = (a, b) => a + Math.random() * (b - a);
+  const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  cfg.layers = ri(2, 6);
+  cfg.speed = r(0.05, 2.0);
+  cfg.distort = r(0, 2.5);
+  cfg.scale = r(0.3, 3.0);
+  cfg.bright = r(0.3, 2.5);
+  cfg.bloom = r(0, 1.5);
+  cfg.confluent = r(0, 2.0);
+  cfg.breath = r(0, 1.0);
+  cfg.sweep = r(0, 1.2);
+  cfg.warpspin = r(0, 5.0);
+  cfg.pull = r(0, 1.0);
+  cfg.chroma = r(0, 1.0);
+  cfg.particles = r(0, 1.0);
+  cfg.field = ri(0, 5);
+  cfg.palette = ri(0, PALETTES.length - 1);
+  cfg.halftone = r(0, 1.0);
+  cfg.dotsize = ri(2, 24);
+  cfg.htmode = ri(0, 3);
+  syncUIFromCfg();
+}
+document.getElementById('dice-btn').addEventListener('click', randomizeCfg);
 
 // Apply URL state on load (runs after all listeners are attached)
 loadFromURL();
