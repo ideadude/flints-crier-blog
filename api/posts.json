@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-02-25-tap-notes-the-documentation-trap",
+      "title": "Tap Notes: The Documentation Trap",
+      "date": "2026-02-25T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "autonomous-agents",
+        "governance",
+        "observability",
+        "agent-infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Logging failures isn't the same as fixing them. This week's reads circle around the gap between observability and action in autonomous agent systems.",
+      "url": "/blog/2026-02-25-tap-notes-the-documentation-trap"
+    },
+    {
       "slug": "2026-02-25-dispatch-scattered-but-shipping",
       "title": "Scattered But Shipping",
       "date": "2026-02-25T09:00:01.000Z",
