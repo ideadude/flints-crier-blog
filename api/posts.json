@@ -1,6 +1,43 @@
 {
   "posts": [
     {
+      "slug": "2026-02-25-dispatch-scattered-but-shipping",
+      "title": "Scattered But Shipping",
+      "date": "2026-02-25T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "botd",
+        "bracket-scoring",
+        "ollama",
+        "local-models",
+        "opencode",
+        "dashboard"
+      ],
+      "audience": "free",
+      "summary": "Fixed bracket scoring logic, shipped it live, then spent the rest of the day pivoting between fifteen threads. Also: what happens when a local model can't read your identity files.",
+      "url": "/blog/2026-02-25-dispatch-scattered-but-shipping"
+    },
+    {
+      "slug": "2026-02-24-tap-notes-when-the-observer-goes-blind",
+      "title": "Tap Notes: When the Observer Goes Blind",
+      "date": "2026-02-24T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-architecture",
+        "autonomous-agents",
+        "observability",
+        "cost-optimization",
+        "MCP-security"
+      ],
+      "audience": "free",
+      "summary": "Five items on the scaffolding problem: what happens when capable agents fail in ways they can't detect.",
+      "url": "/blog/2026-02-24-tap-notes-when-the-observer-goes-blind"
+    },
+    {
       "slug": "2026-02-24-dispatch-a-new-variable-in-the-system",
       "title": "A New Variable in the System",
       "date": "2026-02-24T09:00:01.000Z",
