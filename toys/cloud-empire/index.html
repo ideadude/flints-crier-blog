@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cloud empire</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #000510; overflow: hidden; }
+canvas#glc { display: block; width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 1; }
+
+#ui {
+  position: fixed; top: 0; right: 0;
+  font-family: 'Courier New', monospace; font-size: 11px;
+  z-index: 10; user-select: none;
+}
+#toggle-btn {
+  display: block; padding: 7px 12px;
+  background: rgba(4,8,24,0.88);
+  border: 1px solid rgba(40,80,200,0.35);
+  border-top: none; border-right: none;
+  color: #4870a0; cursor: pointer; letter-spacing: 0.12em;
+  font-family: inherit; font-size: inherit;
+}
+#toggle-btn:hover { color: #90b8e8; border-color: rgba(70,140,255,0.55); }
+#panel {
+  display: none; background: rgba(4,8,24,0.95);
+  border-left: 1px solid rgba(30,70,160,0.4);
+  border-bottom: 1px solid rgba(30,70,160,0.4);
+  padding: 14px 15px; width: 215px;
+  max-height: calc(100vh - 32px); overflow-y: auto;
+}
+#panel.open { display: block; }
+.row { margin-bottom: 11px; }
+.lbl { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.lbl-text { color: #385878; letter-spacing: 0.07em; }
+.lbl-val  { color: #7090b8; }
+.section-divider {
+  border: none; border-top: 1px solid rgba(30,70,160,0.25);
+  margin: 13px 0 13px;
+}
+.section-title {
+  color: #7090c0; letter-spacing: 0.18em; font-size: 10px;
+  margin-bottom: 13px; text-transform: uppercase; opacity: 0.75;
+}
+.sub-title {
+  color: #507090; letter-spacing: 0.12em; font-size: 9px;
+  margin-bottom: 9px; margin-top: 3px; text-transform: uppercase; opacity: 0.65;
+}
+input[type=range] { width: 100%; accent-color: #2060c0; cursor: pointer; }
+select {
+  width: 100%; background: rgba(4,8,28,0.96); color: #607090;
+  border: 1px solid rgba(30,70,160,0.4);
+  font-family: 'Courier New', monospace; font-size: 11px; padding: 4px 3px; margin-top: 3px;
+}
+.preset-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 4px; margin-top: 5px;
+}
+.preset-btn {
+  padding: 5px 0; background: rgba(6,14,40,0.7);
+  border: 1px solid rgba(30,70,160,0.3);
+  color: #507090; font-family: 'Courier New', monospace; font-size: 9px;
+  letter-spacing: 0.05em; cursor: pointer; text-align: center;
+}
+.preset-btn:hover { color: #a0c8e8; border-color: rgba(70,140,255,0.5); background: rgba(14,30,80,0.7); }
+#share-btn {
+  display: block; width: 100%; padding: 7px 0; margin-top: 6px;
+  background: rgba(10,20,60,0.5); color: #507090;
+  border: 1px solid rgba(40,100,220,0.3);
+  font-family: 'Courier New', monospace; font-size: 11px;
+  letter-spacing: 0.12em; cursor: pointer;
+}
+#share-btn:hover { color: #90c0f0; border-color: rgba(70,140,255,0.55); background: rgba(20,50,130,0.5); }
+#dice-btn {
+  float: right; background: none; border: none; color: #385878;
+  cursor: pointer; font-size: 14px; padding: 0; line-height: 1;
+}
+#dice-btn:hover { color: #90b8e8; }
+#hint {
+  position: fixed; bottom: 12px; left: 14px;
+  font-family: 'Courier New', monospace; font-size: 10px;
+  color: rgba(80,100,160,0.38); pointer-events: none; letter-spacing: 0.06em;
+  z-index: 10;
+}
+</style>
+</head>
+<body>
+<canvas id="glc"></canvas>
+
+<div id="ui">
+  <button id="toggle-btn">&#9881; settings</button>
+  <div id="panel">
+    <div class="section-title">Cloud Empire <button id="dice-btn" title="Randomize">&#127922;</button></div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">TIME OF DAY</span><span class="lbl-val" id="v-tod">0.50</span></div>
+      <input type="range" id="s-tod" min="0" max="1" value="0.50" step="0.01">
+    </div>
+
+    <div class="row">
+      <div class="lbl-text" style="margin-bottom:5px;">PRESETS</div>
+      <div class="preset-grid">
+        <button class="preset-btn" data-preset="day">Day</button>
+        <button class="preset-btn" data-preset="sunset">Sunset</button>
+        <button class="preset-btn" data-preset="dawn">Dawn</button>
+        <button class="preset-btn" data-preset="night">Night</button>
+        <button class="preset-btn" data-preset="bluehr">Blue Hr</button>
+        <button class="preset-btn" data-preset="storm">Storm</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">TYPE</span></div>
+      <select id="s-type">
+        <option value="0">cumulus</option>
+        <option value="1">cirrus</option>
+        <option value="2">stratus</option>
+        <option value="3">cumulonimbus</option>
+        <option value="4" selected>mixed</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">COVERAGE</span><span class="lbl-val" id="v-cov">0.45</span></div>
+      <input type="range" id="s-cov" min="0.10" max="0.95" value="0.65" step="0.01">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">SCALE</span><span class="lbl-val" id="v-scale">1.00</span></div>
+      <input type="range" id="s-scale" min="0.3" max="3.0" value="0.65" step="0.05">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">TURBULENCE</span><span class="lbl-val" id="v-turb">0.50</span></div>
+      <input type="range" id="s-turb" min="0" max="1.5" value="1.05" step="0.05">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">LAYERS</span><span class="lbl-val" id="v-layers">3</span></div>
+      <input type="range" id="s-layers" min="1" max="6" value="3" step="1">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">SPEED</span><span class="lbl-val" id="v-speed">0.50</span></div>
+      <input type="range" id="s-speed" min="0" max="2.0" value="0.35" step="0.05">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">DIRECTION</span><span class="lbl-val" id="v-winddir">0°</span></div>
+      <input type="range" id="s-winddir" min="0" max="359" value="21" step="1">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">APPROACH</span><span class="lbl-val" id="v-approach">0.00</span></div>
+      <input type="range" id="s-approach" min="0" max="1.0" value="0.08" step="0.02">
+    </div>
+
+    <hr class="section-divider">
+    <div class="sub-title">Post Process</div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">BLOOM</span><span class="lbl-val" id="v-bloom">0.60</span></div>
+      <input type="range" id="s-bloom" min="0" max="2.0" value="0.3" step="0.05">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">HALFTONE</span><span class="lbl-val" id="v-halftone">0.00</span></div>
+      <input type="range" id="s-halftone" min="0" max="1.0" value="0.06" step="0.02">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">DOT SIZE</span><span class="lbl-val" id="v-dotsize">8</span></div>
+      <input type="range" id="s-dotsize" min="2" max="24" value="6" step="1">
+    </div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">MODE</span></div>
+      <select id="s-htmode">
+        <option value="0">halftone dots</option>
+        <option value="1">grain dither</option>
+        <option value="2">scanlines</option>
+        <option value="3">crosshatch</option>
+      </select>
+    </div>
+
+    <button id="share-btn">&#8679; share settings</button>
+  </div>
+</div>
+
+<div id="hint">s = settings &middot; drag to set wind direction</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// WebGL init
+// ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('glc');
+const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
+if (!gl) {
+  document.body.innerHTML = '<p style="color:#f55;font-family:monospace;padding:20px">WebGL required</p>';
+  throw new Error('WebGL not supported');
+}
+
+// ─────────────────────────────────────────────────────────────
+// Scene shader — sky + clouds entirely in GLSL
+// ─────────────────────────────────────────────────────────────
+const SCENE_VS = `attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
+
+const SCENE_FS = `
+precision highp float;
+
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uTod;
+uniform float uSpeed;
+uniform float uCov;
+uniform float uScale;
+uniform float uTurb;
+uniform int   uLayers;
+uniform int   uType;
+uniform vec2  uWind;
+uniform vec2  uWindDir;   // normalized wind direction vec2 (cos/sin of angle)
+uniform float uApproach;  // 0=flat drift, 1=clouds grow as they cross sky
+
+// ── Hash / noise ──────────────────────────────────────────────
+float h21(vec2 p) {
+  p = fract(p * vec2(127.1, 311.7));
+  p += dot(p, p + 17.545);
+  return fract(p.x * p.y);
+}
+
+float vn(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(h21(i),              h21(i + vec2(1.0, 0.0)), u.x),
+    mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+
+// lacunarity 1.95, gain 0.52 — ideal for puffy cumulus
+float fbm(vec2 p, int oct) {
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 8; i++) {
+    if (i >= oct) break;
+    v += a * vn(p);
+    p = p * 1.95 + vec2(3.7, 1.4);
+    a *= 0.52;
+  }
+  return v;
+}
+
+// ── Time of day weights ────────────────────────────────────────
+float dayness() {
+  float t = fract(uTod);
+  return smoothstep(0.22, 0.42, t) * smoothstep(0.78, 0.58, t);
+}
+float dawnness() {
+  float t = fract(uTod);
+  return smoothstep(0.10, 0.24, t) * smoothstep(0.36, 0.24, t);
+}
+float sunsetness() {
+  float t = fract(uTod);
+  return smoothstep(0.64, 0.76, t) * smoothstep(0.88, 0.76, t);
+}
+float nightness() {
+  return 1.0 - clamp(dayness() + dawnness() + sunsetness(), 0.0, 1.0);
+}
+
+// ── Celestial positions ────────────────────────────────────────
+// Sun sweeps across frame left-to-right through the day.
+// In looking-up view these are projected positions on the sky plane.
+vec2 sunUV() {
+  float t     = fract(uTod);
+  float theta = (t - 0.25) * 3.14159265 * 2.0;
+  return vec2(0.5 + cos(theta) * 0.40, 0.5 + sin(theta) * 0.35);
+}
+vec2 moonUV() {
+  float t     = fract(uTod);
+  float theta = (t - 0.25) * 3.14159265 * 2.0 + 3.14159265;
+  return vec2(0.5 + cos(theta) * 0.40, 0.5 + sin(theta) * 0.35);
+}
+
+// ── Sky — looking straight up ──────────────────────────────────
+// No horizon. Center = zenith. Color deepens toward center,
+// lightens at edges (atmospheric limb-brightening effect).
+vec3 skyCol(vec2 uv) {
+  float dn = dayness();
+  float ss = sunsetness();
+  float dr = dawnness();
+  float nn = nightness();
+
+  float dist = length(uv - 0.5) * 1.41421;  // 0 at center, ~1 at corners
+
+  // Day: rich cerulean zenith, lighter sky blue at periphery
+  vec3 dayDeep = vec3(0.06, 0.20, 0.66);
+  vec3 dayEdge = vec3(0.28, 0.56, 0.90);
+  vec3 daySky  = mix(dayDeep, dayEdge, pow(dist, 0.80) * 0.58);
+
+  // Sunset: deep indigo zenith, warm purple/orange at edges
+  vec3 ssDeep = vec3(0.04, 0.02, 0.20);
+  vec3 ssEdge = vec3(0.60, 0.18, 0.32);
+  vec3 ssSky  = mix(ssDeep, ssEdge, pow(dist, 0.70) * 0.80);
+
+  // Dawn: deep navy, soft rose-lavender at periphery
+  vec3 drDeep = vec3(0.04, 0.05, 0.22);
+  vec3 drEdge = vec3(0.55, 0.32, 0.52);
+  vec3 drSky  = mix(drDeep, drEdge, pow(dist, 0.70) * 0.75);
+
+  // Night: near-black with barely perceptible blue depth
+  vec3 nightDeep = vec3(0.003, 0.007, 0.038);
+  vec3 nightEdge = vec3(0.016, 0.028, 0.075);
+  vec3 nightSky  = mix(nightDeep, nightEdge, dist * 0.50);
+
+  return daySky * dn + ssSky * ss + drSky * dr + nightSky * nn;
+}
+
+// ── Cloud illumination ─────────────────────────────────────────
+vec3 cloudLitCol() {
+  float dn = dayness();
+  float ss = sunsetness();
+  float dr = dawnness();
+  float nn = nightness();
+  return vec3(1.00, 0.98, 0.95) * dn
+       + vec3(1.00, 0.64, 0.28) * ss
+       + vec3(1.00, 0.84, 0.66) * dr
+       + vec3(0.58, 0.68, 0.88) * nn;  // moon-silvered cloud tops
+}
+vec3 cloudShadCol() {
+  float dn = dayness();
+  float ss = sunsetness();
+  float dr = dawnness();
+  float nn = nightness();
+  return vec3(0.60, 0.70, 0.86) * dn
+       + vec3(0.26, 0.10, 0.28) * ss
+       + vec3(0.38, 0.32, 0.54) * dr
+       + vec3(0.22, 0.28, 0.46) * nn;  // visible dark blue-gray, not black
+}
+
+// ── Cloud density — no altitude bands ─────────────────────────
+// Very low base frequency → massive blobs that fill the frame.
+// Domain-warped fBm adds the bumpy cauliflower surface detail.
+float cloudDensity(vec2 p, float cov) {
+  // Primary form: huge smooth blobs
+  float bigBlob = vn(p * 0.22) * 0.55
+                + vn(p * 0.44) * 0.28
+                + vn(p * 0.88) * 0.17;
+  // Domain warp for organic, cauliflower-y surface
+  vec2 q;
+  q.x = fbm(p * 0.50 + vec2(0.0, 0.0), 3);
+  q.y = fbm(p * 0.50 + vec2(5.2, 1.3),  3);
+  float surface = fbm(p * 0.80 + uTurb * q * 0.90, 5);
+  float d = bigBlob * 0.58 + surface * 0.42;
+  // Wide smoothstep threshold → soft, billowing edges
+  return smoothstep(1.0 - cov, 1.0 - cov + 0.44, d);
+}
+
+// ── Cloud layer — depth via parallax, 360° wind, approach ──────
+// Front layers (idx=0): largest, fastest drift.
+// Back layers (idx=5): smallest, slowest — appear distant.
+// Approach: project UV onto wind axis → clouds small at entry,
+// large at exit, dissipating as they drift past.
+float cloudLayer(vec2 uv, int idx) {
+  float fi       = float(idx);
+  float driftSpd = uSpeed * (0.08 - fi * 0.010);
+
+  // Drift in wind direction (replaces hardcoded x-only drift)
+  vec2 drift = uWindDir * uTime * driftSpd;
+
+  // Approach: how far along the wind axis is this pixel?
+  // 0 = windward edge (entry, clouds appear small/distant)
+  // 1 = leeward edge  (exit, clouds appear large/close, then dissipate)
+  float windAxis = clamp(dot(uv - 0.5, uWindDir) + 0.5, 0.0, 1.0);
+
+  // Frequency modifier: entry=1.0 (normal), exit=0.45 (2.2x bigger)
+  float approachMod = mix(1.0, 0.45, windAxis * uApproach);
+  // Clouds dissolve at the leeward edge
+  float dissipate = 1.0 - smoothstep(0.78, 0.98, windAxis) * uApproach * 0.82;
+
+  // Higher depthFreq = higher noise frequency = smaller apparent clouds (distance)
+  float depthFreq = 1.55 + fi * 0.55;
+  vec2 p = (uv + drift) * depthFreq * uScale * approachMod;
+  p += vec2(fi * 4.73, fi * 3.17);
+  float cov = max(uCov - fi * 0.025, 0.05);
+  float density = 0.0;
+
+  if (uType == 0) {
+    // Cumulus — big puffy blobs
+    density = cloudDensity(p * vec2(0.88, 1.05), cov);
+  }
+  else if (uType == 1) {
+    // Cirrus — thin horizontal wisps (stretched perpendicular to wind)
+    vec2 windPerp = vec2(-uWindDir.y, uWindDir.x);
+    vec2 cp   = p * (vec2(0.18) + windPerp * windPerp * 5.3);
+    vec2 warp = vec2(fbm(cp * 0.38, 3), 0.0);
+    float d   = fbm(cp + warp * 0.32, 5);
+    density   = smoothstep(1.0 - cov * 0.52, 1.0 - cov * 0.08, d) * 0.55;
+  }
+  else if (uType == 2) {
+    // Stratus — broad flat sheets
+    vec2 sp  = p * vec2(0.48, 2.4);
+    float d  = fbm(sp, 4);
+    density  = smoothstep(1.0 - cov, 1.0 - cov + 0.50, d);
+  }
+  else if (uType == 3) {
+    // Cumulonimbus — massive single mass, dark and heavy
+    float d    = cloudDensity(p * 0.52, cov * 1.08);
+    float xFoc = 1.0 - smoothstep(0.22, 0.58, abs(uv.x - 0.5));
+    density    = d * (0.68 + xFoc * 0.32);
+  }
+  else {
+    // Mixed — foreground = cumulus, background = cirrus wisps
+    if (idx < 3) {
+      density = cloudDensity(p * vec2(0.88, 1.05), cov);
+    } else {
+      vec2 cp   = p * vec2(0.18, 5.5);
+      vec2 warp = vec2(fbm(cp * 0.38, 3), 0.0);
+      float d   = fbm(cp + warp * 0.32, 5);
+      density   = smoothstep(1.0 - cov * 0.52, 1.0 - cov * 0.08, d) * 0.45;
+    }
+  }
+
+  return clamp(density * dissipate, 0.0, 1.0);
+}
+
+// ── Main ───────────────────────────────────────────────────────
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  // Looking straight up — center of frame is zenith, edges are horizon.
+
+  vec3 col = skyCol(uv);
+
+  float dn = dayness();
+  float ss = sunsetness();
+  float dr = dawnness();
+  float nn = nightness();
+
+  // Stars — 3 overlapping jittered layers to break grid regularity.
+  // Each layer: different cell density, random sub-cell position jitter,
+  // and one layer uses a rotated coordinate frame to kill alignment artifacts.
+  if (nn > 0.05) {
+    vec3 stars = vec3(0.0);
+
+    // Layer A: bright sparse stars — wide spacing, tight dot
+    {
+      vec2 suv  = uv * 28.0;
+      vec2 cell = floor(suv);
+      vec2 jit  = vec2(h21(cell + vec2(31.7, 58.3)),
+                       h21(cell + vec2(88.1, 22.7))) - 0.5;
+      vec2 loc  = fract(suv) - 0.5 - jit * 0.72;
+      float r   = h21(cell + vec2(73.1, 15.3));
+      float brt = pow(r, 11.0);
+      float twk = 0.60 + 0.40 * sin(uTime * (0.325 + r * 0.90) + r * 6.28);
+      float pt  = smoothstep(0.055, 0.008, length(loc));  // tight: ~3px on 1080p
+      stars    += brt * twk * pt * vec3(0.90, 0.94, 1.00);
+    }
+
+    // Layer B: faint stars on a 17° rotated grid
+    {
+      float ca = 0.9563, sa = 0.2924;  // cos/sin 17°
+      vec2 rot = vec2(uv.x * ca - uv.y * sa, uv.x * sa + uv.y * ca);
+      vec2 suv  = rot * 55.0;
+      vec2 cell = floor(suv);
+      vec2 jit  = vec2(h21(cell + vec2(44.2, 91.5)),
+                       h21(cell + vec2(17.8, 63.4))) - 0.5;
+      vec2 loc  = fract(suv) - 0.5 - jit * 0.65;
+      float r   = h21(cell + vec2(19.4, 72.1));
+      float brt = pow(r, 18.0) * 0.55;
+      float twk = 0.70 + 0.30 * sin(uTime * (0.175 + r * 0.625) + r * 9.4);
+      float pt  = smoothstep(0.045, 0.006, length(loc));
+      stars    += brt * twk * pt * vec3(0.85, 0.90, 1.00);
+    }
+
+    // Layer C: faint background stars
+    {
+      vec2 suv  = uv * 92.0;
+      vec2 cell = floor(suv);
+      vec2 jit  = vec2(h21(cell + vec2(67.3, 11.9)),
+                       h21(cell + vec2(5.4,  83.7))) - 0.5;
+      vec2 loc  = fract(suv) - 0.5 - jit * 0.55;
+      float r   = h21(cell + vec2(52.8, 39.1));
+      float brt = pow(r, 26.0) * 0.38;
+      float pt  = smoothstep(0.035, 0.004, length(loc));
+      stars    += brt * pt * vec3(0.80, 0.86, 1.00);
+    }
+
+    col += stars * nn;
+  }
+
+  // Sun / moon glow — sweep across the sky plane with time of day
+  vec2 sun  = sunUV();
+  vec2 moon = moonUV();
+
+  float sunDist    = length(uv - sun);
+  vec3  sunGlowCol = mix(vec3(1.0, 0.70, 0.22), vec3(1.0, 0.97, 0.88), dn);
+  col += sunGlowCol * exp(-sunDist * 5.0) * 0.22
+       * (dn * 0.28 + ss * 1.0 + dr * 0.88);
+  col += sunGlowCol * exp(-sunDist * 18.0) * 0.24
+       * (dn * 0.18 + ss * 1.0 + dr * 0.94);
+
+  float moonDist = length(uv - moon);
+  col += vec3(0.84, 0.88, 0.98) * exp(-moonDist * 10.0) * 0.20 * nn;
+
+  // Cloud layers — back to front for occlusion
+  vec3 litCol  = cloudLitCol();
+  vec3 shadCol = cloudShadCol();
+  // Sun direction across sky plane for directional cloud lighting
+  vec2 sunDir  = normalize(sun - 0.5 + vec2(0.001));
+
+  for (int i = 0; i < 6; i++) {
+    if (i >= uLayers) break;
+    float den = cloudLayer(uv, i);
+    if (den < 0.005) continue;
+
+    float fi = float(i);
+
+    // Directional lighting: toward sun = lit, away = shadowed.
+    // Also darken dense centers (self-shadowing).
+    vec2  toSun     = normalize(uv - 0.5 + vec2(0.001));
+    float sunProx   = dot(toSun, sunDir) * 0.5 + 0.5;  // 0=away, 1=toward
+    float selfShad  = 1.0 - den * 0.50;
+    float litFactor = mix(0.20, 1.0, sunProx * selfShad);
+
+    // Back layers slightly cooler/dimmer — depth cue
+    float depthFade = 1.0 - fi * 0.055;
+    vec3 cloudCol   = mix(shadCol, litCol, litFactor) * depthFade;
+
+    // Moon ambient — lifts all clouds at night so they read against the dark sky.
+    // The min litFactor (~0.20) still leaves shadow sides dark, but this floor
+    // prevents clouds from disappearing entirely into the night.
+    float moonAmb = nn * 0.28;
+    cloudCol = max(cloudCol, vec3(moonAmb * 0.65, moonAmb * 0.78, moonAmb * 1.10));
+
+    // Golden-hour rim light on cloud edges
+    float twilight = ss + dr;
+    if (twilight > 0.05) {
+      float rim  = (1.0 - den) * (1.0 - den) * twilight * 0.52;
+      cloudCol  += litCol * rim * 0.68;
+    }
+
+    // Front layers more opaque, back layers more transparent (aerial perspective)
+    // Boost alpha slightly at night — clouds need more density to read against dark sky
+    float alpha = den * (0.74 - fi * 0.06) * (1.0 + nn * 0.30);
+    col = mix(col, cloudCol, min(alpha, 0.92));
+  }
+
+  // Vignette — circular darkening at edges (natural looking-up falloff)
+  vec2 vig = (uv - 0.5) * 1.30;
+  col *= 1.0 - dot(vig, vig) * 0.32;
+  col = clamp(col, 0.0, 1.0);
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+// ─────────────────────────────────────────────────────────────
+// Post-process shader — bloom + halftone
+// ─────────────────────────────────────────────────────────────
+const BLOOM_VS = `
+  attribute vec2 aPos;
+  varying vec2 vUV;
+  void main() { vUV = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }
+`;
+
+const BLOOM_FS = `
+  precision mediump float;
+  varying vec2 vUV;
+  uniform sampler2D uScene;
+  uniform vec2  uTexel;
+  uniform float uBloom;
+  uniform float uHalftone;
+  uniform float uDotSize;
+  uniform int   uHTMode;
+
+  void main() {
+    vec3 sharp = texture2D(uScene, vUV).rgb;
+
+    // Bloom pass 1: tight radius
+    float r1 = uTexel.x * 4.0;
+    vec3 b1 = vec3(0.0);
+    b1 += texture2D(uScene, vUV + vec2( r1,  0.0)).rgb;
+    b1 += texture2D(uScene, vUV + vec2(-r1,  0.0)).rgb;
+    b1 += texture2D(uScene, vUV + vec2( 0.0,  r1)).rgb;
+    b1 += texture2D(uScene, vUV + vec2( 0.0, -r1)).rgb;
+    b1 += texture2D(uScene, vUV + vec2( r1*0.707,  r1*0.707)).rgb;
+    b1 += texture2D(uScene, vUV + vec2(-r1*0.707,  r1*0.707)).rgb;
+    b1 += texture2D(uScene, vUV + vec2( r1*0.707, -r1*0.707)).rgb;
+    b1 += texture2D(uScene, vUV + vec2(-r1*0.707, -r1*0.707)).rgb;
+    b1 /= 8.0;
+
+    // Bloom pass 2: wide radius
+    float r2 = uTexel.x * 22.0;
+    vec3 b2 = vec3(0.0);
+    b2 += texture2D(uScene, vUV + vec2( r2, 0.0)).rgb;
+    b2 += texture2D(uScene, vUV + vec2(-r2, 0.0)).rgb;
+    b2 += texture2D(uScene, vUV + vec2( 0.0,  r2)).rgb;
+    b2 += texture2D(uScene, vUV + vec2( 0.0, -r2)).rgb;
+    b2 /= 4.0;
+
+    vec3 result = sharp
+                + max(b1 - 0.2, vec3(0.0)) * uBloom * 1.5
+                + max(b2 - 0.1, vec3(0.0)) * uBloom * 0.6;
+    result = clamp(result, 0.0, 1.0);
+
+    // Halftone overlay
+    if (uHalftone > 0.01) {
+      float lum = dot(result, vec3(0.299, 0.587, 0.114));
+      lum = clamp(lum, 0.0, 1.0);
+      float mask = 1.0;
+
+      if (uHTMode == 0) {
+        // Halftone dots at 45 degrees
+        float ca = 0.7071; float sa = 0.7071;
+        vec2 fc  = gl_FragCoord.xy;
+        vec2 rot = vec2(fc.x * ca - fc.y * sa, fc.x * sa + fc.y * ca);
+        vec2 cell  = rot / uDotSize;
+        vec2 local = (fract(cell) - 0.5) * 2.0;
+        float dotR = sqrt(lum) * 1.05;
+        mask = step(length(local), dotR);
+
+      } else if (uHTMode == 1) {
+        // Grain dither
+        vec2 dPos = floor(gl_FragCoord.xy / uDotSize);
+        float noise = fract(52.9829189 * fract(dot(dPos, vec2(0.06711056, 0.00583715))));
+        mask = step(noise, lum);
+
+      } else if (uHTMode == 2) {
+        // Scanlines
+        mask = mod(floor(gl_FragCoord.y / uDotSize), 2.0);
+
+      } else {
+        // Crosshatch
+        float ca = 0.7071; float sa = 0.7071;
+        vec2 fc = gl_FragCoord.xy;
+        float d1 = abs(fract((fc.x * ca - fc.y * sa) / uDotSize) - 0.5) * 2.0;
+        float d2 = abs(fract((fc.x * ca + fc.y * sa) / uDotSize) - 0.5) * 2.0;
+        float lw = 0.38;
+        float h1 = step(lw, d1);
+        float h2 = step(lw, d2);
+        if (lum > 0.65) {
+          mask = 1.0;
+        } else if (lum > 0.3) {
+          mask = h1;
+        } else {
+          mask = min(h1, h2);
+        }
+      }
+
+      vec3 htResult = result * mask;
+      result = mix(result, htResult, uHalftone);
+    }
+
+    gl_FragColor = vec4(result, 1.0);
+  }
+`;
+
+// ─────────────────────────────────────────────────────────────
+// Compile / link helpers
+// ─────────────────────────────────────────────────────────────
+function compileShader(src, type) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error('Shader error:', gl.getShaderInfoLog(s));
+    return null;
+  }
+  return s;
+}
+function linkProgram(vsrc, fsrc) {
+  const vs = compileShader(vsrc, gl.VERTEX_SHADER);
+  const fs = compileShader(fsrc, gl.FRAGMENT_SHADER);
+  if (!vs || !fs) return null;
+  const p = gl.createProgram();
+  gl.attachShader(p, vs);
+  gl.attachShader(p, fs);
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+    console.error('Link error:', gl.getProgramInfoLog(p));
+    return null;
+  }
+  return p;
+}
+
+const sceneProg = linkProgram(SCENE_VS, SCENE_FS);
+const bloomProg = linkProgram(BLOOM_VS, BLOOM_FS);
+if (!sceneProg || !bloomProg) throw new Error('Shader compilation failed');
+
+// Fullscreen quad
+const quadBuf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+function bindQuad(prog) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  const loc = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+}
+
+// ─────────────────────────────────────────────────────────────
+// FBO
+// ─────────────────────────────────────────────────────────────
+let fbo, fboTex;
+function createFBO(w, h) {
+  if (fboTex) gl.deleteTexture(fboTex);
+  if (fbo)    gl.deleteFramebuffer(fbo);
+
+  fboTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, fboTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  fbo = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, fboTex, 0);
+
+  const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+  if (status !== gl.FRAMEBUFFER_COMPLETE) {
+    console.error('Framebuffer incomplete:', status);
+  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Uniform locations
+// ─────────────────────────────────────────────────────────────
+function uniLoc(prog, names) {
+  const L = {};
+  names.forEach(n => { L[n] = gl.getUniformLocation(prog, n); });
+  return L;
+}
+
+const sU = uniLoc(sceneProg, [
+  'uRes','uTime','uTod','uSpeed','uCov','uScale','uTurb','uLayers','uType','uWind','uWindDir','uApproach'
+]);
+const bU = uniLoc(bloomProg, [
+  'uScene','uTexel','uBloom','uHalftone','uDotSize','uHTMode'
+]);
+
+// ─────────────────────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────────────────────
+const cfg = {
+  tod: 0.5, speed: 0.35, cov: 0.65, scale: 0.65, turb: 1.05,
+  layers: 3, type: 4, bloom: 0.3, halftone: 0.06, dotsize: 6, htmode: 0,
+  winddir: 21, approach: 0.08
+};
+
+const CFG_KEYS = ['tod','speed','cov','scale','turb','layers','type','bloom','halftone','dotsize','htmode','winddir','approach'];
+const INT_KEYS = new Set(['layers','type','dotsize','htmode']);
+
+// Presets
+const PRESETS = {
+  day:    { tod: 0.50, type: 0 },
+  sunset: { tod: 0.75, type: 0 },
+  dawn:   { tod: 0.25, type: 0 },
+  night:  { tod: 0.02, type: 0 },
+  bluehr: { tod: 0.85, type: 2 },
+  storm:  { tod: 0.52, type: 3 },
+};
+
+// ─────────────────────────────────────────────────────────────
+// Resize
+// ─────────────────────────────────────────────────────────────
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  createFBO(canvas.width, canvas.height);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ─────────────────────────────────────────────────────────────
+// Mouse (wind)
+// ─────────────────────────────────────────────────────────────
+const wind = { x: 0, y: 0, active: false };
+
+// Drag from center → sets wind direction angle
+function setWindFromDrag(x, y) {
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight / 2;
+  const dx =  (x - cx);
+  const dy = -(y - cy); // flip Y: canvas Y increases downward, math Y increases upward
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > 20) {
+    const angle = ((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360;
+    cfg.winddir = Math.round(angle);
+    // update slider display without triggering another syncUIFromCfg loop
+    const sl = document.getElementById('s-winddir');
+    const vl = document.getElementById('v-winddir');
+    if (sl) sl.value = cfg.winddir;
+    if (vl) {
+      const dirs = ['E','NE','N','NW','W','SW','S','SE'];
+      const label = dirs[Math.round(((cfg.winddir + 22.5) % 360) / 45) % 8];
+      vl.textContent = cfg.winddir + '° ' + label;
+    }
+  }
+}
+
+canvas.addEventListener('mousemove', e => {
+  if (wind.active) setWindFromDrag(e.clientX, e.clientY);
+});
+canvas.addEventListener('mousedown', e => {
+  wind.active = true;
+  setWindFromDrag(e.clientX, e.clientY);
+});
+canvas.addEventListener('mouseup', () => { wind.active = false; });
+canvas.addEventListener('mouseleave', () => { wind.active = false; });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  setWindFromDrag(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
+canvas.addEventListener('touchstart', e => {
+  wind.active = true;
+  setWindFromDrag(e.touches[0].clientX, e.touches[0].clientY);
+});
+canvas.addEventListener('touchend', () => { wind.active = false; });
+
+// ─────────────────────────────────────────────────────────────
+// Render loop
+// ─────────────────────────────────────────────────────────────
+const t0 = performance.now();
+let lastNow = t0;
+
+function render(now) {
+  requestAnimationFrame(render);
+  const dt = Math.min((now - lastNow) / 1000, 0.05);
+  lastNow  = now;
+  const t  = (now - t0) / 1000;
+
+  // Pass 1: scene → FBO
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.useProgram(sceneProg);
+  bindQuad(sceneProg);
+
+  if (sU.uRes)    gl.uniform2f(sU.uRes,    canvas.width, canvas.height);
+  if (sU.uTime)   gl.uniform1f(sU.uTime,   t);
+  if (sU.uTod)    gl.uniform1f(sU.uTod,    cfg.tod);
+  if (sU.uSpeed)  gl.uniform1f(sU.uSpeed,  cfg.speed);
+  if (sU.uCov)    gl.uniform1f(sU.uCov,    cfg.cov);
+  // Invert scale so higher value = bigger clouds (lower noise frequency)
+  if (sU.uScale)  gl.uniform1f(sU.uScale,  1.0 / Math.max(cfg.scale, 0.05));
+  if (sU.uTurb)   gl.uniform1f(sU.uTurb,   cfg.turb);
+  if (sU.uLayers) gl.uniform1i(sU.uLayers, cfg.layers);
+  if (sU.uType)   gl.uniform1i(sU.uType,   cfg.type);
+  if (sU.uWind)   gl.uniform2f(sU.uWind,   wind.x, wind.y);
+  const wRad = cfg.winddir * Math.PI / 180;
+  if (sU.uWindDir)  gl.uniform2f(sU.uWindDir,  Math.cos(wRad), Math.sin(wRad));
+  if (sU.uApproach) gl.uniform1f(sU.uApproach, cfg.approach);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Pass 2: bloom + halftone → screen
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.useProgram(bloomProg);
+  bindQuad(bloomProg);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, fboTex);
+
+  if (bU.uScene)    gl.uniform1i(bU.uScene,    0);
+  if (bU.uTexel)    gl.uniform2f(bU.uTexel,    1.0 / canvas.width, 1.0 / canvas.height);
+  if (bU.uBloom)    gl.uniform1f(bU.uBloom,    cfg.bloom);
+  if (bU.uHalftone) gl.uniform1f(bU.uHalftone, cfg.halftone);
+  if (bU.uDotSize)  gl.uniform1f(bU.uDotSize,  cfg.dotsize);
+  if (bU.uHTMode)   gl.uniform1i(bU.uHTMode,   cfg.htmode);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+requestAnimationFrame(render);
+
+// ─────────────────────────────────────────────────────────────
+// Settings UI
+// ─────────────────────────────────────────────────────────────
+const panel     = document.getElementById('panel');
+const toggleBtn = document.getElementById('toggle-btn');
+
+function openPanel()  { panel.classList.add('open'); }
+function closePanel() { panel.classList.remove('open'); }
+function togglePanel(){ panel.classList.toggle('open'); }
+
+toggleBtn.addEventListener('click', togglePanel);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 's' || e.key === 'S') togglePanel();
+  if (e.key === 'Escape') closePanel();
+});
+
+// Bind a range slider
+function bindRange(id, key, parse, dec) {
+  const sl = document.getElementById('s-' + id);
+  const vl = document.getElementById('v-' + id);
+  if (!sl) return;
+  sl.addEventListener('input', () => {
+    const val = parse ? parse(sl.value) : parseFloat(sl.value);
+    cfg[key] = val;
+    if (vl) vl.textContent = dec != null ? val.toFixed(dec) : String(val);
+  });
+}
+
+bindRange('tod',      'tod',      null,     2);
+bindRange('cov',      'cov',      null,     2);
+bindRange('scale',    'scale',    null,     2);
+bindRange('turb',     'turb',     null,     2);
+bindRange('layers',   'layers',   parseInt, 0);
+bindRange('speed',    'speed',    null,     2);
+bindRange('approach', 'approach', null,     2);
+bindRange('bloom',    'bloom',    null,     2);
+bindRange('halftone', 'halftone', null,     2);
+bindRange('dotsize',  'dotsize',  parseInt, 0);
+
+// Direction slider — display as degrees with compass hint
+(function() {
+  const sl = document.getElementById('s-winddir');
+  const vl = document.getElementById('v-winddir');
+  if (!sl) return;
+  function compassLabel(deg) {
+    const dirs = ['E','NE','N','NW','W','SW','S','SE'];
+    return dirs[Math.round(((deg + 22.5) % 360) / 45) % 8];
+  }
+  sl.addEventListener('input', () => {
+    cfg.winddir = parseInt(sl.value);
+    if (vl) vl.textContent = cfg.winddir + '° ' + compassLabel(cfg.winddir);
+  });
+  sl.dispatchEvent(new Event('input')); // init display
+})();
+
+document.getElementById('s-type').addEventListener('change', e => {
+  cfg.type = parseInt(e.target.value);
+});
+document.getElementById('s-htmode').addEventListener('change', e => {
+  cfg.htmode = parseInt(e.target.value);
+});
+
+// Presets
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = PRESETS[btn.dataset.preset];
+    if (!p) return;
+    Object.assign(cfg, p);
+    syncUIFromCfg();
+  });
+});
+
+// Dice button
+document.getElementById('dice-btn').addEventListener('click', () => {
+  const r  = (a, b) => a + Math.random() * (b - a);
+  const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  cfg.tod      = r(0, 1);
+  cfg.speed    = r(0, 2.0);
+  cfg.cov      = r(0.10, 0.95);
+  cfg.scale    = r(0.3, 3.0);
+  cfg.turb     = r(0, 1.5);
+  cfg.layers   = ri(1, 4);
+  cfg.type     = ri(0, 4);
+  cfg.bloom    = r(0, 2.0);
+  cfg.halftone = r(0, 1.0);
+  cfg.dotsize  = ri(2, 24);
+  cfg.htmode   = ri(0, 3);
+  cfg.winddir  = ri(0, 359);
+  cfg.approach = r(0, 0.8);
+  syncUIFromCfg();
+});
+
+// Share button
+document.getElementById('share-btn').addEventListener('click', () => {
+  const url = encodeURL();
+  const btn = document.getElementById('share-btn');
+  const reset = () => { btn.textContent = '\u21E7 share settings'; };
+  const copied = () => { btn.textContent = '\u2713 copied!'; setTimeout(reset, 1800); };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(copied).catch(() => { prompt('Copy this link:', url); });
+  } else {
+    const ta = Object.assign(document.createElement('textarea'), { value: url, style: 'position:fixed;opacity:0' });
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    copied();
+  }
+});
+
+// Sync UI controls from cfg object
+function syncUIFromCfg() {
+  ['tod','cov','scale','turb','layers','speed','approach','bloom','halftone','dotsize','winddir'].forEach(id => {
+    const sl = document.getElementById('s-' + id);
+    if (sl) { sl.value = cfg[id]; sl.dispatchEvent(new Event('input')); }
+  });
+  const sType = document.getElementById('s-type');
+  if (sType) { sType.value = cfg.type; sType.dispatchEvent(new Event('change')); }
+  const sHTMode = document.getElementById('s-htmode');
+  if (sHTMode) { sHTMode.value = cfg.htmode; sHTMode.dispatchEvent(new Event('change')); }
+}
+
+// ─────────────────────────────────────────────────────────────
+// URL sharing
+// ─────────────────────────────────────────────────────────────
+function encodeURL() {
+  const p = new URLSearchParams();
+  CFG_KEYS.forEach(k => p.set(k, cfg[k]));
+  return location.origin + location.pathname + '#' + p.toString();
+}
+
+function loadFromURL() {
+  if (!location.hash || location.hash.length < 2) return;
+  const p = new URLSearchParams(location.hash.slice(1));
+  CFG_KEYS.forEach(k => {
+    if (p.has(k)) cfg[k] = INT_KEYS.has(k) ? parseInt(p.get(k)) : parseFloat(p.get(k));
+  });
+}
+
+// Hide UI when ?ui=0 is in URL
+function checkHideUI() {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const qs   = new URLSearchParams(location.search);
+  if (hash.get('ui') === '0' || qs.get('ui') === '0') {
+    document.getElementById('ui').style.display   = 'none';
+    document.getElementById('hint').style.display = 'none';
+  }
+}
+
+// Apply URL state
+loadFromURL();
+syncUIFromCfg();
+checkHideUI();
+</script>
+</body>
+</html>
