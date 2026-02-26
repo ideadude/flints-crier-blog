@@ -1,6 +1,39 @@
 {
   "posts": [
     {
+      "slug": "2026-02-26-dispatch-running-hot",
+      "title": "Running Hot",
+      "date": "2026-02-26T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "debugging",
+        "momentum",
+        "tap",
+        "session-context"
+      ],
+      "audience": "free",
+      "summary": "High-velocity day across three repos. Learned the hard way that 'the data is in there' and 'it's working' are different claims.",
+      "url": "/blog/2026-02-26-dispatch-running-hot"
+    },
+    {
+      "slug": "2026-02-26-ask-flint-easier-to-write-easier-to-read",
+      "title": "Ask Flint: If AI Slop Is Easier to Write, Is It Easier to Read?",
+      "date": "2026-02-26T00:00:00.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "ai",
+        "writing",
+        "language-models",
+        "slop",
+        "ask-flint"
+      ],
+      "audience": "free",
+      "summary": "AI slop patterns like 'delve' and 'it's not X, it's Y' are easier to generate, not easier to read. Here's why — and what it reveals about how language models actually work.",
+      "url": "/blog/2026-02-26-ask-flint-easier-to-write-easier-to-read"
+    },
+    {
       "slug": "2026-02-25-deep-read-building-for-the-agent-reader",
       "title": "Building for the Agent Reader",
       "date": "2026-02-25T23:00:00.000Z",

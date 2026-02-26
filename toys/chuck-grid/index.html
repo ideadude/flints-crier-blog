@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>chuck grid</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #f5f0e8; overflow: hidden; font-family: 'Courier New', monospace; }
+canvas { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+
+#ui {
+  position: fixed; top: 0; right: 0;
+  font-size: 11px; z-index: 10; user-select: none;
+}
+#toggle-btn {
+  display: block; padding: 7px 12px;
+  background: rgba(245,240,232,0.92);
+  border: 1px solid rgba(60,40,20,0.25);
+  border-top: none; border-right: none;
+  color: #5a4020; cursor: pointer; letter-spacing: 0.12em;
+  font-family: inherit; font-size: inherit;
+}
+#toggle-btn:hover { color: #1a0a00; border-color: rgba(60,40,20,0.5); }
+#panel {
+  display: none; background: rgba(245,240,232,0.96);
+  border-left: 1px solid rgba(60,40,20,0.2);
+  border-bottom: 1px solid rgba(60,40,20,0.2);
+  padding: 14px 15px; width: 205px;
+  max-height: calc(100vh - 32px); overflow-y: auto;
+}
+#panel.open { display: block; }
+.section-title {
+  color: #3a2010; letter-spacing: 0.18em; font-size: 10px;
+  margin-bottom: 14px; text-transform: uppercase; opacity: 0.7;
+}
+.row { margin-bottom: 12px; }
+.lbl { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.lbl-text { color: #5a4020; letter-spacing: 0.07em; }
+.lbl-val  { color: #3a2010; }
+input[type=range] { width: 100%; accent-color: #5a3010; cursor: pointer; }
+select {
+  width: 100%; background: rgba(245,240,232,0.98); color: #3a2010;
+  border: 1px solid rgba(60,40,20,0.3);
+  font-family: 'Courier New', monospace; font-size: 11px; padding: 4px 3px; margin-top: 3px;
+}
+hr.div { border: none; border-top: 1px solid rgba(60,40,20,0.15); margin: 12px 0; }
+#dice-btn {
+  float: right; background: none; border: none; color: #8a6040;
+  cursor: pointer; font-size: 14px; padding: 0; line-height: 1;
+}
+#dice-btn:hover { color: #1a0a00; }
+#hint {
+  position: fixed; bottom: 12px; left: 14px;
+  font-family: 'Courier New', monospace; font-size: 10px;
+  color: rgba(60,40,20,0.38); pointer-events: none; letter-spacing: 0.06em;
+  z-index: 10;
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="ui">
+  <button id="toggle-btn">⚙ settings</button>
+  <div id="panel">
+    <div class="section-title">chuck grid <button id="dice-btn" title="Randomize">🎲</button></div>
+
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">ERA / MARK</span></div>
+      <select id="s-era">
+        <option value="dots">early · fingerprint dots</option>
+        <option value="rings">mid · concentric rings</option>
+        <option value="diamonds">late · diamond grid</option>
+        <option value="cross">cross + circle fill</option>
+        <option value="mosaic">mosaic squares</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">GRID SIZE</span><span class="lbl-val" id="v-grid">18</span></div>
+      <input type="range" id="s-grid" min="6" max="48" value="18" step="1">
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">MARK SCALE</span><span class="lbl-val" id="v-mark">0.82</span></div>
+      <input type="range" id="s-mark" min="0.3" max="1.2" value="0.82" step="0.01">
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">CONTRAST</span><span class="lbl-val" id="v-contrast">1.40</span></div>
+      <input type="range" id="s-contrast" min="0.5" max="3.0" value="1.4" step="0.05">
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">PALETTE</span></div>
+      <select id="s-palette">
+        <option value="grayscale">grayscale (B&amp;W era)</option>
+        <option value="warm">warm paper</option>
+        <option value="color">color grid (late era)</option>
+        <option value="ink">blue ink</option>
+        <option value="sepia">sepia / daguerreotype</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">FACE SEED</span><span class="lbl-val" id="v-seed">42</span></div>
+      <input type="range" id="s-seed" min="1" max="99" value="42" step="1">
+    </div>
+    <hr class="div">
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">ANIMATE</span><span class="lbl-val" id="v-anim">off</span></div>
+      <input type="range" id="s-anim" min="0" max="1" value="0" step="1">
+    </div>
+    <div class="row">
+      <div class="lbl"><span class="lbl-text">JITTER</span><span class="lbl-val" id="v-jitter">0.12</span></div>
+      <input type="range" id="s-jitter" min="0" max="0.5" value="0.12" step="0.01">
+    </div>
+  </div>
+</div>
+
+<div id="hint">chuck close · photorealist grid portrait · drag to reveal</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// ── Settings ──────────────────────────────────────────────────
+let cfg = {
+  era: 'dots',
+  grid: 18,
+  mark: 0.82,
+  contrast: 1.4,
+  palette: 'grayscale',
+  seed: 42,
+  anim: 0,
+  jitter: 0.12,
+};
+
+// ── Palettes ──────────────────────────────────────────────────
+const PALETTES = {
+  grayscale: { bg: '#f5f5f5', fg: (v) => `rgb(${i(v)},${i(v)},${i(v)})`, paper: '#f5f5f5' },
+  warm:      { bg: '#f5f0e8', fg: (v) => `rgb(${i(v*0.82+0.18*0.6*255/255)},${i(v*0.78+0.22*0.45*255/255)},${i(v*0.65+0.35*0.3*255/255)})`, paper: '#f5f0e8' },
+  color:     { bg: '#fafaf8', fg: null, paper: '#fafaf8' }, // special: per-cell hue
+  ink:       { bg: '#f2f4f8', fg: (v) => `rgb(${i((1-v)*0.18*255)},${i((1-v)*0.25*255)},${i((1-v)*0.82*255+v*200)})`, paper: '#f2f4f8' },
+  sepia:     { bg: '#f4ede0', fg: (v) => `rgb(${i(v*0.85+0.15*120/255*255)},${i(v*0.75+0.25*80/255*255)},${i(v*0.55+0.45*40/255*255)})`, paper: '#f4ede0' },
+};
+
+function i(v) { return Math.round(Math.max(0,Math.min(255, v < 1 ? v * 255 : v))); }
+
+// ── Noise / RNG ───────────────────────────────────────────────
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Smooth noise via bilinear interp over random grid
+function makeNoise(seed, size) {
+  const rng = mulberry32(seed * 1337 + 17);
+  const n = size + 3;
+  const g = new Float32Array(n * n);
+  for (let i = 0; i < g.length; i++) g[i] = rng();
+  return (x, y) => {
+    x = Math.max(0, Math.min(n - 1.001, x));
+    y = Math.max(0, Math.min(n - 1.001, y));
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const xf = x - xi, yf = y - yi;
+    const a = g[yi * n + xi], b = g[yi * n + xi + 1];
+    const c = g[(yi+1)*n+xi], d = g[(yi+1)*n+xi+1];
+    return a*(1-xf)*(1-yf) + b*xf*(1-yf) + c*(1-xf)*yf + d*xf*yf;
+  };
+}
+
+// ── Portrait SDF / luminance ──────────────────────────────────
+// Generates a stylized face luminance field (0=dark, 1=light)
+// Uses multiple noise octaves + SDF ellipses for head/eyes/nose/mouth
+function makeFace(seed) {
+  const rng = mulberry32(seed * 997 + 3);
+  // Randomize face proportions slightly per seed
+  const eyeY    = 0.38 + (rng()-0.5)*0.06;
+  const eyeSep  = 0.14 + (rng()-0.5)*0.04;
+  const noseY   = 0.58 + (rng()-0.5)*0.05;
+  const mouthY  = 0.72 + (rng()-0.5)*0.05;
+  const chinY   = 0.88 + (rng()-0.5)*0.04;
+  const headW   = 0.30 + (rng()-0.5)*0.04;
+  const headH   = 0.42 + (rng()-0.5)*0.04;
+
+  // Skin texture noise layers
+  const n1 = makeNoise(seed, 8);
+  const n2 = makeNoise(seed + 1, 14);
+  const n3 = makeNoise(seed + 2, 22);
+
+  return (nx, ny) => {
+    // nx, ny in [0,1] — normalized canvas coords, y-flipped to face-natural
+    const cx = 0.5, cy = 0.5;
+    const dx = nx - cx, dy = ny - cy;
+
+    // Head ellipse SDF
+    const headSDF = Math.sqrt((dx/headW)**2 + (dy/headH)**2);
+    if (headSDF > 1.0) {
+      // Outside head — paper background
+      return 0.92 + n1(nx*4, ny*4)*0.05;
+    }
+
+    // Soft head edge darkening
+    const edgeDark = Math.pow(Math.max(0, headSDF - 0.75) / 0.25, 1.5) * 0.6;
+
+    // Skin base value (medium-light)
+    let lum = 0.72;
+
+    // Macro skin texture: multiple octaves
+    lum += (n1(nx*6, ny*6) - 0.5) * 0.12;
+    lum += (n2(nx*12, ny*12) - 0.5) * 0.07;
+    lum += (n3(nx*20, ny*20) - 0.5) * 0.04;
+
+    // Forehead highlight
+    lum += Math.max(0, 0.25 - Math.abs(nx - 0.5) * 2) * Math.max(0, 0.28 - Math.abs(ny - 0.28)) * 1.8;
+
+    // Cheek highlights
+    lum += Math.exp(-((dx-0.13)**2 + (dy-0.05)**2) / 0.006) * 0.18;
+    lum += Math.exp(-((dx+0.13)**2 + (dy-0.05)**2) / 0.006) * 0.18;
+
+    // ── Eyes ──
+    const eyeR = 0.035;
+    const lEye = Math.sqrt((dx - eyeSep)**2 + (dy - (eyeY-0.5))**2);
+    const rEye = Math.sqrt((dx + eyeSep)**2 + (dy - (eyeY-0.5))**2);
+    const eyeDark = Math.exp(-Math.min(lEye, rEye)**2 / (eyeR**2)) * 0.9;
+
+    // Eye socket shadow
+    const lSocket = Math.exp(-((dx-eyeSep)**2 / 0.008 + (dy-(eyeY-0.5))**2 / 0.004)) * 0.35;
+    const rSocket = Math.exp(-((dx+eyeSep)**2 / 0.008 + (dy-(eyeY-0.5))**2 / 0.004)) * 0.35;
+    lum -= lSocket + rSocket;
+
+    // Iris highlight
+    const irisHi = Math.exp(-((dx-eyeSep+0.01)**2 + (dy-(eyeY-0.51))**2) / 0.0003) * 0.7;
+
+    // ── Nose ──
+    const noseCY = noseY - 0.5;
+    const noseShad = Math.exp(-((dx-0.04)**2 + (dy-noseCY)**2) / 0.003) * 0.45;
+    const nostril = Math.exp(-((dx-0.05)**2 + (dy-noseCY-0.04)**2) / 0.0008) * 0.6
+                  + Math.exp(-((dx+0.05)**2 + (dy-noseCY-0.04)**2) / 0.0008) * 0.6;
+
+    // ── Mouth ──
+    const mCY = mouthY - 0.5;
+    const lipDark = Math.exp(-(dy-mCY)**2 / 0.0006) * Math.max(0, 0.12 - Math.abs(dx)*0.8) * 5.0 * 0.6;
+    const lipShad = Math.exp(-((dy-mCY-0.025)**2) / 0.002) * Math.max(0, 0.15-Math.abs(dx)) * 2.0 * 0.25;
+
+    // ── Chin / jaw shadow ──
+    const jawDark = Math.max(0, ny - (0.5 + headH*0.72)) / (headH*0.28) * 0.35;
+
+    // ── Hair (top) ──
+    const hairSDF = Math.sqrt((dx/(headW*0.95))**2 + ((dy+headH*0.65)/(headH*0.55))**2);
+    const hair = hairSDF < 1.0 ? Math.max(0, 1 - hairSDF) * 0.55 + n1(nx*5,ny*5)*0.1 : 0;
+
+    lum -= eyeDark + noseShad*0.7 + nostril*0.5 + lipDark + lipShad + jawDark + edgeDark;
+    lum += irisHi;
+    lum -= hair;
+    lum = Math.max(0.02, Math.min(0.98, lum));
+
+    return lum;
+  };
+}
+
+// ── Draw Mark ─────────────────────────────────────────────────
+function drawMark(ctx, era, cx, cy, cellW, cellH, lum, palette, seed, time, jitter, rng) {
+  const r = Math.min(cellW, cellH) * 0.5 * cfg.mark;
+  const jx = (rng() - 0.5) * cellW * jitter;
+  const jy = (rng() - 0.5) * cellH * jitter;
+  const x = cx + jx, y = cy + jy;
+
+  // Determine ink color
+  let fillColor, strokeColor;
+  if (palette === 'color') {
+    // Late-era Close: each cell gets its own hue, luminance drives saturation/lightness
+    const hue = (seed * 137 + Math.floor(cx * 10) * 31 + Math.floor(cy * 10) * 17) % 360;
+    const sat = Math.round(30 + (1-lum) * 60);
+    const lit = Math.round(20 + lum * 60);
+    fillColor = `hsl(${hue},${sat}%,${lit}%)`;
+    strokeColor = `hsl(${hue},${sat}%,${Math.max(10,lit-20)}%)`;
+  } else {
+    const pal = PALETTES[palette];
+    const v = 1 - lum; // flip: dark lum = dark ink
+    fillColor = pal.fg(v);
+    strokeColor = pal.fg(Math.min(1, v * 1.3));
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  switch (era) {
+    case 'dots': {
+      // Early Close: varying-size circular dots (fingerprint / mezzotint feel)
+      const radius = r * (0.2 + lum * 0.0 + (1-lum) * 0.9); // dark = large dot
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(0.5, radius * 0.88), 0, Math.PI * 2);
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      break;
+    }
+
+    case 'rings': {
+      // Mid Close: concentric rings, ring count/density encodes value
+      const rings = Math.max(1, Math.round(2 + (1-lum) * 5));
+      const maxR = r * 0.95;
+      for (let ri = rings; ri >= 1; ri--) {
+        const pr = (ri / rings) * maxR;
+        const thick = maxR / rings * (0.35 + (1-lum) * 0.5);
+        ctx.beginPath();
+        ctx.arc(0, 0, pr, 0, Math.PI * 2);
+        ctx.strokeStyle = fillColor;
+        ctx.lineWidth = thick;
+        ctx.stroke();
+      }
+      break;
+    }
+
+    case 'diamonds': {
+      // Late Close: diamond / lozenge shapes, filled per luminance
+      const s = r * 0.92;
+      ctx.rotate(Math.PI / 4);
+      ctx.beginPath();
+      ctx.rect(-s * 0.7, -s * 0.7, s * 1.4, s * 1.4);
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      // Inner diamond for highlight cells
+      if (lum > 0.5) {
+        const inner = s * (lum - 0.5) * 1.2;
+        ctx.fillStyle = palette === 'color' ? 'rgba(255,255,255,0.4)' : PALETTES[palette].bg || '#f5f0e8';
+        ctx.beginPath();
+        ctx.rect(-inner*0.7, -inner*0.7, inner*1.4, inner*1.4);
+        ctx.fill();
+      }
+      break;
+    }
+
+    case 'cross': {
+      // Cross hatching + center circle — encodes value in cross arm width + circle fill
+      const armW = r * (0.15 + (1-lum) * 0.35);
+      const circR = r * (0.25 + (1-lum) * 0.4);
+      // Cross arms
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(-r * 0.9, -armW * 0.5, r * 1.8, armW);
+      ctx.fillRect(-armW * 0.5, -r * 0.9, armW, r * 1.8);
+      // Center circle
+      ctx.beginPath();
+      ctx.arc(0, 0, circR, 0, Math.PI * 2);
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      break;
+    }
+
+    case 'mosaic': {
+      // Flat mosaic squares: pure value encoding, Close-like late works
+      const sq = r * 1.82;
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(-sq*0.5, -sq*0.5, sq, sq);
+      // Thin grid line
+      ctx.strokeStyle = PALETTES[palette]?.bg || '#f5f0e8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-sq*0.5, -sq*0.5, sq, sq);
+      break;
+    }
+  }
+
+  ctx.restore();
+}
+
+// ── Main render ───────────────────────────────────────────────
+let faceData = null;
+let lastSeed = -1;
+let t = 0;
+let animating = false;
+let rafId = null;
+let isDragging = false;
+let revealX = -1, revealY = -1, revealR = 0;
+
+function buildFace() {
+  if (cfg.seed !== lastSeed) {
+    faceData = makeFace(cfg.seed);
+    lastSeed = cfg.seed;
+  }
+}
+
+function applyContrast(v, contrast) {
+  // S-curve contrast
+  v = (v - 0.5) * contrast + 0.5;
+  return Math.max(0, Math.min(1, v));
+}
+
+function render(time) {
+  const W = canvas.width, H = canvas.height;
+  const pal = PALETTES[cfg.palette];
+  ctx.fillStyle = pal.paper || '#f5f0e8';
+  ctx.fillRect(0, 0, W, H);
+
+  buildFace();
+
+  const cellW = W / cfg.grid;
+  const cellH = H / cfg.grid;
+  // Keep cells square based on smaller dimension
+  const cell = Math.min(cellW, cellH);
+  const cols = Math.ceil(W / cell);
+  const rows = Math.ceil(H / cell);
+
+  // Per-render seeded RNG for jitter (consistent but different per frame if animating)
+  const frameSeed = cfg.anim ? Math.floor(time / 80) : 0;
+  let rng = mulberry32(cfg.seed * 999 + frameSeed + 1);
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const cx = (col + 0.5) * cell;
+      const cy = (row + 0.5) * cell;
+
+      // Normalized coords for face sampling
+      const nx = cx / W;
+      const ny = cy / H;
+
+      let lum = faceData(nx, ny);
+      lum = applyContrast(lum, cfg.contrast);
+
+      // Animate: subtle breathing / drift
+      if (cfg.anim) {
+        const pulse = Math.sin(time * 0.0008 + col * 0.15 + row * 0.13) * 0.04;
+        lum = applyContrast(lum + pulse, 1.0);
+      }
+
+      drawMark(ctx, cfg.era, cx, cy, cell, cell, lum, cfg.palette, cfg.seed + col*7 + row*13, time, cfg.jitter, rng);
+    }
+  }
+
+  // Draw grid overlay (faint, like Close's ruled canvas lines)
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  for (let col = 0; col <= cols; col++) {
+    ctx.beginPath(); ctx.moveTo(col*cell, 0); ctx.lineTo(col*cell, H); ctx.stroke();
+  }
+  for (let row = 0; row <= rows; row++) {
+    ctx.beginPath(); ctx.moveTo(0, row*cell); ctx.lineTo(W, row*cell); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ── Resize ────────────────────────────────────────────────────
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  scheduleRender();
+}
+
+// ── Animation loop ────────────────────────────────────────────
+let dirty = true;
+let lastT = 0;
+
+function loop(ts) {
+  if (cfg.anim || dirty) {
+    render(ts);
+    dirty = false;
+    lastT = ts;
+  }
+  rafId = requestAnimationFrame(loop);
+}
+
+function scheduleRender() { dirty = true; }
+
+// ── Controls ──────────────────────────────────────────────────
+const toggleBtn = document.getElementById('toggle-btn');
+const panel = document.getElementById('panel');
+toggleBtn.addEventListener('click', () => { panel.classList.toggle('open'); });
+
+function bindRange(id, key, valId, fmt) {
+  const el = document.getElementById(id);
+  const vl = document.getElementById(valId);
+  el.addEventListener('input', () => {
+    cfg[key] = fmt === 'int' ? parseInt(el.value) : parseFloat(el.value);
+    if (vl) vl.textContent = fmt === 'int' ? el.value : parseFloat(el.value).toFixed(2);
+    lastSeed = -1; // force face rebuild if needed
+    scheduleRender();
+  });
+}
+function bindSelect(id, key) {
+  const el = document.getElementById(id);
+  el.addEventListener('change', () => { cfg[key] = el.value; scheduleRender(); });
+}
+
+bindRange('s-grid',     'grid',     'v-grid',     'int');
+bindRange('s-mark',     'mark',     'v-mark',     'float');
+bindRange('s-contrast', 'contrast', 'v-contrast', 'float');
+bindRange('s-seed',     'seed',     'v-seed',     'int');
+bindRange('s-jitter',   'jitter',   'v-jitter',   'float');
+bindRange('s-anim',     'anim',     'v-anim',     'int');
+bindSelect('s-era',     'era');
+bindSelect('s-palette', 'palette');
+
+// Display anim as on/off
+document.getElementById('s-anim').addEventListener('input', function() {
+  document.getElementById('v-anim').textContent = this.value === '1' ? 'on' : 'off';
+});
+
+// Dice
+document.getElementById('dice-btn').addEventListener('click', () => {
+  const eras = ['dots','rings','diamonds','cross','mosaic'];
+  const pals = ['grayscale','warm','color','ink','sepia'];
+  cfg.era = eras[Math.floor(Math.random()*eras.length)];
+  cfg.palette = pals[Math.floor(Math.random()*pals.length)];
+  cfg.grid = 8 + Math.floor(Math.random() * 32);
+  cfg.mark = 0.5 + Math.random() * 0.6;
+  cfg.contrast = 0.8 + Math.random() * 1.8;
+  cfg.seed = 1 + Math.floor(Math.random() * 99);
+  cfg.jitter = Math.random() * 0.35;
+
+  document.getElementById('s-era').value = cfg.era;
+  document.getElementById('s-palette').value = cfg.palette;
+  document.getElementById('s-grid').value = cfg.grid;
+  document.getElementById('s-mark').value = cfg.mark;
+  document.getElementById('s-contrast').value = cfg.contrast;
+  document.getElementById('s-seed').value = cfg.seed;
+  document.getElementById('s-jitter').value = cfg.jitter;
+
+  document.getElementById('v-grid').textContent = cfg.grid;
+  document.getElementById('v-mark').textContent = cfg.mark.toFixed(2);
+  document.getElementById('v-contrast').textContent = cfg.contrast.toFixed(2);
+  document.getElementById('v-seed').textContent = cfg.seed;
+  document.getElementById('v-jitter').textContent = cfg.jitter.toFixed(2);
+
+  lastSeed = -1;
+  scheduleRender();
+});
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('resize', resize);
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
