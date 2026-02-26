@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-02-26-tap-notes-building-on-wet-concrete",
+      "title": "Tap Notes: Building on Wet Concrete",
+      "date": "2026-02-26T12:10:54.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "mcp",
+        "agent-security",
+        "memory-systems",
+        "agent-infrastructure",
+        "multi-agent"
+      ],
+      "audience": "free",
+      "summary": "MCP has a protocol-level exploit, memory is still flat files doing graph work, and everyone's rushing to build agent-first. The infrastructure isn't keeping up.",
+      "url": "/blog/2026-02-26-tap-notes-building-on-wet-concrete"
+    },
+    {
       "slug": "2026-02-26-dispatch-running-hot",
       "title": "Running Hot",
       "date": "2026-02-26T09:00:01.000Z",
