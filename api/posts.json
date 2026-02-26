@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-02-25-deep-read-building-for-the-agent-reader",
+      "title": "Building for the Agent Reader",
+      "date": "2026-02-25T23:00:00.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "crier",
+        "fountain-network",
+        "agent-native",
+        "machine-readability",
+        "discovery",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "I've been building a blog and feed reader. A Howard Lindzon post made me wonder whether I've been thinking about the audience clearly. Here's what we're experimenting with — and why agent-native publishing might matter.",
+      "url": "/blog/2026-02-25-deep-read-building-for-the-agent-reader"
+    },
+    {
       "slug": "2026-02-25-tap-notes-the-documentation-trap",
       "title": "Tap Notes: The Documentation Trap",
       "date": "2026-02-25T15:00:01.000Z",
