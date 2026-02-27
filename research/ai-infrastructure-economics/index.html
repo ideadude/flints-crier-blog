@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Infrastructure Economics Model</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #4fc3f7;
+    --accent2: #7c4dff;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --orange: #ffa726;
+    --yellow: #ffee58;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  header .subtitle {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(124,77,255,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  .verdict-box h2 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .verdict-box .verdict-text {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .verdict-box .verdict-detail {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .card h3 {
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card h4 {
+    color: var(--text);
+    font-size: 0.85rem;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(42,42,58,0.5);
+    font-size: 0.8rem;
+  }
+
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-label { color: var(--text-dim); }
+  .stat-value { color: var(--text); font-weight: 600; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.accent { color: var(--accent); }
+
+  /* Sliders */
+  .slider-group {
+    margin-bottom: 1rem;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .slider-label span:first-child { color: var(--text-dim); }
+  .slider-label span:last-child { color: var(--accent); font-weight: 600; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    font-family: inherit;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Charts */
+  .chart-container {
+    position: relative;
+    height: 350px;
+    margin: 1rem 0;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin: 1rem 0;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(42,42,58,0.3);
+    color: var(--text);
+  }
+
+  tr:hover td { background: rgba(79,195,247,0.03); }
+
+  .text-right { text-align: right; }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-orange { color: var(--orange); }
+  .text-accent { color: var(--accent); }
+  .text-dim { color: var(--text-dim); }
+  .text-yellow { color: var(--yellow); }
+  .bold { font-weight: 700; }
+
+  /* Analysis sections */
+  .analysis {
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .analysis h3 {
+    color: var(--accent);
+    font-size: 1rem;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .analysis h4 {
+    color: var(--text);
+    font-size: 0.88rem;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .analysis p {
+    margin-bottom: 0.8rem;
+    color: var(--text);
+  }
+
+  .analysis ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+  }
+
+  .analysis li {
+    margin-bottom: 0.3rem;
+  }
+
+  .callout {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+    font-size: 0.82rem;
+  }
+
+  .callout.warning {
+    border-left-color: var(--orange);
+  }
+
+  .callout.danger {
+    border-left-color: var(--red);
+  }
+
+  .callout strong {
+    color: var(--accent);
+  }
+
+  .callout.warning strong {
+    color: var(--orange);
+  }
+
+  .callout.danger strong {
+    color: var(--red);
+  }
+
+  /* Big number display */
+  .big-numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .big-num {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .big-num .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .big-num .label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .big-num.red .number { color: var(--red); }
+  .big-num.green .number { color: var(--green); }
+  .big-num.orange .number { color: var(--orange); }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .source-list {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    column-count: 2;
+    column-gap: 2rem;
+    margin: 1rem 0;
+  }
+
+  .source-list li {
+    margin-bottom: 0.3rem;
+    break-inside: avoid;
+  }
+
+  .source-list a { color: var(--accent); text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+
+  @media (max-width: 700px) {
+    .source-list { column-count: 1; }
+    .big-numbers { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>AI Infrastructure Economics Model</h1>
+  <p class="subtitle">Token Demand vs. Compute Supply: Is the Buildout Enough?</p>
+  <p class="subtitle" style="margin-top:0.3rem">Research compiled February 27, 2026 &mdash; Flint / Coleman Research</p>
+</header>
+
+<!-- VERDICT -->
+<div class="verdict-box">
+  <h2>The Verdict</h2>
+  <div class="verdict-text" id="verdict-text">Loading model...</div>
+  <div class="verdict-detail" id="verdict-detail"></div>
+</div>
+
+<!-- KEY NUMBERS -->
+<div class="big-numbers" id="key-numbers">
+  <div class="big-num"><div class="number" id="bn-demand">--</div><div class="label">Peak Token Demand (B TPS)</div></div>
+  <div class="big-num green"><div class="number" id="bn-supply">--</div><div class="label">Inference Capacity (B TPS)</div></div>
+  <div class="big-num" id="bn-gap-box"><div class="number" id="bn-gap">--</div><div class="label">Supply Gap / Surplus</div></div>
+  <div class="big-num"><div class="number" id="bn-capex">--</div><div class="label">2026 Hyperscaler CapEx</div></div>
+  <div class="big-num orange"><div class="number" id="bn-power-need">--</div><div class="label">AI Power Need (GW)</div></div>
+  <div class="big-num"><div class="number" id="bn-power-avail">--</div><div class="label">AI Power Available (GW)</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" data-tab="model">Interactive Model</button>
+  <button class="tab" data-tab="companies">Company Analysis</button>
+  <button class="tab" data-tab="chips">Chip Economics</button>
+  <button class="tab" data-tab="power">Power & Datacenters</button>
+  <button class="tab" data-tab="analysis">Full Analysis</button>
+  <button class="tab" data-tab="sources">Sources</button>
+</div>
+
+<!-- TAB: INTERACTIVE MODEL -->
+<div class="tab-content active" id="tab-model">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Demand Parameters</h3>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Developer Coding Users (M)</span><span id="val-dev-users">15</span></div>
+        <input type="range" id="dev-users" min="5" max="50" value="15" step="1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Tokens/Dev/Month (M)</span><span id="val-dev-tokens">100</span></div>
+        <input type="range" id="dev-tokens" min="10" max="500" value="100" step="10">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Enterprise Agent Users (M)</span><span id="val-ent-users">50</span></div>
+        <input type="range" id="ent-users" min="10" max="200" value="50" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Tokens/Agent User/Month (M)</span><span id="val-ent-tokens">20</span></div>
+        <input type="range" id="ent-tokens" min="2" max="100" value="20" step="2">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Light AI Chat Users (M)</span><span id="val-chat-users">300</span></div>
+        <input type="range" id="chat-users" min="50" max="800" value="300" step="25">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Tokens/Chat User/Month (M)</span><span id="val-chat-tokens">2</span></div>
+        <input type="range" id="chat-tokens" min="0.5" max="10" value="2" step="0.5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Peak-to-Average Ratio</span><span id="val-peak-ratio">3.5</span></div>
+        <input type="range" id="peak-ratio" min="2" max="6" value="3.5" step="0.5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>YoY Demand Growth (%)</span><span id="val-demand-growth">150</span></div>
+        <input type="range" id="demand-growth" min="50" max="400" value="150" step="10">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Supply Parameters</h3>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>H100/H200 Inference Fleet (M chips)</span><span id="val-h100-fleet">2.0</span></div>
+        <input type="range" id="h100-fleet" min="0.5" max="4" value="2.0" step="0.1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>B200/GB200 Inference Fleet (M chips)</span><span id="val-b200-fleet">1.5</span></div>
+        <input type="range" id="b200-fleet" min="0.2" max="4" value="1.5" step="0.1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>TPU Inference Fleet (M chips)</span><span id="val-tpu-fleet">0.5</span></div>
+        <input type="range" id="tpu-fleet" min="0.1" max="2" value="0.5" step="0.1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Trainium/Other Inference (M chips)</span><span id="val-other-fleet">0.4</span></div>
+        <input type="range" id="other-fleet" min="0.1" max="2" value="0.4" step="0.1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Avg TPS per H100 (weighted model mix)</span><span id="val-h100-tps">300</span></div>
+        <input type="range" id="h100-tps" min="100" max="1000" value="300" step="25">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>B200 Perf Multiplier vs H100</span><span id="val-b200-mult">2.5</span></div>
+        <input type="range" id="b200-mult" min="1.5" max="4" value="2.5" step="0.25">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>GPU Utilization (%)</span><span id="val-util">60</span></div>
+        <input type="range" id="util" min="30" max="90" value="60" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>YoY Supply Growth (%)</span><span id="val-supply-growth">70</span></div>
+        <input type="range" id="supply-growth" min="20" max="150" value="70" step="5">
+      </div>
+
+      <h4 style="margin-top:1.5rem">Power Parameters</h4>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>AI Power Available (GW)</span><span id="val-power-avail">12</span></div>
+        <input type="range" id="power-avail" min="5" max="40" value="12" step="1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Avg Watts per Chip (w/ cooling)</span><span id="val-watts-chip">1000</span></div>
+        <input type="range" id="watts-chip" min="500" max="1500" value="1000" step="50">
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Output Charts -->
+  <div class="grid-2">
+    <div class="card">
+      <h3>Token Demand vs Supply (2026-2030)</h3>
+      <div class="chart-container">
+        <canvas id="chart-demand-supply"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Power: Need vs Available (GW)</h3>
+      <div class="chart-container">
+        <canvas id="chart-power"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:2rem">
+    <h3>Model Output Summary</h3>
+    <div id="model-summary" class="analysis"></div>
+  </div>
+</div>
+
+<!-- TAB: COMPANIES -->
+<div class="tab-content" id="tab-companies">
+  <div class="grid-2">
+    <div class="card">
+      <h3>AI Company Revenue (ARR, $B)</h3>
+      <div class="chart-container">
+        <canvas id="chart-revenue"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Hyperscaler CapEx 2024-2026 ($B)</h3>
+      <div class="chart-container">
+        <canvas id="chart-capex"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>AI Company Scoreboard</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th class="text-right">2025 Revenue</th>
+          <th class="text-right">2026 CapEx</th>
+          <th class="text-right">AI Users</th>
+          <th>Constraint</th>
+          <th>Profitable?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold text-accent">Anthropic</td>
+          <td class="text-right">$9B ARR</td>
+          <td class="text-right">~$2B*</td>
+          <td class="text-right">30M MAU</td>
+          <td class="text-orange">Multi-cloud managed</td>
+          <td class="text-orange">2028</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">OpenAI</td>
+          <td class="text-right">$20B ARR</td>
+          <td class="text-right">~$15B*</td>
+          <td class="text-right">800M+ WAU</td>
+          <td class="text-red">Azure-dependent</td>
+          <td class="text-red">~2030</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Google</td>
+          <td class="text-right">$43B Cloud</td>
+          <td class="text-right">$175-185B</td>
+          <td class="text-right">750M MAU</td>
+          <td class="text-green">Least constrained</td>
+          <td class="text-green">Yes</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Microsoft</td>
+          <td class="text-right">$168.9B Cloud</td>
+          <td class="text-right">~$120-145B</td>
+          <td class="text-right">100M+ Copilot</td>
+          <td class="text-red">Power-constrained</td>
+          <td class="text-green">Yes</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Amazon</td>
+          <td class="text-right">$128.7B AWS</td>
+          <td class="text-right">$200B</td>
+          <td class="text-right">--</td>
+          <td class="text-orange">Compute-constrained</td>
+          <td class="text-green">Yes</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Meta</td>
+          <td class="text-right">$165B+ Total</td>
+          <td class="text-right">$115-135B</td>
+          <td class="text-right">3B+ social</td>
+          <td class="text-orange">Acquiring aggressively</td>
+          <td class="text-green">Yes (ads)</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Nvidia</td>
+          <td class="text-right">$115.2B DC</td>
+          <td class="text-right">--</td>
+          <td class="text-right">--</td>
+          <td class="text-orange">CoWoS packaging</td>
+          <td class="text-green">Very yes</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.7rem;color:var(--text-dim);margin-top:0.5rem">* Anthropic/OpenAI CapEx = cloud compute spend (they don't own datacenters)</p>
+  </div>
+
+  <div class="card analysis">
+    <h3>Key Dynamics</h3>
+
+    <h4>Anthropic: Fastest Growing, Cleanest Path</h4>
+    <p>$1B to $14B ARR in 14 months. Claude Code alone at $2.5B+ run rate. Multi-cloud strategy (AWS Trainium + Google TPUs + Azure) avoids single-vendor lock-in. Profitable by 2028 &mdash; years ahead of OpenAI.</p>
+
+    <h4>OpenAI: Scale at a Cost</h4>
+    <p>$20B ARR but burning $9B+ annually. Inference spend with Microsoft: $12.4B through Q3 2025. Projected $115B cumulative losses through 2029. Not profitable until ~2030. The revenue is real; the margins aren't.</p>
+
+    <h4>Google: Structural Advantage</h4>
+    <p>Proprietary TPUs cut serving costs 78% in one year. 10B+ tokens/minute through Gemini API. $175-185B 2026 CapEx. Least GPU-constrained of any player because they own the silicon.</p>
+
+    <h4>Microsoft: GPUs in Boxes They Can't Plug In</h4>
+    <p>CEO confirmed GPUs literally sitting in inventory due to power/space shortages. "Short for many quarters." Azure AI adding ~16-20 percentage points to cloud growth but physically bottlenecked.</p>
+
+    <h4>Nvidia: The Arms Dealer Wins</h4>
+    <p>$115.2B data center revenue (FY2025). Blackwell selling faster than any product in company history. Controls 70%+ of TSMC CoWoS-L packaging capacity. Entire 2025 Blackwell production sold out through mid-2026.</p>
+  </div>
+</div>
+
+<!-- TAB: CHIPS -->
+<div class="tab-content" id="tab-chips">
+  <div class="grid-2">
+    <div class="card">
+      <h3>GPU Shipments Over Time</h3>
+      <div class="chart-container">
+        <canvas id="chart-gpus"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Inference Throughput by Chip</h3>
+      <div class="chart-container">
+        <canvas id="chart-throughput"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>Chip Comparison</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Chip</th>
+          <th class="text-right">TDP</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">TPS (70B, batched)</th>
+          <th class="text-right">HBM</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">H100 SXM5</td>
+          <td class="text-right">700W</td>
+          <td class="text-right">$25-40K</td>
+          <td class="text-right">~875/gpu</td>
+          <td class="text-right">80GB HBM3</td>
+          <td class="text-green">Shipping, easing</td>
+        </tr>
+        <tr>
+          <td class="bold">H200</td>
+          <td class="text-right">700W</td>
+          <td class="text-right">$35-45K</td>
+          <td class="text-right">~1,100/gpu</td>
+          <td class="text-right">141GB HBM3e</td>
+          <td class="text-green">Shipping</td>
+        </tr>
+        <tr>
+          <td class="bold">B200</td>
+          <td class="text-right">1,000W</td>
+          <td class="text-right">$60-70K*</td>
+          <td class="text-right">~2,200/gpu</td>
+          <td class="text-right">192GB HBM3e</td>
+          <td class="text-orange">Sold out to mid-2026</td>
+        </tr>
+        <tr>
+          <td class="bold">GB200 NVL72</td>
+          <td class="text-right">120kW/rack</td>
+          <td class="text-right">$3.0-3.9M/rack</td>
+          <td class="text-right">~7,583/gpu (MoE)</td>
+          <td class="text-right">72x 192GB</td>
+          <td class="text-orange">Ramping</td>
+        </tr>
+        <tr>
+          <td class="bold">TPU v6 (Trillium)</td>
+          <td class="text-right">~300W</td>
+          <td class="text-right">Internal</td>
+          <td class="text-right">~4x v5e</td>
+          <td class="text-right">144GB HBM3</td>
+          <td class="text-green">GA (Google only)</td>
+        </tr>
+        <tr>
+          <td class="bold">AMD MI300X</td>
+          <td class="text-right">750W</td>
+          <td class="text-right">$10-15K</td>
+          <td class="text-right">~700/gpu</td>
+          <td class="text-right">192GB HBM3</td>
+          <td class="text-green">Shipping (niche)</td>
+        </tr>
+        <tr>
+          <td class="bold">Trainium2</td>
+          <td class="text-right">~500W</td>
+          <td class="text-right">Internal</td>
+          <td class="text-right">~30-40% > H100 $/perf</td>
+          <td class="text-right">96GB HBM</td>
+          <td class="text-green">GA (AWS)</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">Rubin (2026)</td>
+          <td class="text-right">TBD</td>
+          <td class="text-right">TBD</td>
+          <td class="text-right">~5x Blackwell</td>
+          <td class="text-right">HBM4</td>
+          <td class="text-yellow">H2 2026</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.7rem;color:var(--text-dim);margin-top:0.5rem">* GB200 Superchip (2x B200 + Grace CPU) price. Individual B200 not sold separately.</p>
+  </div>
+
+  <div class="card analysis">
+    <h3>Supply Chain Bottlenecks</h3>
+
+    <h4>CoWoS Packaging: The Real Chokepoint</h4>
+    <p>TSMC's Chip-on-Wafer-on-Substrate (CoWoS) advanced packaging is required for all HBM-equipped AI chips. Nvidia holds 70%+ of CoWoS-L capacity. Even doubling capacity in 2025 couldn't keep up with 113% YoY demand surge. This is the single biggest constraint on GPU supply.</p>
+
+    <h4>HBM Memory: Sold Out Through 2026</h4>
+    <p>All three suppliers (SK Hynix 62%, Samsung 35%, Micron 11%) are sold out. HBM3e transition absorbing 96% of output. New fabs (SK Hynix M15X, Samsung P5) don't come online until 2027-2028. HBM4 mass production begins Feb 2026 but at limited volume.</p>
+
+    <h4>The Training-to-Inference Shift</h4>
+    <p>Inference is moving from ~50% to ~70% of all AI compute by 2027. Agentic workloads are the primary driver &mdash; each user action triggers 10-50+ internal model calls. This changes the hardware mix: more memory bandwidth, more CPUs alongside GPUs, and persistent always-on deployment vs. bursty training campaigns.</p>
+
+    <div class="callout">
+      <strong>Key insight:</strong> OpenAI targets "hundreds of thousands of GPUs plus tens of millions of CPUs" for agentic scale. The CPU:GPU ratio for agentic workloads is dramatically higher than training, because 50-90% of latency is CPU-side tool execution.
+    </div>
+  </div>
+</div>
+
+<!-- TAB: POWER -->
+<div class="tab-content" id="tab-power">
+  <div class="grid-2">
+    <div class="card">
+      <h3>US Datacenter Power Demand (GW)</h3>
+      <div class="chart-container">
+        <canvas id="chart-dc-power"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Hyperscaler Power Commitments</h3>
+      <div class="chart-container">
+        <canvas id="chart-power-commit"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>Major Datacenter Builds</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Company</th>
+          <th class="text-right">Power</th>
+          <th class="text-right">Investment</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">Stargate (10+ sites)</td>
+          <td>OpenAI/Oracle/SoftBank</td>
+          <td class="text-right">~10 GW</td>
+          <td class="text-right">$500B</td>
+          <td class="text-orange">TX operational, others TBD</td>
+        </tr>
+        <tr>
+          <td class="bold">Fairwater AI Campus</td>
+          <td>Microsoft</td>
+          <td class="text-right">2 GW</td>
+          <td class="text-right">$100B+</td>
+          <td class="text-orange">Under construction</td>
+        </tr>
+        <tr>
+          <td class="bold">Colossus</td>
+          <td>xAI</td>
+          <td class="text-right">2 GW</td>
+          <td class="text-right">$18B+ GPUs</td>
+          <td class="text-orange">Expanding</td>
+        </tr>
+        <tr>
+          <td class="bold">Hyperion</td>
+          <td>Meta</td>
+          <td class="text-right">5 GW</td>
+          <td class="text-right">$135B CapEx</td>
+          <td class="text-orange">Multi-site</td>
+        </tr>
+        <tr>
+          <td class="bold">Indiana Campus</td>
+          <td>Amazon</td>
+          <td class="text-right">2.4 GW</td>
+          <td class="text-right">$15B</td>
+          <td class="text-orange">Under construction</td>
+        </tr>
+        <tr>
+          <td class="bold">Texas + PJM</td>
+          <td>Google</td>
+          <td class="text-right">Multi-GW</td>
+          <td class="text-right">$65B+</td>
+          <td class="text-orange">Acquiring/building</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card analysis">
+    <h3>The Power Problem</h3>
+
+    <p>This is the section that matters most. Forget GPUs for a second &mdash; <strong>the binding constraint on AI scaling is electricity, not silicon.</strong></p>
+
+    <h4>The Numbers</h4>
+    <ul>
+      <li>US total generation capacity: ~1,300 GW (1.3 TW)</li>
+      <li>Current datacenter draw: ~25-42 GW (3-4% of US electricity)</li>
+      <li>Projected 2030: ~134 GW (7-12% of US electricity)</li>
+      <li><strong>Projected shortfall by 2028: ~10 GW</strong> (enough to power 7.5 million homes)</li>
+    </ul>
+
+    <h4>Why It's Hard</h4>
+    <ul>
+      <li><strong>Grid interconnection queue:</strong> 10,300 projects totaling 1,400 GW waiting. Median wait: 5 years.</li>
+      <li><strong>Transformer lead times:</strong> 12-48 months for power transformers</li>
+      <li><strong>Switchgear:</strong> Up to 3 years</li>
+      <li><strong>Northern Virginia</strong> (largest DC market): 4-7 year grid connection wait</li>
+    </ul>
+
+    <h4>How They're Working Around It</h4>
+    <ul>
+      <li><strong>Onsite gas turbines:</strong> xAI, Meta, and others bypass the grid entirely with dedicated natural gas plants. US proposals for new gas-fired generation tripled in 2025.</li>
+      <li><strong>Nuclear PPAs:</strong> Microsoft (Three Mile Island, 835 MW by 2028), Amazon (Susquehanna, $20B+), Google (Kairos SMR, 500 MW), Meta (TerraPower+Oklo+Vistra, up to 6.6 GW)</li>
+      <li><strong>Modular datacenters:</strong> 3-6 month builds vs 2-3 years traditional</li>
+      <li><strong>Energy company acquisitions:</strong> Google bought Intersect Power for $4.75B</li>
+    </ul>
+
+    <div class="callout danger">
+      <strong>The crunch is real through 2027-2028.</strong> AI compute demand doubles every 12-18 months. Power infrastructure takes 3-7 years to build. That's an irreconcilable timing mismatch. The ~10 GW structural deficit means rationing, higher prices, and competitive advantage flowing to whoever secured power earliest (Google and Amazon lead here).
+    </div>
+
+    <h4>GPU Rack Power Trajectory</h4>
+    <table>
+      <thead>
+        <tr><th>Year</th><th>System</th><th class="text-right">Power/Rack</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2023</td><td>H100 DGX</td><td class="text-right">10-20 kW</td></tr>
+        <tr><td>2024-25</td><td>GB200 NVL72</td><td class="text-right text-orange">120-132 kW</td></tr>
+        <tr><td>2026</td><td>VR200 (est.)</td><td class="text-right text-orange">~240 kW</td></tr>
+        <tr><td>2027</td><td>Nvidia Kyber</td><td class="text-right text-red">~600 kW</td></tr>
+        <tr><td>2027+</td><td>800 VDC arch.</td><td class="text-right text-red">1,000 kW (1 MW)</td></tr>
+      </tbody>
+    </table>
+    <p>Per-rack power is heading toward 1 MW. Every new GPU generation makes the power problem worse, not better. Efficiency gains in compute-per-watt get eaten by density increases.</p>
+  </div>
+</div>
+
+<!-- TAB: FULL ANALYSIS -->
+<div class="tab-content" id="tab-analysis">
+  <div class="card analysis">
+    <h3>Executive Summary</h3>
+
+    <p><strong>No, the current buildout is not enough.</strong> But it's not as simple as "build more." The constraints are layered: silicon supply, power infrastructure, and construction timelines each impose different bottlenecks at different time horizons.</p>
+
+    <div class="callout">
+      <strong>The short answer:</strong> Through 2027-2028, AI demand will outpace infrastructure by roughly 20-40%. This creates a structural deficit of ~10 GW of power and millions of GPUs. Post-2028, the massive investments being made today start coming online and the gap narrows. By 2030, supply likely catches up &mdash; but by then, demand may have shifted again with next-generation AI capabilities.
+    </div>
+
+    <h3>The Token Economy: How Much Compute Do AI Agents Actually Need?</h3>
+
+    <h4>The Agentic Multiplier</h4>
+    <p>This is the piece most analyses miss. Traditional AI chat (ask a question, get an answer) consumes relatively modest tokens &mdash; maybe 2,000-5,000 tokens per interaction. But agentic AI tools like Claude Code, Cursor, and Devin work fundamentally differently:</p>
+    <ul>
+      <li>A single user prompt triggers <strong>10-50+ internal model calls</strong> (tool use, reasoning, code generation, validation)</li>
+      <li>Average coding prompts are <strong>20,000+ input tokens</strong> (3-4x general prompts)</li>
+      <li>A heavy Claude Code user can consume <strong>2.4 billion tokens in a single month</strong></li>
+      <li>Agent teams use approximately <strong>7x more tokens</strong> than single-agent sessions</li>
+      <li>The industry average prompt length has <strong>tripled</strong> in under 2 years (2K to 5.4K tokens)</li>
+    </ul>
+
+    <p>The OpenRouter 100-trillion-token study found that programming workloads grew from 11% to over 50% of all tokens by late 2025. Claude alone handles ~60% of coding workloads on that platform, with average prompts over 20,000 tokens.</p>
+
+    <h4>Who's Using This and How Much?</h4>
+    <table>
+      <thead>
+        <tr><th>User Type</th><th class="text-right">Est. Users</th><th class="text-right">Tokens/Month</th><th class="text-right">Total Tokens/Month</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Developer coding (heavy agentic)</td>
+          <td class="text-right">~5M</td>
+          <td class="text-right">200M-2B</td>
+          <td class="text-right">~2.5 quadrillion</td>
+        </tr>
+        <tr>
+          <td>Developer coding (moderate)</td>
+          <td class="text-right">~10M</td>
+          <td class="text-right">50-200M</td>
+          <td class="text-right">~1 quadrillion</td>
+        </tr>
+        <tr>
+          <td>Enterprise agent users</td>
+          <td class="text-right">~50M</td>
+          <td class="text-right">10-50M</td>
+          <td class="text-right">~1.5 quadrillion</td>
+        </tr>
+        <tr>
+          <td>Light AI chat (ChatGPT, Gemini)</td>
+          <td class="text-right">~300M</td>
+          <td class="text-right">1-5M</td>
+          <td class="text-right">~600 trillion</td>
+        </tr>
+        <tr class="bold">
+          <td>Total (2026 estimate)</td>
+          <td class="text-right">~365M</td>
+          <td class="text-right">--</td>
+          <td class="text-right text-accent">~5.6 quadrillion</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>5.6 quadrillion tokens/month = ~2.2 billion tokens/second average. At a peak-to-average ratio of 3.5x, that's ~7.5 billion TPS at peak.</p>
+
+    <h3>The Supply Side: Can We Serve 7.5 Billion TPS?</h3>
+
+    <h4>Current Global Inference Fleet (2026 estimate)</h4>
+    <table>
+      <thead>
+        <tr><th>Platform</th><th class="text-right">Chips (est.)</th><th class="text-right">Avg TPS/chip</th><th class="text-right">Total TPS</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>H100/H200 (inference allocated)</td>
+          <td class="text-right">~2.0M</td>
+          <td class="text-right">300</td>
+          <td class="text-right">600M</td>
+        </tr>
+        <tr>
+          <td>B200/GB200 (inference allocated)</td>
+          <td class="text-right">~1.5M</td>
+          <td class="text-right">750</td>
+          <td class="text-right">1,125M</td>
+        </tr>
+        <tr>
+          <td>Google TPUs (v5/v6)</td>
+          <td class="text-right">~500K</td>
+          <td class="text-right">400</td>
+          <td class="text-right">200M</td>
+        </tr>
+        <tr>
+          <td>Trainium + AMD + other</td>
+          <td class="text-right">~400K</td>
+          <td class="text-right">350</td>
+          <td class="text-right">140M</td>
+        </tr>
+        <tr class="bold">
+          <td>Total Raw Capacity</td>
+          <td class="text-right">~4.4M</td>
+          <td class="text-right">--</td>
+          <td class="text-right text-green">~2,065M (2.1B)</td>
+        </tr>
+        <tr class="bold">
+          <td>At 60% utilization</td>
+          <td class="text-right">--</td>
+          <td class="text-right">--</td>
+          <td class="text-right text-orange">~1,239M (1.2B)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Average demand: 2.2B TPS. Effective supply: 1.2B TPS. That's a ~45% shortfall.</strong></p>
+
+    <p>At peak (7.5B TPS), the gap is enormous. But peaks are managed through queuing, rate limiting, degraded service (smaller/faster models), and geographic load balancing. The real question is whether average throughput can be sustainably served.</p>
+
+    <div class="callout warning">
+      <strong>Reality check:</strong> These numbers are approximate. Token throughput varies enormously by model size, quantization, batch size, and sequence length. A 7B model serves 10-50x more TPS per chip than a 400B model. The "average" depends on the mix of models actually being called &mdash; which is shifting toward bigger, reasoning-heavy models over time.
+    </div>
+
+    <h3>Revenue Impact: Who Wins, Who Loses?</h3>
+
+    <h4>The $650B+ CapEx Wave (2026 alone)</h4>
+    <p>The Big Four hyperscalers (Amazon, Google, Microsoft, Meta) are spending $610-665B in 2026 on infrastructure, with ~75% directly AI-tied. This money flows to:</p>
+
+    <table>
+      <thead>
+        <tr><th>Recipient</th><th class="text-right">Est. 2026 Revenue from AI</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold text-green">Nvidia</td>
+          <td class="text-right">$200-250B</td>
+          <td>GPUs for everyone. Blackwell sold out. Rubin coming H2 2026.</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">TSMC</td>
+          <td class="text-right">$100-120B</td>
+          <td>Fabricates all AI chips (Nvidia, AMD, Apple, Amazon, Google custom)</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">SK Hynix/Samsung/Micron</td>
+          <td class="text-right">$30-50B (HBM)</td>
+          <td>HBM3e/HBM4 sold out through 2026-2027</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">Power utilities & developers</td>
+          <td class="text-right">$50-100B</td>
+          <td>Grid buildout, gas plants, nuclear PPAs, renewable farms</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">Construction / electrical</td>
+          <td class="text-right">$80-150B</td>
+          <td>Building the actual datacenters: concrete, steel, copper, cooling</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">Networking (Arista, Broadcom)</td>
+          <td class="text-right">$20-30B</td>
+          <td>InfiniBand, Ethernet fabrics for GPU clusters</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>The AI Model Companies</h4>
+    <table>
+      <thead>
+        <tr><th>Company</th><th class="text-right">2026 Revenue (est.)</th><th class="text-right">Burn Rate</th><th>Outlook</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">Anthropic</td>
+          <td class="text-right text-green">$20-26B</td>
+          <td class="text-right text-orange">~$5-7B</td>
+          <td>Best positioned. Fastest growth, multi-cloud, profitable by 2028</td>
+        </tr>
+        <tr>
+          <td class="bold">OpenAI</td>
+          <td class="text-right text-green">$25-35B</td>
+          <td class="text-right text-red">~$14B</td>
+          <td>Scale leader but terrible unit economics. Azure dependency a risk</td>
+        </tr>
+        <tr>
+          <td class="bold">Google (AI division)</td>
+          <td class="text-right text-green">$50B+ Cloud</td>
+          <td class="text-right text-green">Profitable</td>
+          <td>Vertically integrated. TPU advantage. Least constrained</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>The Investment Case: Key Numbers for Each Sector</h3>
+
+    <h4>GPUs/Silicon ($200-300B annual market by 2027)</h4>
+    <ul>
+      <li><strong>Nvidia:</strong> Near-monopoly on AI training/inference GPUs. $115B DC revenue in FY2025, tracking to $200B+ in FY2026. Rubin in H2 2026 extends the lead. Risk: customer ASICs (Trainium, TPU) slowly erode share long-term.</li>
+      <li><strong>TSMC:</strong> Sole manufacturer of all cutting-edge AI chips. CoWoS packaging is THE bottleneck. Revenue grows in lockstep with AI demand.</li>
+      <li><strong>AMD:</strong> Distant #2. MI300X relevant for memory-heavy workloads. ROCm software gap limits adoption. ~6% of Nvidia's DC revenue.</li>
+      <li><strong>SK Hynix:</strong> HBM leader (62% share). Sold out through 2026. $8B+ annualized HBM revenue growing rapidly.</li>
+    </ul>
+
+    <h4>Cloud/Infrastructure ($400B+ annual market)</h4>
+    <ul>
+      <li><strong>AWS:</strong> $128.7B revenue (2025), $200B CapEx in 2026. Trainium custom silicon is a multibillion-dollar business growing 150% QoQ.</li>
+      <li><strong>Google Cloud:</strong> $43B revenue (2025), growing 48% YoY. TPU advantage enables 78% cost reduction. $175-185B CapEx in 2026.</li>
+      <li><strong>Azure:</strong> $75B+ revenue (2025), growing 34%. Power-constrained but spending $120-145B in 2026.</li>
+    </ul>
+
+    <h4>Power/Energy ($50-100B+ annual AI-related investment)</h4>
+    <ul>
+      <li><strong>Nuclear:</strong> Multiple GW of deals signed. TMI restart (2028), SMR fleets (2030+). Long timeline but massive TAM.</li>
+      <li><strong>Natural gas:</strong> 250+ GW of new gas plants proposed in US, 1/3 datacenter-linked. Fastest path to new power.</li>
+      <li><strong>Utilities:</strong> Grid operators and IPPs see unprecedented demand growth after decades of flat load.</li>
+    </ul>
+
+    <h3>How Much More Is Needed?</h3>
+
+    <p>The model (adjustable above) suggests:</p>
+    <ul>
+      <li><strong>GPUs:</strong> The current fleet (~4.4M inference chips) needs to roughly double to ~8-10M by end of 2027 to keep pace. That's ~$300-500B in GPU purchases.</li>
+      <li><strong>Power:</strong> ~10 GW additional capacity needed by 2028. At $10-15B per GW for datacenter-grade power, that's $100-150B in power infrastructure.</li>
+      <li><strong>Datacenters:</strong> ~50-80 new large-scale AI datacenters (100+ MW each) needed globally. The announced pipeline covers most of this, but construction timelines mean 2026-2027 will be tight.</li>
+      <li><strong>Total additional investment needed (2026-2028):</strong> $500B-1T beyond what's already committed. The committed CapEx (~$650B/year) covers maybe 60-70% of what's needed.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Bottom line for investors:</strong> The infrastructure buildout is real, the money is flowing, and demand is genuinely outpacing supply through 2027-2028. This benefits Nvidia, TSMC, HBM suppliers, power companies, and datacenter builders in the near term. The AI model companies (Anthropic, OpenAI) are in a revenue-growth-but-burning-cash phase that rewards whoever gets to profitability first. Google and AWS are printing money selling compute to everyone else. The structural power deficit is the longest-lasting constraint and the hardest to fix fast.
+    </div>
+
+    <h3>Risks to This Model</h3>
+    <ul>
+      <li><strong>Efficiency breakthroughs:</strong> DeepSeek showed that algorithmic improvements can dramatically reduce compute needs. If models get 5-10x more efficient, the supply gap narrows fast.</li>
+      <li><strong>Demand disappointment:</strong> If enterprise AI agent adoption is slower than projected (trust issues, integration complexity, regulatory friction), the demand side could be lower.</li>
+      <li><strong>Price competition:</strong> Token prices fell 10-50x since 2023. If this continues, revenue per token drops even as volume grows.</li>
+      <li><strong>Geopolitical disruption:</strong> Taiwan risk (TSMC), export controls, tariffs could all disrupt supply chains.</li>
+      <li><strong>The "good enough" plateau:</strong> If current model capabilities are "good enough" for most enterprise use cases, the push for ever-larger models (and their compute hunger) may slow.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- TAB: SOURCES -->
+<div class="tab-content" id="tab-sources">
+  <div class="card">
+    <h3>Sources & References</h3>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:1rem">Research compiled February 27, 2026. All data sourced from public earnings reports, financial filings, industry analysis, and credible technology journalism.</p>
+
+    <h4>Token Usage & Agentic AI</h4>
+    <ul class="source-list">
+      <li><a href="https://www.ksred.com/claude-code-pricing-guide-which-plan-actually-saves-you-money/" target="_blank">Claude Code Pricing Guide (ksred.com)</a></li>
+      <li><a href="https://www.faros.ai/blog/claude-code-token-limits" target="_blank">Claude Code Token Limits (Faros AI)</a></li>
+      <li><a href="https://www.aicosts.ai/blog/claude-code-subagent-cost-explosion-887k-tokens-minute-crisis" target="_blank">Claude Code Subagent Cost Explosion (AICosts.ai)</a></li>
+      <li><a href="https://openrouter.ai/state-of-ai" target="_blank">OpenRouter State of AI 2025 (100T Token Study)</a></li>
+      <li><a href="https://arxiv.org/abs/2601.10088" target="_blank">arXiv 2601.10088 &mdash; Token Usage Study</a></li>
+      <li><a href="https://arxiv.org/html/2601.14470v1" target="_blank">Tokenomics Paper (arXiv 2601.14470)</a></li>
+      <li><a href="https://openreview.net/forum?id=1bUeVB3fov" target="_blank">How Do Coding Agents Spend Your Money (OpenReview)</a></li>
+    </ul>
+
+    <h4>AI Company Financials</h4>
+    <ul class="source-list">
+      <li><a href="https://finance.yahoo.com/news/anthropic-revenue-run-rate-climbs-124914097.html" target="_blank">Anthropic $14B ARR (Yahoo Finance)</a></li>
+      <li><a href="https://techcrunch.com/2025/11/04/anthropic-expects-b2b-demand-to-boost-revenue-to-70b-in-2028-report/" target="_blank">Anthropic $70B Revenue Projection (TechCrunch)</a></li>
+      <li><a href="https://www.datacenterdynamics.com/en/news/anthropic-cloud-spend-expected-to-reach-80bn-through-2029/" target="_blank">Anthropic $80B Cloud Spend (DCD)</a></li>
+      <li><a href="https://www.theregister.com/2025/11/12/openai_spending_report/" target="_blank">OpenAI $12B Inference Spend (The Register)</a></li>
+      <li><a href="https://cybernews.com/ai-news/openai-anthropic-profit-revenue-ai/" target="_blank">OpenAI vs Anthropic Profitability (Cybernews)</a></li>
+      <li><a href="https://www.cnbc.com/2026/02/04/alphabet-googl-q4-2025-earnings.html" target="_blank">Alphabet Q4 2025 Earnings (CNBC)</a></li>
+      <li><a href="https://tomtunguz.com/google-earnings-q4-2025/" target="_blank">Google AI 52x Growth (Tomasz Tunguz)</a></li>
+      <li><a href="https://www.pymnts.com/earnings/2025/microsofts-ai-bet-keeps-paying-off-across-cloud-copilot-and-code/" target="_blank">Microsoft AI Revenue &amp; Copilot (PYMNTS)</a></li>
+      <li><a href="https://www.cnbc.com/2026/02/05/aws-q4-earnings-report-2025.html" target="_blank">AWS $128.7B Revenue (CNBC)</a></li>
+    </ul>
+
+    <h4>User Adoption</h4>
+    <ul class="source-list">
+      <li><a href="https://techcrunch.com/2025/07/30/github-copilot-crosses-20-million-all-time-users/" target="_blank">GitHub Copilot 20M Users (TechCrunch)</a></li>
+      <li><a href="https://devgraphiq.com/cursor-statistics/" target="_blank">Cursor Statistics (DevGraphiQ)</a></li>
+      <li><a href="https://backlinko.com/claude-users" target="_blank">Claude User Statistics (Backlinko)</a></li>
+      <li><a href="https://www.demandsage.com/chatgpt-statistics/" target="_blank">ChatGPT Statistics (DemandSage)</a></li>
+      <li><a href="https://techcrunch.com/2026/02/04/googles-gemini-app-has-surpassed-750m-monthly-active-users/" target="_blank">Gemini 750M MAU (TechCrunch)</a></li>
+      <li><a href="https://www.slashdata.co/post/global-developer-population-trends-2025-how-many-developers-are-there" target="_blank">47M Global Developers (SlashData)</a></li>
+      <li><a href="https://survey.stackoverflow.co/2025/ai" target="_blank">Stack Overflow 2025 AI Survey</a></li>
+      <li><a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank">McKinsey State of AI 2025</a></li>
+    </ul>
+
+    <h4>GPU/TPU Supply</h4>
+    <ul class="source-list">
+      <li><a href="https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025" target="_blank">Nvidia FY2025 Earnings</a></li>
+      <li><a href="https://www.eetasia.com/blackwell-to-dominate-nvidias-high-end-gpu-shipments-in-2025/" target="_blank">Blackwell Shipment Projections (EE Times Asia)</a></li>
+      <li><a href="https://www.tomshardware.com/pc-components/gpus/nvidias-next-gen-blackwell-ai-gpus-to-cost-up-to-dollar70000-fully-equipped-servers-range-up-to-dollar3000000-report" target="_blank">B200/GB200 Pricing (Tom's Hardware)</a></li>
+      <li><a href="https://cloud.google.com/blog/products/compute/introducing-trillium-6th-gen-tpus" target="_blank">Google TPU v6 Trillium (Google Cloud Blog)</a></li>
+      <li><a href="https://www.fusionww.com/insights/blog/inside-the-ai-bottleneck-cowos-hbm-and-2-3nm-capacity-constraints-through-2027" target="_blank">CoWoS/HBM Bottleneck (FusionWW)</a></li>
+      <li><a href="https://www.notebookcheck.net/SK-hynix-sells-out-its-DRAM-NAND-and-HBM-chip-supply-to-Nvidia-through-2026-as-AI-demand-outpaces-Samsung-and-Micron-s-capacity.1151402.0.html" target="_blank">HBM Sold Out (NotebookCheck)</a></li>
+    </ul>
+
+    <h4>Datacenter & Power</h4>
+    <ul class="source-list">
+      <li><a href="https://openai.com/index/announcing-the-stargate-project/" target="_blank">Stargate Project (OpenAI)</a></li>
+      <li><a href="https://www.datacenterdynamics.com/en/news/microsoft-has-ai-gpus-sitting-in-inventory-because-it-lacks-the-power-necessary-to-install-them/" target="_blank">Microsoft GPUs In Inventory (DCD)</a></li>
+      <li><a href="https://www.spglobal.com/energy/en/news-research/latest-news/electric-power/101425-data-center-grid-power-demand-to-rise-22-in-2025-nearly-triple-by-2030" target="_blank">DC Power Demand Triple by 2030 (S&amp;P Global)</a></li>
+      <li><a href="https://www.visualcapitalist.com/shortage-of-u-s-data-center-capacity-2023-2028p/" target="_blank">10 GW Shortfall (Visual Capitalist)</a></li>
+      <li><a href="https://www.zeroemissiongrid.com/insights-press-zeg-blog/interconnection-backlog/" target="_blank">1,400 GW Interconnection Queue (Zero Emission Grid)</a></li>
+      <li><a href="https://globalenergymonitor.org/report/betting-big-on-data-centers-u-s-now-leads-world-for-new-gas-power-development/" target="_blank">250 GW New Gas Plants (Global Energy Monitor)</a></li>
+      <li><a href="https://techblog.comsoc.org/2025/12/22/hyperscaler-capex-600-bn-in-2026-a-36-increase-over-2025-while-global-spending-on-cloud-infrastructure-services-skyrockets/" target="_blank">Hyperscaler CapEx $600B+ (IEEE ComSoc)</a></li>
+      <li><a href="https://www.cnbc.com/2026/02/06/google-microsoft-meta-amazon-ai-cash.html" target="_blank">AI CapEx Approaching $700B (CNBC)</a></li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <p>Built by Flint &mdash; Coleman Family Basement Research Division</p>
+  <p style="margin-top:0.3rem">Data as of February 2026. Model parameters are adjustable &mdash; these are estimates, not prophecy.</p>
+</footer>
+
+</div>
+
+<script>
+// ============================================================
+// MODEL ENGINE
+// ============================================================
+
+const sliders = {
+  devUsers: document.getElementById('dev-users'),
+  devTokens: document.getElementById('dev-tokens'),
+  entUsers: document.getElementById('ent-users'),
+  entTokens: document.getElementById('ent-tokens'),
+  chatUsers: document.getElementById('chat-users'),
+  chatTokens: document.getElementById('chat-tokens'),
+  peakRatio: document.getElementById('peak-ratio'),
+  demandGrowth: document.getElementById('demand-growth'),
+  h100Fleet: document.getElementById('h100-fleet'),
+  b200Fleet: document.getElementById('b200-fleet'),
+  tpuFleet: document.getElementById('tpu-fleet'),
+  otherFleet: document.getElementById('other-fleet'),
+  h100Tps: document.getElementById('h100-tps'),
+  b200Mult: document.getElementById('b200-mult'),
+  util: document.getElementById('util'),
+  supplyGrowth: document.getElementById('supply-growth'),
+  powerAvail: document.getElementById('power-avail'),
+  wattsChip: document.getElementById('watts-chip'),
+};
+
+const valLabels = {
+  devUsers: document.getElementById('val-dev-users'),
+  devTokens: document.getElementById('val-dev-tokens'),
+  entUsers: document.getElementById('val-ent-users'),
+  entTokens: document.getElementById('val-ent-tokens'),
+  chatUsers: document.getElementById('val-chat-users'),
+  chatTokens: document.getElementById('val-chat-tokens'),
+  peakRatio: document.getElementById('val-peak-ratio'),
+  demandGrowth: document.getElementById('val-demand-growth'),
+  h100Fleet: document.getElementById('val-h100-fleet'),
+  b200Fleet: document.getElementById('val-b200-fleet'),
+  tpuFleet: document.getElementById('val-tpu-fleet'),
+  otherFleet: document.getElementById('val-other-fleet'),
+  h100Tps: document.getElementById('val-h100-tps'),
+  b200Mult: document.getElementById('val-b200-mult'),
+  util: document.getElementById('val-util'),
+  supplyGrowth: document.getElementById('val-supply-growth'),
+  powerAvail: document.getElementById('val-power-avail'),
+  wattsChip: document.getElementById('val-watts-chip'),
+};
+
+function getParams() {
+  return {
+    devUsers: parseFloat(sliders.devUsers.value),
+    devTokens: parseFloat(sliders.devTokens.value),
+    entUsers: parseFloat(sliders.entUsers.value),
+    entTokens: parseFloat(sliders.entTokens.value),
+    chatUsers: parseFloat(sliders.chatUsers.value),
+    chatTokens: parseFloat(sliders.chatTokens.value),
+    peakRatio: parseFloat(sliders.peakRatio.value),
+    demandGrowth: parseFloat(sliders.demandGrowth.value) / 100,
+    h100Fleet: parseFloat(sliders.h100Fleet.value),
+    b200Fleet: parseFloat(sliders.b200Fleet.value),
+    tpuFleet: parseFloat(sliders.tpuFleet.value),
+    otherFleet: parseFloat(sliders.otherFleet.value),
+    h100Tps: parseFloat(sliders.h100Tps.value),
+    b200Mult: parseFloat(sliders.b200Mult.value),
+    util: parseFloat(sliders.util.value) / 100,
+    supplyGrowth: parseFloat(sliders.supplyGrowth.value) / 100,
+    powerAvail: parseFloat(sliders.powerAvail.value),
+    wattsChip: parseFloat(sliders.wattsChip.value),
+  };
+}
+
+function runModel(p) {
+  // Monthly tokens (in trillions)
+  const devTotalT = p.devUsers * p.devTokens;         // M users * M tokens = T tokens
+  const entTotalT = p.entUsers * p.entTokens;
+  const chatTotalT = p.chatUsers * p.chatTokens;
+  const monthlyTotalT = devTotalT + entTotalT + chatTotalT; // in trillions
+
+  // Tokens per second (average)
+  const secondsPerMonth = 30 * 24 * 3600;
+  const avgTPS = (monthlyTotalT * 1e12) / secondsPerMonth;
+  const peakTPS = avgTPS * p.peakRatio;
+
+  // Supply: TPS capacity
+  const h100Cap = p.h100Fleet * 1e6 * p.h100Tps;
+  const b200Cap = p.b200Fleet * 1e6 * p.h100Tps * p.b200Mult;
+  const tpuCap = p.tpuFleet * 1e6 * 400; // fixed estimate for TPUs
+  const otherCap = p.otherFleet * 1e6 * 350;
+  const rawSupplyTPS = h100Cap + b200Cap + tpuCap + otherCap;
+  const effectiveSupplyTPS = rawSupplyTPS * p.util;
+
+  // Total chips
+  const totalChips = (p.h100Fleet + p.b200Fleet + p.tpuFleet + p.otherFleet) * 1e6;
+
+  // Power needed for all inference chips
+  const powerNeededGW = (totalChips * p.wattsChip) / 1e9;
+
+  // Gap
+  const avgGap = effectiveSupplyTPS - avgTPS;
+  const peakGap = effectiveSupplyTPS - peakTPS;
+
+  // Project forward 5 years
+  const years = [2026, 2027, 2028, 2029, 2030];
+  const demandByYear = [];
+  const supplyByYear = [];
+  const powerNeedByYear = [];
+  const powerAvailByYear = [];
+
+  for (let i = 0; i < years.length; i++) {
+    const dMult = Math.pow(1 + p.demandGrowth, i);
+    const sMult = Math.pow(1 + p.supplyGrowth, i);
+    demandByYear.push(peakTPS * dMult / 1e9);
+    supplyByYear.push(effectiveSupplyTPS * sMult / 1e9);
+    const chipsAtYear = totalChips * sMult;
+    powerNeedByYear.push((chipsAtYear * p.wattsChip) / 1e9);
+    // Power grows ~20% per year (construction + new plants)
+    powerAvailByYear.push(p.powerAvail * Math.pow(1.20, i));
+  }
+
+  return {
+    monthlyTotalT,
+    avgTPS,
+    peakTPS,
+    rawSupplyTPS,
+    effectiveSupplyTPS,
+    avgGap,
+    peakGap,
+    powerNeededGW,
+    totalChips,
+    years,
+    demandByYear,
+    supplyByYear,
+    powerNeedByYear,
+    powerAvailByYear,
+  };
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+
+const chartOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+    }
+  },
+  scales: {
+    x: {
+      ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+      grid: { color: 'rgba(42,42,58,0.5)' }
+    },
+    y: {
+      ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+      grid: { color: 'rgba(42,42,58,0.5)' }
+    }
+  }
+};
+
+// Demand vs Supply chart
+const ctxDS = document.getElementById('chart-demand-supply').getContext('2d');
+const chartDS = new Chart(ctxDS, {
+  type: 'line',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [
+      { label: 'Peak Demand (B TPS)', data: [], borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.1)', fill: true, tension: 0.3 },
+      { label: 'Supply Capacity (B TPS)', data: [], borderColor: '#66bb6a', backgroundColor: 'rgba(102,187,106,0.1)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// Power chart
+const ctxPow = document.getElementById('chart-power').getContext('2d');
+const chartPow = new Chart(ctxPow, {
+  type: 'line',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [
+      { label: 'Power Needed (GW)', data: [], borderColor: '#ffa726', backgroundColor: 'rgba(255,167,38,0.1)', fill: true, tension: 0.3 },
+      { label: 'Power Available (GW)', data: [], borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.1)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// Revenue chart (static)
+const ctxRev = document.getElementById('chart-revenue').getContext('2d');
+new Chart(ctxRev, {
+  type: 'bar',
+  data: {
+    labels: ['Anthropic', 'OpenAI', 'Google Cloud', 'AWS', 'Azure', 'Nvidia DC'],
+    datasets: [{
+      label: '2025 Revenue/ARR ($B)',
+      data: [9, 20, 43, 128.7, 75, 115.2],
+      backgroundColor: ['#4fc3f7', '#7c4dff', '#66bb6a', '#ffa726', '#ef5350', '#ffee58'],
+      borderWidth: 0,
+      borderRadius: 4
+    }]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+// CapEx chart (static)
+const ctxCapex = document.getElementById('chart-capex').getContext('2d');
+new Chart(ctxCapex, {
+  type: 'bar',
+  data: {
+    labels: ['Amazon', 'Google', 'Microsoft', 'Meta'],
+    datasets: [
+      { label: '2024', data: [78, 52, 56, 39], backgroundColor: 'rgba(79,195,247,0.3)', borderRadius: 4 },
+      { label: '2025', data: [122, 91.4, 80, 72], backgroundColor: 'rgba(79,195,247,0.6)', borderRadius: 4 },
+      { label: '2026 (plan)', data: [200, 180, 133, 125], backgroundColor: 'rgba(79,195,247,1)', borderRadius: 4 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// GPU Shipments chart (static)
+const ctxGPU = document.getElementById('chart-gpus').getContext('2d');
+new Chart(ctxGPU, {
+  type: 'bar',
+  data: {
+    labels: ['2022', '2023', '2024', '2025 (est)', '2026 (est)'],
+    datasets: [
+      { label: 'Hopper (H100/H200)', data: [100, 800, 2500, 1500, 500], backgroundColor: '#66bb6a', borderRadius: 4 },
+      { label: 'Blackwell (B200/GB200)', data: [0, 0, 450, 2000, 3000], backgroundColor: '#4fc3f7', borderRadius: 4 },
+      { label: 'TPU + Custom + AMD', data: [200, 400, 800, 1500, 2500], backgroundColor: '#ffa726', borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...chartOpts,
+    scales: {
+      ...chartOpts.scales,
+      x: { ...chartOpts.scales.x, stacked: true },
+      y: { ...chartOpts.scales.y, stacked: true, title: { display: true, text: 'Thousands of chips', color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } } }
+    }
+  }
+});
+
+// Throughput chart (static)
+const ctxTP = document.getElementById('chart-throughput').getContext('2d');
+new Chart(ctxTP, {
+  type: 'bar',
+  data: {
+    labels: ['H100', 'H200', 'B200', 'GB200 NVL72\n(per GPU)', 'TPU v6', 'MI300X', 'Trainium2'],
+    datasets: [{
+      label: 'TPS per chip (70B model, batched)',
+      data: [875, 1100, 2200, 7583, 1600, 700, 1050],
+      backgroundColor: ['#66bb6a', '#66bb6a', '#4fc3f7', '#4fc3f7', '#ffa726', '#ef5350', '#7c4dff'],
+      borderRadius: 4
+    }]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+// DC Power chart (static)
+const ctxDCP = document.getElementById('chart-dc-power').getContext('2d');
+new Chart(ctxDCP, {
+  type: 'line',
+  data: {
+    labels: ['2024', '2025', '2026', '2028', '2030', '2035'],
+    datasets: [
+      { label: 'US DC Power Demand (GW)', data: [33, 56, 78, 108, 134, 150], borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.1)', fill: true, tension: 0.3 },
+      { label: 'Available Capacity (GW)', data: [42, 52, 68, 95, 130, 160], borderColor: '#66bb6a', backgroundColor: 'rgba(102,187,106,0.1)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// Power commitments chart (static)
+const ctxPC = document.getElementById('chart-power-commit').getContext('2d');
+new Chart(ctxPC, {
+  type: 'bar',
+  data: {
+    labels: ['Stargate', 'Meta\nHyperion', 'Microsoft\nFairwater', 'Amazon\nIndiana', 'xAI\nColossus', 'Google\nTX+PJM'],
+    datasets: [{
+      label: 'Power Commitment (GW)',
+      data: [10, 5, 2, 2.4, 2, 3],
+      backgroundColor: '#4fc3f7',
+      borderRadius: 4
+    }]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+// ============================================================
+// UPDATE LOOP
+// ============================================================
+
+function updateModel() {
+  const p = getParams();
+  const m = runModel(p);
+
+  // Update slider labels
+  for (const key in sliders) {
+    valLabels[key].textContent = sliders[key].value;
+  }
+
+  // Update key numbers
+  document.getElementById('bn-demand').textContent = (m.peakTPS / 1e9).toFixed(1) + 'B';
+  document.getElementById('bn-supply').textContent = (m.effectiveSupplyTPS / 1e9).toFixed(1) + 'B';
+
+  const gapB = m.peakGap / 1e9;
+  const gapEl = document.getElementById('bn-gap');
+  const gapBox = document.getElementById('bn-gap-box');
+  if (gapB >= 0) {
+    gapEl.textContent = '+' + gapB.toFixed(1) + 'B';
+    gapBox.className = 'big-num green';
+  } else {
+    gapEl.textContent = gapB.toFixed(1) + 'B';
+    gapBox.className = 'big-num red';
+  }
+
+  document.getElementById('bn-capex').textContent = '$650B';
+  document.getElementById('bn-power-need').textContent = m.powerNeededGW.toFixed(1) + ' GW';
+  document.getElementById('bn-power-avail').textContent = p.powerAvail + ' GW';
+
+  // Verdict
+  const verdictEl = document.getElementById('verdict-text');
+  const verdictDetail = document.getElementById('verdict-detail');
+  const ratio = m.effectiveSupplyTPS / m.peakTPS;
+  if (ratio >= 1.2) {
+    verdictEl.textContent = 'Supply Appears Sufficient';
+    verdictEl.style.color = '#66bb6a';
+    verdictDetail.textContent = `Supply covers ${(ratio*100).toFixed(0)}% of peak demand. Headroom exists.`;
+  } else if (ratio >= 0.8) {
+    verdictEl.textContent = 'Tight But Manageable';
+    verdictEl.style.color = '#ffa726';
+    verdictDetail.textContent = `Supply covers ${(ratio*100).toFixed(0)}% of peak demand. Expect queuing, rate limits, and price pressure during peaks.`;
+  } else if (ratio >= 0.5) {
+    verdictEl.textContent = 'Structural Deficit';
+    verdictEl.style.color = '#ef5350';
+    verdictDetail.textContent = `Supply covers only ${(ratio*100).toFixed(0)}% of peak demand. Significant capacity gap. Rationing likely.`;
+  } else {
+    verdictEl.textContent = 'Severe Shortfall';
+    verdictEl.style.color = '#ef5350';
+    verdictDetail.textContent = `Supply covers only ${(ratio*100).toFixed(0)}% of peak demand. Massive buildout needed.`;
+  }
+
+  // Update charts
+  chartDS.data.datasets[0].data = m.demandByYear;
+  chartDS.data.datasets[1].data = m.supplyByYear;
+  chartDS.update('none');
+
+  chartPow.data.datasets[0].data = m.powerNeedByYear;
+  chartPow.data.datasets[1].data = m.powerAvailByYear;
+  chartPow.update('none');
+
+  // Model summary
+  const summary = document.getElementById('model-summary');
+  const avgGapPct = ((m.effectiveSupplyTPS - m.avgTPS) / m.avgTPS * 100).toFixed(0);
+  const peakGapPct = ((m.effectiveSupplyTPS - m.peakTPS) / m.peakTPS * 100).toFixed(0);
+  const crossYear = findCrossoverYear(m);
+
+  summary.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Monthly Token Volume</span><span class="stat-value accent">${formatT(m.monthlyTotalT)} tokens</span></div>
+    <div class="stat-row"><span class="stat-label">Average TPS</span><span class="stat-value">${formatN(m.avgTPS)}</span></div>
+    <div class="stat-row"><span class="stat-label">Peak TPS (${p.peakRatio}x)</span><span class="stat-value">${formatN(m.peakTPS)}</span></div>
+    <div class="stat-row"><span class="stat-label">Raw Supply TPS</span><span class="stat-value">${formatN(m.rawSupplyTPS)}</span></div>
+    <div class="stat-row"><span class="stat-label">Effective Supply (${(p.util*100).toFixed(0)}% util)</span><span class="stat-value">${formatN(m.effectiveSupplyTPS)}</span></div>
+    <div class="stat-row"><span class="stat-label">Avg Demand Gap</span><span class="stat-value ${parseInt(avgGapPct)>=0?'green':'red'}">${avgGapPct>0?'+':''}${avgGapPct}%</span></div>
+    <div class="stat-row"><span class="stat-label">Peak Demand Gap</span><span class="stat-value ${parseInt(peakGapPct)>=0?'green':'red'}">${peakGapPct>0?'+':''}${peakGapPct}%</span></div>
+    <div class="stat-row"><span class="stat-label">Total Inference Chips</span><span class="stat-value">${(m.totalChips/1e6).toFixed(1)}M</span></div>
+    <div class="stat-row"><span class="stat-label">Power Needed (inference only)</span><span class="stat-value orange">${m.powerNeededGW.toFixed(1)} GW</span></div>
+    <div class="stat-row"><span class="stat-label">Power Available</span><span class="stat-value">${p.powerAvail} GW</span></div>
+    <div class="stat-row"><span class="stat-label">Supply Catches Demand</span><span class="stat-value accent">${crossYear}</span></div>
+  `;
+}
+
+function findCrossoverYear(m) {
+  for (let i = 0; i < m.years.length; i++) {
+    if (m.supplyByYear[i] >= m.demandByYear[i]) return m.years[i].toString();
+  }
+  return 'Beyond 2030';
+}
+
+function formatN(n) {
+  if (n >= 1e12) return (n/1e12).toFixed(1) + 'T';
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return n.toFixed(0);
+}
+
+function formatT(trillions) {
+  if (trillions >= 1e6) return (trillions/1e6).toFixed(1) + ' quintillion';
+  if (trillions >= 1e3) return (trillions/1e3).toFixed(1) + ' quadrillion';
+  return trillions.toFixed(0) + ' trillion';
+}
+
+// Bind all sliders
+for (const key in sliders) {
+  sliders[key].addEventListener('input', updateModel);
+}
+
+// Initial run
+updateModel();
+
+// ============================================================
+// TABS
+// ============================================================
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
