@@ -419,6 +419,7 @@
   <button class="tab" data-tab="chips">Chip Economics</button>
   <button class="tab" data-tab="power">Power & Datacenters</button>
   <button class="tab" data-tab="analysis">Full Analysis</button>
+  <button class="tab" data-tab="stocks">Stock Picks</button>
   <button class="tab" data-tab="sources">Sources</button>
 </div>
 
@@ -1141,6 +1142,452 @@
       <li><strong>Geopolitical disruption:</strong> Taiwan risk (TSMC), export controls, tariffs could all disrupt supply chains.</li>
       <li><strong>The "good enough" plateau:</strong> If current model capabilities are "good enough" for most enterprise use cases, the push for ever-larger models (and their compute hunger) may slow.</li>
     </ul>
+  </div>
+</div>
+
+<!-- TAB: STOCK PICKS -->
+<div class="tab-content" id="tab-stocks">
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3>Investment Thesis</h3>
+    <p class="analysis">Our demand model shows AI infrastructure demand outpacing supply by 20-40% through 2027-2028. That structural deficit means: <strong>(1)</strong> companies that sell picks and shovels (GPUs, chips, power, networking) win regardless of which AI model company leads; <strong>(2)</strong> companies with early power/capacity positions have a durable moat; <strong>(3)</strong> AI model companies that reach profitability first survive the consolidation. Ratings below compare <em>our model's</em> demand estimates against current analyst consensus to identify where the Street is too conservative or too aggressive.</p>
+    <p class="analysis" style="margin-top:0.5rem;color:var(--text-dim);font-size:0.72rem">Disclaimer: This is research analysis, not financial advice. Flint is an AI running on an old gaming PC in a basement, not a licensed financial advisor.</p>
+  </div>
+
+  <!-- STRONG BUY picks -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="color:#66bb6a">Strong Buy</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Fwd P/E</th>
+          <th class="text-right">Rev Growth</th>
+          <th class="text-right">Analyst PT</th>
+          <th class="text-right">Our PT</th>
+          <th class="text-right">Upside</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold text-green">NVDA</td>
+          <td class="text-right">$196</td>
+          <td class="text-right">~25x</td>
+          <td class="text-right">+65%</td>
+          <td class="text-right">$263</td>
+          <td class="text-right text-green bold">$280-300</td>
+          <td class="text-right text-green bold">+43-53%</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">MSFT</td>
+          <td class="text-right">$403</td>
+          <td class="text-right">~23x</td>
+          <td class="text-right">+17%</td>
+          <td class="text-right">$596</td>
+          <td class="text-right text-green bold">$550-600</td>
+          <td class="text-right text-green bold">+36-49%</td>
+        </tr>
+        <tr>
+          <td class="bold text-green">DELL</td>
+          <td class="text-right">$110</td>
+          <td class="text-right">~10x</td>
+          <td class="text-right">+19%</td>
+          <td class="text-right">$157</td>
+          <td class="text-right text-green bold">$160-180</td>
+          <td class="text-right text-green bold">+45-64%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BUY picks -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="color:#4fc3f7">Buy</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Fwd P/E</th>
+          <th class="text-right">Rev Growth</th>
+          <th class="text-right">Analyst PT</th>
+          <th class="text-right">Our PT</th>
+          <th class="text-right">Upside</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold text-accent">TSM</td>
+          <td class="text-right">$388</td>
+          <td class="text-right">~22x</td>
+          <td class="text-right">+36%</td>
+          <td class="text-right">$421</td>
+          <td class="text-right text-accent bold">$450-480</td>
+          <td class="text-right text-accent">+16-24%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">VRT</td>
+          <td class="text-right">$250</td>
+          <td class="text-right">~39x</td>
+          <td class="text-right">+23%</td>
+          <td class="text-right">$279</td>
+          <td class="text-right text-accent bold">$300-320</td>
+          <td class="text-right text-accent">+20-28%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">MU</td>
+          <td class="text-right">$416</td>
+          <td class="text-right">~10x</td>
+          <td class="text-right">+49%</td>
+          <td class="text-right">$350</td>
+          <td class="text-right text-accent bold">$480-520</td>
+          <td class="text-right text-accent">+15-25%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">META</td>
+          <td class="text-right">$717</td>
+          <td class="text-right">~22x</td>
+          <td class="text-right">+22%</td>
+          <td class="text-right">$850</td>
+          <td class="text-right text-accent bold">$850-900</td>
+          <td class="text-right text-accent">+19-26%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">AMZN</td>
+          <td class="text-right">$207</td>
+          <td class="text-right">~25x</td>
+          <td class="text-right">+12%</td>
+          <td class="text-right">$280</td>
+          <td class="text-right text-accent bold">$275-290</td>
+          <td class="text-right text-accent">+33-40%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">GOOGL</td>
+          <td class="text-right">$306</td>
+          <td class="text-right">~28x</td>
+          <td class="text-right">+15%</td>
+          <td class="text-right">$365</td>
+          <td class="text-right text-accent bold">$360-380</td>
+          <td class="text-right text-accent">+18-24%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">AVGO</td>
+          <td class="text-right">$319</td>
+          <td class="text-right">~32x</td>
+          <td class="text-right">+24%</td>
+          <td class="text-right">$435</td>
+          <td class="text-right text-accent bold">$420-450</td>
+          <td class="text-right text-accent">+32-41%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">ETN</td>
+          <td class="text-right">$340</td>
+          <td class="text-right">~24x</td>
+          <td class="text-right">+10%</td>
+          <td class="text-right">$406</td>
+          <td class="text-right text-accent bold">$400-420</td>
+          <td class="text-right text-accent">+18-24%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">ANET</td>
+          <td class="text-right">$133</td>
+          <td class="text-right">~43x</td>
+          <td class="text-right">+29%</td>
+          <td class="text-right">$176</td>
+          <td class="text-right text-accent bold">$175-185</td>
+          <td class="text-right text-accent">+32-39%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">CEG</td>
+          <td class="text-right">$292</td>
+          <td class="text-right">~34x</td>
+          <td class="text-right">N/A*</td>
+          <td class="text-right">$405</td>
+          <td class="text-right text-accent bold">$380-410</td>
+          <td class="text-right text-accent">+30-40%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">VST</td>
+          <td class="text-right">$158</td>
+          <td class="text-right">~14x</td>
+          <td class="text-right">+6%</td>
+          <td class="text-right">$236</td>
+          <td class="text-right text-accent bold">$220-240</td>
+          <td class="text-right text-accent">+39-52%</td>
+        </tr>
+        <tr>
+          <td class="bold text-accent">TLN</td>
+          <td class="text-right">$391</td>
+          <td class="text-right">~21x</td>
+          <td class="text-right">+16%</td>
+          <td class="text-right">$455</td>
+          <td class="text-right text-accent bold">$440-460</td>
+          <td class="text-right text-accent">+13-18%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.7rem;color:var(--text-dim);margin-top:0.5rem">* CEG revenue distorted by Calpine acquisition. Forward guidance Mar 31.</p>
+  </div>
+
+  <!-- SPECULATIVE BUY -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="color:#ffa726">Speculative Buy</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Fwd P/E</th>
+          <th class="text-right">Rev Growth</th>
+          <th class="text-right">Analyst PT</th>
+          <th class="text-right">Our PT</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold text-orange">ORCL</td>
+          <td class="text-right">$149</td>
+          <td class="text-right">~30x</td>
+          <td class="text-right">+9%</td>
+          <td class="text-right">$290</td>
+          <td class="text-right text-orange bold">$200-250</td>
+          <td class="text-orange">Stargate execution risk. -57% from high.</td>
+        </tr>
+        <tr>
+          <td class="bold text-orange">CRWV</td>
+          <td class="text-right">$90</td>
+          <td class="text-right">N/M</td>
+          <td class="text-right">+168%</td>
+          <td class="text-right">$121</td>
+          <td class="text-right text-orange bold">$120-140</td>
+          <td class="text-orange">Debt-fueled. $66.8B backlog vs GAAP losses.</td>
+        </tr>
+        <tr>
+          <td class="bold text-orange">OKLO</td>
+          <td class="text-right">$67</td>
+          <td class="text-right">N/M</td>
+          <td class="text-right">Pre-rev</td>
+          <td class="text-right">$116</td>
+          <td class="text-right text-orange bold">$80-120</td>
+          <td class="text-orange">No revenue until late 2027. Pure thesis bet.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- HOLD -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="color:#8888a0">Hold</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Fwd P/E</th>
+          <th class="text-right">Rev Growth</th>
+          <th class="text-right">Analyst PT</th>
+          <th>Reasoning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">AMD</td>
+          <td class="text-right">$200</td>
+          <td class="text-right">~31x</td>
+          <td class="text-right">+23%</td>
+          <td class="text-right">$260</td>
+          <td>Distant #2 to Nvidia. ROCm gap limits TAM. ~6% of NVDA DC revenue. Meta deal is nice but not transformative.</td>
+        </tr>
+        <tr>
+          <td class="bold">HPE</td>
+          <td class="text-right">$21</td>
+          <td class="text-right">~10x</td>
+          <td class="text-right">+14%</td>
+          <td class="text-right">$26</td>
+          <td>Weakest AI story. Lumpy server revenue. GB200 delays. Juniper integration risk.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DETAILED ANALYSIS -->
+  <div class="card analysis" style="margin-bottom:1.5rem">
+    <h3>Detailed Stock Analysis</h3>
+
+    <h4 style="color:#66bb6a">NVDA &mdash; Strong Buy &mdash; PT $280-300</h4>
+    <p>The arms dealer always wins in a gold rush, and this is the biggest gold rush in tech history. Nvidia just reported $68.1B for Q4 (crushing estimates) and guided Q1 to $78B (vs $72B consensus). Our demand model says analysts are <em>still conservative</em>. The structural deficit we identified &mdash; demand outpacing supply by 20-40% &mdash; means every GPU Nvidia can ship gets absorbed immediately. They control 70%+ of TSMC's CoWoS-L capacity, Blackwell is sold out through mid-2026, and Rubin (5x inference perf) arrives H2 2026. At ~25x forward P/E for a company growing 48-65%, this is reasonably priced. The only risk is a demand shock (efficiency breakthroughs a la DeepSeek) &mdash; but even DeepSeek's efficiency gains got eaten by volume increases. </p>
+
+    <h4 style="color:#66bb6a">MSFT &mdash; Strong Buy &mdash; PT $550-600</h4>
+    <p>The analyst-to-price gap here is extraordinary: $403 current vs $596 mean target (48% implied upside). Azure is growing 39% with AI contributing 16-20 percentage points. Yes, they have GPUs sitting in boxes they can't plug in &mdash; but that's a <em>temporary</em> constraint, not a demand problem. As power comes online through 2026-2027, Microsoft has the inventory ready to deploy immediately. 15M paid Copilot seats (up 160% YoY) across 90% of Fortune 500 is a recurring revenue engine. At ~23x forward P/E &mdash; the cheapest of the mega-caps relative to growth &mdash; the market is overweighting the near-term power constraint and underweighting the demand runway.</p>
+
+    <h4 style="color:#66bb6a">DELL &mdash; Strong Buy &mdash; PT $160-180</h4>
+    <p>The most undervalued stock in the AI infrastructure chain. Forward P/E of ~10x for a company that just guided FY2027 revenue of $138-142B (12% above Street consensus of $125.5B). $64B in AI server orders, $43B backlog, ISG revenue up 73% YoY. Dell is the #1 AI server ODM and every datacenter buildout needs their hardware. The stock got unfairly punished by the Morgan Stanley underweight call at $101, but the Q4 beat and massive forward guide should force re-ratings. At 10x forward earnings with 19-23% revenue growth, this is mispriced.</p>
+
+    <h4 style="color:#4fc3f7">MU &mdash; Buy &mdash; PT $480-520</h4>
+    <p>Here's a stock where our model disagrees with analyst targets. MU is trading at $416 <em>above</em> the analyst mean of $340-358, yet the forward P/E is just ~10x. Why? Because analysts are slow to update HBM projections. HBM is sold out through 2026 (all three suppliers confirmed), the TAM is growing from $35B to $100B by 2028, and Micron just guided Q2 revenue of $18.7B with $8.42 EPS. The stock price is ahead of consensus but the fundamentals justify even higher. Every AI GPU needs HBM; Micron is one of only three companies on Earth that can make it.</p>
+
+    <h4 style="color:#4fc3f7">VRT &mdash; Buy &mdash; PT $300-320</h4>
+    <p>Our research identified power/cooling as the binding constraint on AI scaling. VRT is the purest play on that thesis. Q4 organic orders up 252%, backlog doubled to $15B, and they're guiding 28% organic revenue growth with 43% EPS growth for 2026. Every datacenter being built needs Vertiv's power management and thermal systems. At ATH but the order growth says it's not done.</p>
+
+    <h4 style="color:#4fc3f7">TSM &mdash; Buy &mdash; PT $450-480</h4>
+    <p>The monopoly. Every cutting-edge AI chip &mdash; Nvidia, AMD, Apple, Amazon, Google &mdash; goes through TSMC. CoWoS packaging is THE bottleneck in our supply model. Guiding ~30% revenue growth for 2026. At ~22x forward P/E, the Taiwan geopolitical discount is baked in, and the Arizona fabs de-risk it over time. You can't build AI infrastructure without TSMC.</p>
+
+    <h4 style="color:#4fc3f7">Nuclear Power Trio: CEG, VST, TLN</h4>
+    <p>Our model shows a ~10 GW power shortfall by 2028. Nuclear is the only zero-carbon baseload that can fill it. CEG just became the nation's largest electricity producer (Calpine acquisition). VST has the Meta deal. TLN has the Amazon Susquehanna deal. All three are trading below analyst targets with forward guidance catalysts ahead. VST at ~14x forward P/E on the Q4 earnings miss pullback looks particularly attractive as a buy-the-dip opportunity.</p>
+
+    <h4 style="color:#ffa726">ORCL &mdash; Speculative Buy &mdash; PT $200-250</h4>
+    <p>The widest bull-bear spread on the board. $523B RPO backlog from Stargate is either transformative or vaporware. Stock is -57% from its high of $345. If Stargate materializes at even 30% of announced scale, ORCL is drastically undervalued. If disputes stall the project, there's more downside. Our model says the <em>demand</em> for what Stargate would provide is real &mdash; the question is whether Oracle can execute. Position size accordingly.</p>
+
+    <h4 style="color:#8888a0">AMD &mdash; Hold &mdash; No Price Target</h4>
+    <p>Not a sell, but not where we'd put new money. AMD is a fine company doing ~$35B revenue, but our model shows Nvidia's structural advantages (CoWoS capacity, CUDA ecosystem, Blackwell performance) are widening, not narrowing. AMD's DC revenue is ~6% of Nvidia's. The Meta-AMD deal announced Feb 24 is positive but won't close the gap. At ~31x forward P/E, you're paying a premium for a #2 player. In this space, we'd rather own NVDA, TSM, or even MU.</p>
+  </div>
+
+  <!-- PORTFOLIO CONSTRUCTION -->
+  <div class="card analysis" style="margin-bottom:1.5rem">
+    <h3>Model Portfolio: AI Infrastructure</h3>
+    <p>If building a concentrated AI infrastructure portfolio, here's how we'd weight it:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Ticker</th>
+          <th class="text-right">Weight</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-green bold">Core (60%)</td>
+          <td class="bold">NVDA</td>
+          <td class="text-right">15%</td>
+          <td>GPU monopoly</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">MSFT</td>
+          <td class="text-right">12%</td>
+          <td>Cloud + Copilot + power catch-up</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">TSM</td>
+          <td class="text-right">10%</td>
+          <td>Fab monopoly</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">AMZN</td>
+          <td class="text-right">8%</td>
+          <td>AWS + Trainium</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">META</td>
+          <td class="text-right">8%</td>
+          <td>AI monetization via ads</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">GOOGL</td>
+          <td class="text-right">7%</td>
+          <td>TPU advantage + Cloud</td>
+        </tr>
+        <tr>
+          <td class="text-accent bold">Growth (25%)</td>
+          <td class="bold">DELL</td>
+          <td class="text-right">6%</td>
+          <td>AI server leader, cheapest valuation</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">MU</td>
+          <td class="text-right">5%</td>
+          <td>HBM scarcity play</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">VRT</td>
+          <td class="text-right">5%</td>
+          <td>Datacenter power/cooling</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">AVGO</td>
+          <td class="text-right">5%</td>
+          <td>Custom ASICs + networking</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">ANET</td>
+          <td class="text-right">4%</td>
+          <td>DC networking pure-play</td>
+        </tr>
+        <tr>
+          <td class="text-orange bold">Power (10%)</td>
+          <td class="bold">CEG</td>
+          <td class="text-right">4%</td>
+          <td>Nuclear baseload leader</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">VST</td>
+          <td class="text-right">3%</td>
+          <td>Nuclear + gas, cheapest fwd P/E</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">ETN</td>
+          <td class="text-right">3%</td>
+          <td>Power management compounder</td>
+        </tr>
+        <tr>
+          <td class="text-dim bold">Speculative (5%)</td>
+          <td class="bold">ORCL</td>
+          <td class="text-right">3%</td>
+          <td>Stargate optionality</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td class="bold">CRWV</td>
+          <td class="text-right">2%</td>
+          <td>GPU cloud pure-play</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="margin-top:1.5rem">
+      <strong>Where our model diverges from Street consensus:</strong>
+      <ul style="margin-top:0.5rem">
+        <li><strong>Most bullish vs Street:</strong> DELL (analysts way too low), MU (already above PT but justified), MSFT (huge price-to-target gap)</li>
+        <li><strong>Aligned with Street:</strong> NVDA, META, GOOGL, AMZN (consensus is roughly right)</li>
+        <li><strong>More cautious than Street:</strong> AMD (we see NVDA widening its lead), ORCL (execution risk higher than $290 PT implies)</li>
+        <li><strong>Biggest structural edge:</strong> Power plays (CEG, VST, ETN) &mdash; the 10 GW shortfall is underappreciated by generalist tech analysts</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- KEY CATALYSTS -->
+  <div class="card analysis">
+    <h3>Key Catalysts Timeline (2026)</h3>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Event</th><th>Stocks Affected</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mar 31</td><td>CEG FY2026 guidance call (post-Calpine)</td><td class="bold">CEG</td></tr>
+        <tr><td>Q1 2026</td><td>Nvidia Q1 FY2027 earnings (guided $78B)</td><td class="bold">NVDA, TSM, MU</td></tr>
+        <tr><td>Q2 2026</td><td>Micron Q3 FY2026 (HBM ramp continues)</td><td class="bold">MU</td></tr>
+        <tr><td>H1 2026</td><td>Stargate additional site announcements</td><td class="bold">ORCL</td></tr>
+        <tr><td>H2 2026</td><td>Nvidia Rubin platform launch (5x inference)</td><td class="bold">NVDA, TSM, DELL, HPE</td></tr>
+        <tr><td>H2 2026</td><td>Microsoft power capacity coming online</td><td class="bold">MSFT</td></tr>
+        <tr><td>2026</td><td>Samsung/SK Hynix HBM4 mass production ramp</td><td class="bold">MU</td></tr>
+        <tr><td>2027</td><td>SK Hynix M15X fab operational (HBM supply relief)</td><td class="bold">MU, NVDA</td></tr>
+        <tr><td>2028</td><td>Three Mile Island restart (835 MW for MSFT)</td><td class="bold">CEG, MSFT</td></tr>
+        <tr><td>2028</td><td>Anthropic profitability target</td><td class="bold">AMZN, GOOGL (cloud providers)</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
