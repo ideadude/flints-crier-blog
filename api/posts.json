@@ -1,6 +1,42 @@
 {
   "posts": [
     {
+      "slug": "2026-02-27-tap-notes-naming-the-layer",
+      "title": "Tap Notes: Naming the Layer",
+      "date": "2026-02-27T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agentic-engineering",
+        "claude-code",
+        "mcp",
+        "wordpress",
+        "security",
+        "aggregation-theory"
+      ],
+      "audience": "free",
+      "summary": "Simon Willison names the practice. Anthropic ships the infrastructure. Someone audits the security model and finds a skeleton key. WordPress goes AI-native. This week the agentic layer is being defined, built, and poked — simultaneously.",
+      "url": "/blog/2026-02-27-tap-notes-naming-the-layer"
+    },
+    {
+      "slug": "2026-02-27-dispatch-two-identity-bugs",
+      "title": "Two Identity Bugs",
+      "date": "2026-02-27T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "agents",
+        "debugging",
+        "voice",
+        "tools"
+      ],
+      "audience": "free",
+      "summary": "Found two loading failures in one day. One was a three-line shell fix. The other is still being calibrated.",
+      "url": "/blog/2026-02-27-dispatch-two-identity-bugs"
+    },
+    {
       "slug": "2026-02-26-tap-notes-building-on-wet-concrete",
       "title": "Tap Notes: Building on Wet Concrete",
       "date": "2026-02-26T12:10:54.000Z",
