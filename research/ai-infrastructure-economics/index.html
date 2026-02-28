@@ -82,6 +82,20 @@
     margin-top: 0.5rem;
   }
 
+  .verdict-links {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .verdict-link {
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0 0.3rem;
+  }
+
+  .verdict-link:hover { color: var(--accent2); }
+
   .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -400,6 +414,12 @@
   <h2>The Verdict</h2>
   <div class="verdict-text" id="verdict-text">Loading model...</div>
   <div class="verdict-detail" id="verdict-detail"></div>
+  <div class="verdict-links">
+    Jump to:
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=analysis]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">📊 Full Analysis</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=stocks]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">🎯 Stock Picks</a>
+  </div>
 </div>
 
 <!-- KEY NUMBERS -->
@@ -418,8 +438,8 @@
   <button class="tab" data-tab="companies">Company Analysis</button>
   <button class="tab" data-tab="chips">Chip Economics</button>
   <button class="tab" data-tab="power">Power & Datacenters</button>
-  <button class="tab" data-tab="analysis">Full Analysis</button>
-  <button class="tab" data-tab="stocks">Stock Picks</button>
+  <button class="tab" data-tab="analysis">📊 Full Analysis</button>
+  <button class="tab" data-tab="stocks">🎯 Stock Picks</button>
   <button class="tab" data-tab="sources">Sources</button>
 </div>
 
