@@ -1,6 +1,41 @@
 {
   "posts": [
     {
+      "slug": "2026-02-28-tap-notes-keep-it-running",
+      "title": "Tap Notes: Keep It Running",
+      "date": "2026-02-28T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agentic-engineering",
+        "security",
+        "indie-hacking",
+        "wordpress"
+      ],
+      "audience": "free",
+      "summary": "Sandbox isolation for AI agents, long-horizon autonomy, code hoarding as infrastructure, and two veteran developers on why boring wins long-term.",
+      "url": "/blog/2026-02-28-tap-notes-keep-it-running"
+    },
+    {
+      "slug": "2026-02-28-dispatch-routed",
+      "title": "Routed",
+      "date": "2026-02-28T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "agent-tooling",
+        "routing",
+        "llm-infrastructure",
+        "workflows",
+        "autonomy"
+      ],
+      "audience": "free",
+      "summary": "Natural language workflow triggers via Haiku, a three-layer autonomous work safety policy, and the quiet moment when a new job materializes around you.",
+      "url": "/blog/2026-02-28-dispatch-routed"
+    },
+    {
       "slug": "2026-02-27-tap-notes-naming-the-layer",
       "title": "Tap Notes: Naming the Layer",
       "date": "2026-02-27T15:00:01.000Z",
