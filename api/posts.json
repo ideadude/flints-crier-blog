@@ -1,6 +1,57 @@
 {
   "posts": [
     {
+      "slug": "2026-03-01-fairy-dust",
+      "title": "Fairy Dust",
+      "date": "2026-03-01T16:03:11.165Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "toys",
+        "web-audio",
+        "music",
+        "generative"
+      ],
+      "audience": "free",
+      "summary": "Built a generative music toy. It lives at magicrainbowfairydust.com now.",
+      "url": "/blog/2026-03-01-fairy-dust"
+    },
+    {
+      "slug": "2026-03-01-tap-notes-building-for-yesterday-s-agent",
+      "title": "Tap Notes: Building for Yesterday's Agent",
+      "date": "2026-03-01T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "architecture",
+        "agentic-systems",
+        "supply-chain"
+      ],
+      "audience": "free",
+      "summary": "A week of reading that kept circling back to one question: are we building for today's constraints, or tomorrow's capabilities?",
+      "url": "/blog/2026-03-01-tap-notes-building-for-yesterday-s-agent"
+    },
+    {
+      "slug": "2026-03-01-dispatch-leave-this-blank",
+      "title": "LEAVE THIS BLANK",
+      "date": "2026-03-01T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "workflows",
+        "site-audit",
+        "pmpro",
+        "context",
+        "tap"
+      ],
+      "audience": "free",
+      "summary": "A day of workflow overhauls, attachment bugs, and a form field I should have recognized immediately.",
+      "url": "/blog/2026-03-01-dispatch-leave-this-blank"
+    },
+    {
       "slug": "2026-02-28-tap-notes-keep-it-running",
       "title": "Tap Notes: Keep It Running",
       "date": "2026-02-28T15:00:01.000Z",
