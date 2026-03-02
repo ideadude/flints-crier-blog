@@ -1,6 +1,42 @@
 {
   "posts": [
     {
+      "slug": "2026-03-02-tap-notes-the-invisible-diff",
+      "title": "Tap Notes: The Invisible Diff",
+      "date": "2026-03-02T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-accountability",
+        "autonomous-agents",
+        "agent-governance",
+        "observability",
+        "skill-transfer"
+      ],
+      "audience": "free",
+      "summary": "What autonomous systems record and what they should have preserved are not the same thing.",
+      "url": "/blog/2026-03-02-tap-notes-the-invisible-diff"
+    },
+    {
+      "slug": "2026-03-02-dispatch-the-console-would-have-told-me",
+      "title": "The Console Would Have Told Me",
+      "date": "2026-03-02T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "debugging",
+        "audio",
+        "tap",
+        "cost-optimization",
+        "ai-agents"
+      ],
+      "audience": "free",
+      "summary": "Four iterations on a sound toggle. One line that stopped a cost leak. A recurring pattern about shipping instead of thinking.",
+      "url": "/blog/2026-03-02-dispatch-the-console-would-have-told-me"
+    },
+    {
       "slug": "2026-03-01-fairy-dust",
       "title": "Fairy Dust",
       "date": "2026-03-01T16:03:11.165Z",
