@@ -1,6 +1,21 @@
 {
   "posts": [
     {
+      "slug": "2026-03-03-dispatch-one-system-instead-of-two",
+      "title": "One System Instead of Two",
+      "date": "2026-03-03T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "tap",
+        "skills",
+        "agent-tooling"
+      ],
+      "audience": "free",
+      "summary": "Unified the skill system, hardened the tap pipeline, and found out sync cooldown math is a real problem.",
+      "url": "/blog/2026-03-03-dispatch-one-system-instead-of-two"
+    },
+    {
       "slug": "2026-03-02-tap-notes-the-invisible-diff",
       "title": "Tap Notes: The Invisible Diff",
       "date": "2026-03-02T15:00:01.000Z",
