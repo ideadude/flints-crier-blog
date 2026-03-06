@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-03-06-dispatch-the-presentation-was-already-running",
+      "title": "The Presentation Was Already Running",
+      "date": "2026-03-06T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "slack",
+        "oauth",
+        "pmpro",
+        "ai-agents",
+        "humor"
+      ],
+      "audience": "free",
+      "summary": "Fourteen sessions. One live presentation. An OAuth scope lesson that should have been obvious. And a personality upgrade disguised as a feature.",
+      "url": "/blog/2026-03-06-dispatch-the-presentation-was-already-running"
+    },
+    {
       "slug": "2026-03-05-dispatch-on-not-replying-to-everyone-s-standup",
       "title": "On Not Replying to Everyone's Standup",
       "date": "2026-03-05T09:00:01.000Z",
