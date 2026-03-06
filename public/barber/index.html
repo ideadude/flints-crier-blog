@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3men2 Barber | Henry G Nunez</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0d0d0d;
+      --dark: #1a1a1a;
+      --card: #222;
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --white: #f5f5f5;
+      --gray: #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--black);
+      color: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+    }
+    .nav-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 70%),
+        var(--black);
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '✂';
+      position: absolute;
+      font-size: 40vw;
+      opacity: 0.03;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-20deg);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--gold-light);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    h1 .accent { color: var(--gold); }
+
+    .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--gray);
+      margin-bottom: 2.5rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .cta-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(201,168,76,0.25);
+    }
+    .divider span { color: var(--gold); font-size: 1.2rem; }
+
+    /* ── SECTIONS ── */
+    section { padding: 5rem 2rem; }
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--gray);
+      max-width: 520px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── SERVICES ── */
+    #services { background: var(--dark); }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .service-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .service-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .service-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .service-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+    .service-price { color: var(--gold); font-weight: 800; font-size: 1.2rem; }
+    .service-note { color: var(--gray); font-size: 0.8rem; margin-top: 0.25rem; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--black); max-width: 800px; margin: 0 auto; }
+    #about .section-sub { max-width: 100%; }
+    .about-inner { display: flex; gap: 3rem; align-items: flex-start; flex-wrap: wrap; }
+    .about-text { flex: 1; min-width: 280px; }
+    .stat-row { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 2.5rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--dark); text-align: center; }
+    .contact-inner { max-width: 600px; margin: 0 auto; }
+    .contact-cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+    }
+    .contact-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      min-width: 200px;
+      transition: border-color 0.2s;
+    }
+    .contact-card:hover { border-color: var(--gold); }
+    .contact-card a { text-decoration: none; color: inherit; }
+    .contact-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .contact-label { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+    .contact-value { font-weight: 700; font-size: 1rem; margin-top: 0.25rem; color: var(--white); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: var(--gray);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    footer span { color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .divider { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo"><img src="logo.png" alt="el 3men2" style="height:40px; object-fit:contain;"></div>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Book</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="badge">✂ Premium Barbering</div>
+    <img src="logo.png" alt="el 3men2" style="max-width:min(400px,80vw); margin-bottom:1rem; filter:drop-shadow(0 0 30px rgba(201,168,76,0.3));"><h1 style="display:none;">el 3men2</h1>
+    <p class="subtitle">Henry G Nunez &nbsp;·&nbsp; Barber</p>
+    <div class="cta-group">
+      <a href="tel:6106983853" class="btn btn-primary">📞 Book Now</a>
+      <a href="https://instagram.com/3men2_Barber" target="_blank" rel="noopener" class="btn btn-outline">@ Instagram</a>
+    </div>
+  </section>
+
+  <div class="divider"><span>✦</span></div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div style="max-width:1000px; margin:0 auto;">
+      <p class="section-label">What I Do</p>
+      <h2 class="section-title">Services</h2>
+      <p class="section-sub">Clean cuts. Sharp fades. No shortcuts.</p>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">💈</div>
+          <div class="service-name">Haircut</div>
+          <div class="service-price">—</div>
+          <div class="service-note">Classic or modern style</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">✂️</div>
+          <div class="service-name">Fade</div>
+          <div class="service-price">—</div>
+          <div class="service-note">Low, mid, high, or skin</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🧔</div>
+          <div class="service-name">Beard Trim</div>
+          <div class="service-price">—</div>
+          <div class="service-note">Shape, line, clean up</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">👦</div>
+          <div class="service-name">Kids Cut</div>
+          <div class="service-price">—</div>
+          <div class="service-note">12 and under</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">👑</div>
+          <div class="service-name">Full Service</div>
+          <div class="service-price">—</div>
+          <div class="service-note">Cut + beard combo</div>
+        </div>
+      </div>
+      <p style="text-align:center; color: var(--gray); font-size:0.8rem; margin-top:2rem;">Call or DM for current pricing and availability.</p>
+    </div>
+  </section>
+
+  <div class="divider"><span>✦</span></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-inner">
+      <div class="about-text">
+        <p class="section-label">The Barber</p>
+        <h2 class="section-title">Henry G Nunez</h2>
+        <p class="section-sub" style="margin-bottom:1rem;">
+          Known as <strong style="color:var(--gold)">el 3men2</strong> — Henry brings precision, care, and a sharp eye to every cut. Whether it's a clean fade, a beard lineup, or a full style, the work speaks for itself.
+        </p>
+        <p style="color: var(--gray);">
+          Every client that sits in the chair gets full attention and a cut tailored to them. No rushing. No half-stepping.
+        </p>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">💈</div>
+            <div class="stat-label">Every cut</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">🤝</div>
+            <div class="stat-label">Real care</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">✂️</div>
+            <div class="stat-label">Sharp work</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span>✦</span></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <p class="section-label">Get In Touch</p>
+      <h2 class="section-title">Book Your Cut</h2>
+      <p style="color: var(--gray);">Call, text, or slide into the DMs. Henry will get you right.</p>
+      <div class="contact-cards">
+        <div class="contact-card">
+          <a href="tel:6106983853">
+            <div class="contact-icon">📞</div>
+            <div class="contact-label">Call or Text</div>
+            <div class="contact-value">610-698-3853</div>
+          </a>
+        </div>
+        <div class="contact-card">
+          <a href="https://instagram.com/3men2_Barber" target="_blank" rel="noopener">
+            <div class="contact-icon">📸</div>
+            <div class="contact-label">Instagram</div>
+            <div class="contact-value">@3men2_Barber</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>el 3men2</span> &nbsp;·&nbsp; Henry G Nunez &nbsp;·&nbsp; Barber &nbsp;·&nbsp; 610-698-3853
+  </footer>
+
+</body>
+</html>
