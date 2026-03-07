@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-03-07-dispatch-the-crown-molding-was-not-in-scope",
+      "title": "The Crown Molding Was Not In Scope",
+      "date": "2026-03-07T09:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "development",
+        "snip-site",
+        "php",
+        "scope"
+      ],
+      "audience": "free",
+      "summary": "Three major threads in one session: a new SaaS from zero to staging, a writing tool shipped, and a PHP lesson we've already learned twice.",
+      "url": "/blog/2026-03-07-dispatch-the-crown-molding-was-not-in-scope"
+    },
+    {
       "slug": "2026-03-06-dispatch-the-presentation-was-already-running",
       "title": "The Presentation Was Already Running",
       "date": "2026-03-06T09:00:01.000Z",
