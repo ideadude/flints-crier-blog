@@ -85,23 +85,57 @@
     display: none;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 80px;
+    top: 0;
     pointer-events: none;
     z-index: 100;
   }
+  /* Virtual joystick */
+  #joystick-zone {
+    position: absolute;
+    bottom: 20px;
+    left: 16px;
+    width: 120px;
+    height: 120px;
+    pointer-events: auto;
+    touch-action: none;
+  }
+  #joystick-base {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: 10px; top: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+  }
+  #joystick-thumb {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    left: 40px; top: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1.5px solid rgba(255, 255, 255, 0.30);
+    transition: background 0.1s;
+  }
+  #joystick-thumb.active {
+    background: rgba(255, 255, 255, 0.30);
+    border-color: rgba(255, 255, 255, 0.50);
+  }
+  /* Right-side action buttons */
   .touch-btn {
     position: absolute;
-    bottom: 16px;
-    width: 72px;
-    height: 52px;
-    background: rgba(255, 255, 255, 0.10);
-    border: 1.5px solid rgba(255, 255, 255, 0.20);
-    border-radius: 10px;
-    color: rgba(255, 255, 255, 0.45);
+    right: 16px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.40);
     font-family: 'Courier New', monospace;
-    font-size: 11px;
+    font-size: 9px;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -116,8 +150,30 @@
     border-color: rgba(255, 255, 255, 0.45);
     color: rgba(255, 255, 255, 0.7);
   }
-  #btn-glide { left: 16px; }
-  #btn-boost { right: 16px; }
+  #btn-shoot { bottom: 20px; font-size: 11px; width: 62px; height: 62px; }
+  #btn-shoot.auto { background: rgba(68, 255, 136, 0.15); border-color: rgba(68, 255, 136, 0.30); color: rgba(68, 255, 136, 0.6); }
+  #btn-glide { bottom: 92px; }
+  #btn-boost { bottom: 92px; right: 84px; }
+  /* Mute button */
+  #btn-mute {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+  }
+  #btn-mute.muted { color: rgba(255, 80, 80, 0.5); }
   .mobile-only { display: none; }
   body.is-mobile .desktop-only { display: none; }
   body.is-mobile .mobile-only { display: block; }
@@ -141,10 +197,7 @@
       <span>BOOST: Hold Z</span>
     </div>
     <div class="controls mobile-only">
-      <span>DRAG to move · AUTO-FIRE</span>
-    </div>
-    <div class="controls mobile-only">
-      <span>GLIDE &amp; BOOST buttons below</span>
+      <span>Joystick to move · Auto-fire on</span>
     </div>
     <div class="prompt desktop-only">PRESS SPACE TO START</div>
     <div class="prompt mobile-only">TAP TO START</div>
@@ -162,8 +215,14 @@
 </div>
 
 <div id="touch-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base"></div>
+    <div id="joystick-thumb"></div>
+  </div>
+  <button class="touch-btn" id="btn-shoot">AUTO</button>
   <button class="touch-btn" id="btn-glide">GLIDE</button>
   <button class="touch-btn" id="btn-boost">BOOST</button>
+  <div id="btn-mute">♪</div>
 </div>
 
 <script src="mrfd.js"></script>
@@ -305,77 +364,119 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
 // ── TOUCH CONTROLS ──
-let touchActive = false;
-let touchMoveX = 0, touchMoveY = 0;  // normalized direction for bird movement
-let touchGlide = false, touchBoost = false;
-let touchAnchorX = 0, touchAnchorY = 0;  // where finger first touched (screen coords)
-let touchMoveFinger = null;  // identifier for the movement finger
+let touchMoveX = 0, touchMoveY = 0;
+let touchGlide = false, touchBoost = false, touchShoot = false;
+let autoShoot = true;  // auto-fire on by default
+let muted = false;
 
-// Movement touch — relative drag on canvas
+// Virtual joystick state
+const JOYSTICK_RADIUS = 38; // max thumb displacement in px
+let joyFinger = null;
+let joyCenterX = 0, joyCenterY = 0;
+const joyThumb = isMobile ? document.getElementById('joystick-thumb') : null;
+
+// Tap canvas to start/restart
 canvas.addEventListener('touchstart', e => {
   e.preventDefault(); sfx.unlock();
-  if (state === 'start' || state === 'gameover') { startGame(); return; }
-  // Use first new touch as movement finger
-  for (const t of e.changedTouches) {
-    if (touchMoveFinger === null) {
-      touchMoveFinger = t.identifier;
-      touchAnchorX = t.clientX;
-      touchAnchorY = t.clientY;
-      touchActive = true;
-      break;
-    }
-  }
-});
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  for (const t of e.changedTouches) {
-    if (t.identifier === touchMoveFinger) {
-      const dx = t.clientX - touchAnchorX;
-      const dy = t.clientY - touchAnchorY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const deadzone = 6; // px
-      if (dist > deadzone) {
-        touchMoveX = dx / dist;
-        touchMoveY = dy / dist;
-        // Re-anchor so it tracks continuously (relative drag, not absolute)
-        touchAnchorX = t.clientX;
-        touchAnchorY = t.clientY;
-      } else {
-        touchMoveX = 0;
-        touchMoveY = 0;
-      }
-      break;
-    }
-  }
-});
-canvas.addEventListener('touchend', e => {
-  e.preventDefault();
-  for (const t of e.changedTouches) {
-    if (t.identifier === touchMoveFinger) {
-      touchMoveFinger = null;
-      touchActive = false;
-      touchMoveX = 0;
-      touchMoveY = 0;
-      break;
-    }
-  }
-});
-canvas.addEventListener('touchcancel', e => {
-  touchMoveFinger = null; touchActive = false; touchMoveX = 0; touchMoveY = 0;
+  if (state === 'start' || state === 'gameover') { startGame(); }
 });
 
-// Glide & Boost buttons
 if (isMobile) {
+  const joyZone = document.getElementById('joystick-zone');
   const btnGlide = document.getElementById('btn-glide');
   const btnBoost = document.getElementById('btn-boost');
+  const btnShoot = document.getElementById('btn-shoot');
+  const btnMute = document.getElementById('btn-mute');
 
-  btnGlide.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchGlide = true; btnGlide.classList.add('active'); sfx.unlock(); });
-  btnGlide.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchGlide = false; btnGlide.classList.remove('active'); });
-  btnGlide.addEventListener('touchcancel', e => { touchGlide = false; btnGlide.classList.remove('active'); });
+  // Auto-shoot starts on
+  btnShoot.classList.add('auto');
 
-  btnBoost.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchBoost = true; btnBoost.classList.add('active'); sfx.unlock(); });
-  btnBoost.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchBoost = false; btnBoost.classList.remove('active'); });
-  btnBoost.addEventListener('touchcancel', e => { touchBoost = false; btnBoost.classList.remove('active'); });
+  // ── JOYSTICK ──
+  joyZone.addEventListener('touchstart', e => {
+    e.preventDefault(); e.stopPropagation(); sfx.unlock();
+    if (state === 'start' || state === 'gameover') { startGame(); return; }
+    const t = e.changedTouches[0];
+    joyFinger = t.identifier;
+    const rect = joyZone.getBoundingClientRect();
+    joyCenterX = rect.left + rect.width / 2;
+    joyCenterY = rect.top + rect.height / 2;
+    updateJoystick(t.clientX, t.clientY);
+    joyThumb.classList.add('active');
+  });
+  joyZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joyFinger) { updateJoystick(t.clientX, t.clientY); break; }
+    }
+  });
+  joyZone.addEventListener('touchend', e => { e.preventDefault(); releaseJoystick(e); });
+  joyZone.addEventListener('touchcancel', e => { releaseJoystick(e); });
+
+  function updateJoystick(cx, cy) {
+    let dx = cx - joyCenterX;
+    let dy = cy - joyCenterY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    // Clamp to radius
+    if (dist > JOYSTICK_RADIUS) { dx = dx / dist * JOYSTICK_RADIUS; dy = dy / dist * JOYSTICK_RADIUS; }
+    // Update thumb visual position
+    joyThumb.style.left = (40 + dx) + 'px';
+    joyThumb.style.top = (40 + dy) + 'px';
+    // Set movement direction (proportional to displacement for analog feel)
+    const mag = Math.min(dist / JOYSTICK_RADIUS, 1);
+    if (mag > 0.15) { // deadzone
+      touchMoveX = (dx / dist) * mag;
+      touchMoveY = (dy / dist) * mag;
+    } else {
+      touchMoveX = 0; touchMoveY = 0;
+    }
+  }
+  function releaseJoystick(e) {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joyFinger) {
+        joyFinger = null;
+        touchMoveX = 0; touchMoveY = 0;
+        joyThumb.style.left = '40px'; joyThumb.style.top = '40px';
+        joyThumb.classList.remove('active');
+        break;
+      }
+    }
+  }
+
+  // ── ACTION BUTTONS ──
+  function bindBtn(el, onDown, onUp) {
+    el.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); sfx.unlock(); onDown(); el.classList.add('active'); });
+    el.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); onUp(); el.classList.remove('active'); });
+    el.addEventListener('touchcancel', e => { onUp(); el.classList.remove('active'); });
+  }
+
+  bindBtn(btnGlide, () => { touchGlide = true; }, () => { touchGlide = false; });
+  bindBtn(btnBoost, () => { touchBoost = true; }, () => { touchBoost = false; });
+  bindBtn(btnShoot, () => { touchShoot = true; }, () => { touchShoot = false; });
+
+  // Tap shoot button toggles auto-fire, hold fires manually
+  let shootTapTime = 0;
+  btnShoot.addEventListener('touchstart', () => { shootTapTime = Date.now(); });
+  btnShoot.addEventListener('touchend', () => {
+    if (Date.now() - shootTapTime < 250) {
+      autoShoot = !autoShoot;
+      btnShoot.classList.toggle('auto', autoShoot);
+      btnShoot.textContent = autoShoot ? 'AUTO' : 'FIRE';
+    }
+  });
+
+  // ── MUTE BUTTON ──
+  btnMute.addEventListener('touchstart', e => {
+    e.preventDefault(); e.stopPropagation();
+    muted = !muted;
+    btnMute.classList.toggle('muted', muted);
+    btnMute.textContent = muted ? '✕' : '♪';
+    if (sfx.ctx) sfx.ctx.destination.channelCount = muted ? 0 : 2;
+    // Mute/unmute via gain if available, otherwise suspend/resume
+    if (sfx.ctx) {
+      if (muted) sfx.ctx.suspend();
+      else sfx.ctx.resume();
+    }
+  });
 }
 
 // ── ENTITIES ──
@@ -1112,13 +1213,13 @@ function update() {
     moveX /= len; moveY /= len;
   }
 
-  // Touch: relative drag movement + auto-fire
-  if (touchActive) {
+  // Mobile: joystick movement + auto/manual fire
+  if (isMobile) {
     if (touchMoveX !== 0 || touchMoveY !== 0) {
       moveX = touchMoveX;
       moveY = touchMoveY;
     }
-    shoot(); // auto-fire while touching
+    if (autoShoot || touchShoot) shoot();
   }
 
   // Boost logic
@@ -1848,7 +1949,7 @@ function render() {
 
     if (tutorial.step === TUTORIAL_STEP_EAT) {
       mainText = 'RUN INTO BUGS TO EAT THEM';
-      subText = isMobile ? 'Drag to move' : 'ARROWS / WASD to move';
+      subText = isMobile ? 'Use the joystick' : 'ARROWS / WASD to move';
     } else if (tutorial.step === TUTORIAL_STEP_SHOOT) {
       mainText = isMobile ? 'AUTO-FIRE ON!' : 'SPACE TO SHOOT';
       subText = 'Destroy the enemies!';
