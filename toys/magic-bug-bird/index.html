@@ -1836,10 +1836,27 @@ function gameOver() {
   document.getElementById('game-over-screen').classList.add('active');
 }
 
-// ── GAME LOOP ──
-function loop() { update(); render(); requestAnimationFrame(loop); }
+// ── GAME LOOP (delta-time normalized to 60fps) ──
+let lastTime = 0;
+let dtAccum = 0;
+const FRAME_MS = 1000 / 60; // target 16.67ms per tick
+
+function loop(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  const elapsed = timestamp - lastTime;
+  lastTime = timestamp;
+
+  // Accumulate time, run fixed-step updates at 60fps
+  dtAccum += Math.min(elapsed, 50); // cap to avoid spiral of death
+  while (dtAccum >= FRAME_MS) {
+    update();
+    dtAccum -= FRAME_MS;
+  }
+  render();
+  requestAnimationFrame(loop);
+}
 initStars();
-loop();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
