@@ -96,6 +96,7 @@
       <span>BOOST: Hold Ctrl</span>
     </div>
     <div class="prompt">PRESS SPACE TO START</div>
+    <div class="controls" style="margin-top: 8px;"><span>ENTER to skip tutorial</span></div>
   </div>
   <div id="game-over-screen">
     <h1>GAME OVER</h1>
@@ -179,6 +180,7 @@ const PAL = {
 
 // ── STATE ──
 let state = 'start';
+let hasPlayedBefore = false; // skip tutorial after first play
 let score = 0;
 let wave = 1;           // current wave (increases after each boss kill)
 let waveScore = 0;      // score accumulated in current wave (resets each wave)
@@ -227,6 +229,10 @@ window.addEventListener('keydown', e => {
   if (e.code === 'Space') {
     e.preventDefault();
     if (state === 'start') startGame();
+    else if (state === 'gameover') startGame();
+  }
+  if (e.code === 'Enter') {
+    if (state === 'start') { hasPlayedBefore = true; startGame(); }
     else if (state === 'gameover') startGame();
   }
 });
@@ -292,7 +298,15 @@ function startGame() {
 
   feathersCollected = 0;
   featherPickups = [];
-  tutorial = { step: TUTORIAL_STEP_EAT, timer: 0, done: false, bugsAte: 0, enemiesKilled: 0 };
+
+  if (hasPlayedBefore) {
+    // Skip tutorial — go straight to wave 1
+    wave = 1;
+    scrollSpeed = 0.5;
+    tutorial = null;
+  } else {
+    tutorial = { step: TUTORIAL_STEP_EAT, timer: 0, done: false, bugsAte: 0, enemiesKilled: 0 };
+  }
 
   bullets = []; enemies = []; bugs = []; particles = [];
   enemyBullets = []; floatingTexts = []; obstacles = [];
@@ -929,6 +943,7 @@ function update() {
         // End tutorial — strip powers, clean field, start wave 1
         tutorial.done = true;
         tutorial = null;
+        hasPlayedBefore = true;
         wave = 1;
         waveScore = 0;
         powerLevel = 0;
@@ -1812,6 +1827,7 @@ function render() {
 
 function gameOver() {
   state = 'gameover';
+  hasPlayedBefore = true;
   sfxHit();
   document.getElementById('final-score').textContent = 'SCORE: ' + score;
   const levelNames = ['PECK', 'LASER EYES', 'SPREAD', 'GRAVITY FIELD'];
