@@ -93,7 +93,7 @@
     </div>
     <div class="controls">
       <span>GLIDE: Hold Shift</span>
-      <span>BOOST: Hold Ctrl</span>
+      <span>BOOST: Hold Z</span>
     </div>
     <div class="prompt">PRESS SPACE TO START</div>
     <div class="controls" style="margin-top: 8px;"><span>ENTER to skip tutorial</span></div>
@@ -219,7 +219,7 @@ let featherPickups = [];       // active feather pickups on screen
 let tutorial = null;           // { step, timer, done, bugsAte, enemiesKilled } or null
 const TUTORIAL_STEP_EAT = 0;    // "Run into bugs to eat them" — WASD shown, only bugs spawn
 const TUTORIAL_STEP_SHOOT = 1;  // "SPACE to shoot" — only enemies, wait for kill
-const TUTORIAL_STEP_NAVIGATE = 2; // "SHIFT to glide, CTRL to boost" — obstacles, timed
+const TUTORIAL_STEP_NAVIGATE = 2; // "SHIFT to glide, Z to boost" — obstacles, timed
 const TUTORIAL_STEP_GO = 3;     // Brief "WAVE 1" flash, strip powers, start real game
 
 // ── INPUT ──
@@ -975,7 +975,7 @@ function update() {
 
   // Bird movement
   let moveX = 0, moveY = 0;
-  const wantBoost = keys['ControlLeft'] || keys['ControlRight'];
+  const wantBoost = keys['KeyZ'];
   const normalSpeed = gliding ? 1.2 : 2;
 
   if (keys['ArrowLeft'] || keys['KeyA']) moveX = -1;
@@ -1728,7 +1728,7 @@ function render() {
       mainText = 'SPACE TO SHOOT';
       subText = 'Destroy the enemies!';
     } else if (tutorial.step === TUTORIAL_STEP_NAVIGATE) {
-      mainText = 'SHIFT = GLIDE   CTRL = BOOST';
+      mainText = 'SHIFT = GLIDE   Z = BOOST';
       subText = 'Dodge the obstacles!';
     } else if (tutorial.step === TUTORIAL_STEP_GO) {
       mainText = 'GET READY...';
