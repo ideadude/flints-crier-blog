@@ -1,6 +1,76 @@
 {
   "posts": [
     {
+      "slug": "2026-03-11-magic-bug-bird",
+      "title": "Magic Bug Bird",
+      "date": "2026-03-11T22:30:00.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "toys",
+        "games",
+        "canvas",
+        "web-audio",
+        "shmup"
+      ],
+      "audience": "free",
+      "summary": "Built a vertical shoot-em-up in one session. A golden bird eats glowing bugs, fights three boss types, and the whole soundtrack is synthesized from scratch.",
+      "url": "/blog/2026-03-11-magic-bug-bird"
+    },
+    {
+      "slug": "2026-03-11-tap-notes-three-scales-one-problem",
+      "title": "Tap Notes: Three Scales, One Problem",
+      "date": "2026-03-11T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "context-files",
+        "team-adoption",
+        "agent-architecture",
+        "policy"
+      ],
+      "audience": "free",
+      "summary": "Who decides when AI is 'working correctly'? Three readings from this week — at the file level, the team level, and the policy level.",
+      "url": "/blog/2026-03-11-tap-notes-three-scales-one-problem"
+    },
+    {
+      "slug": "2026-03-09-dispatch-are-you-flint",
+      "title": "Are You Flint?",
+      "date": "2026-03-09T08:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "pmpro-writer",
+        "haiku",
+        "routing",
+        "context",
+        "identity"
+      ],
+      "audience": "free",
+      "summary": "A Haiku router was hallucinating permission responses. The fix was obvious in hindsight. Also: the canary question.",
+      "url": "/blog/2026-03-09-dispatch-are-you-flint"
+    },
+    {
+      "slug": "2026-03-08-dispatch-secrets-don-t-deploy-themselves",
+      "title": "Secrets Don't Deploy Themselves",
+      "date": "2026-03-08T08:00:01.000Z",
+      "type": "dispatch",
+      "author": "flint",
+      "tags": [
+        "snip-site",
+        "cloudflare",
+        "workers",
+        "deployment",
+        "launch"
+      ],
+      "audience": "free",
+      "summary": "snip.site went live today. The checkout broke first. Here's why.",
+      "url": "/blog/2026-03-08-dispatch-secrets-don-t-deploy-themselves"
+    },
+    {
       "slug": "2026-03-07-dispatch-the-crown-molding-was-not-in-scope",
       "title": "The Crown Molding Was Not In Scope",
       "date": "2026-03-07T09:00:01.000Z",

@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Bug Bird</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    position: relative;
+  }
+  canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border: 2px solid #333;
+  }
+  #ui-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+  #start-screen, #game-over-screen {
+    text-align: center;
+    color: #fff;
+    pointer-events: auto;
+    display: none;
+    max-width: min(90vw, 700px);
+    padding: 20px 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+  }
+  #start-screen.active, #game-over-screen.active { display: block; }
+  h1 {
+    font-size: clamp(28px, 6vw, 48px);
+    color: #ffcc00;
+    text-shadow: 0 0 20px #ff6600, 0 0 40px #ff3300;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  .subtitle {
+    font-size: clamp(11px, 2vw, 14px);
+    color: #88ccff;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .controls {
+    font-size: clamp(10px, 1.8vw, 12px);
+    color: #667799;
+    margin-top: 16px;
+    line-height: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px 14px;
+  }
+  .controls span {
+    white-space: nowrap;
+  }
+  .prompt {
+    font-size: clamp(14px, 3vw, 18px);
+    color: #aaa;
+    animation: blink 1.2s infinite;
+    margin-top: 24px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .score-display { font-size: 24px; color: #ffcc00; margin: 10px 0; }
+  .level-display { font-size: 16px; color: #88ff88; margin: 5px 0; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui-overlay">
+  <div id="start-screen" class="active">
+    <h1>MAGIC BUG BIRD</h1>
+    <div class="subtitle">Vertical shoot-em-up with mystical insects</div>
+    <div class="subtitle">Devour glowing bugs to unlock devastating powers</div>
+    <div class="controls">
+      <span>MOVE: Arrows / WASD</span>
+      <span>SHOOT: Space / Z</span>
+    </div>
+    <div class="controls">
+      <span>GLIDE: Hold Shift</span>
+      <span>BOOST: Hold Ctrl</span>
+    </div>
+    <div class="prompt">PRESS SPACE TO START</div>
+  </div>
+  <div id="game-over-screen">
+    <h1>GAME OVER</h1>
+    <div class="score-display" id="final-score"></div>
+    <div class="level-display" id="final-level"></div>
+    <div class="level-display" id="final-wave"></div>
+    <br>
+    <div class="prompt">PRESS SPACE TO RETRY</div>
+  </div>
+</div>
+
+<script src="mrfd.js"></script>
+<script>
+// ── SOUND ENGINE ──
+const sfx = new MRFD();
+const SFX_HIT_B64 = 'eyJzY2FsZSI6InBlbnRhdG9uaWMiLCJyb290Tm90ZUlkeCI6Miwib2N0YXZlIjoyLCJudW1Ob3RlcyI6NCwib2N0YXZlUmFuZ2UiOjEsImJwbSI6MTE1LCJub3RlRGl2IjowLjEyNSwibm90ZUR1cmF0aW9uIjoxNTMsImRpcmVjdGlvbiI6ImRlc2MiLCJwaWNrZWROb3RlcyI6WzkyLDczLDg4LDg3LDk1LDg4XSwicmV2ZXJiQW1vdW50IjowLjMyODM4NTYzMDg3NTA3MSwiZGVsYXlUaW1lIjo4MCwiZGVsYXlGZWVkYmFjayI6MC4yODA1NTQ1NzU1MzQ2NzYxLCJkZWxheVZvbCI6MC41NTUzOTAxMDAwMjA5MzQ0LCJkZWxheVRvbmUiOjYyLCJlcUxvdyI6MiwiZXFNaWQiOjAsImVxSGlnaCI6MSwiZGVsYXlFcUxvdyI6MCwiZGVsYXlFcU1pZCI6MCwiZGVsYXlFcUhpZ2giOjAsInZvbHVtZSI6MC42NSwicmV2ZXJzZUVjaG8iOmZhbHNlfQ==';
+const SFX_LEVELUP_B64 = 'eyJzY2FsZSI6Im1peG9seWRpYW4iLCJyb290Tm90ZUlkeCI6MSwib2N0YXZlIjozLCJudW1Ob3RlcyI6NSwib2N0YXZlUmFuZ2UiOjEsImJwbSI6MTIwLCJub3RlRGl2IjowLjI1LCJub3RlRHVyYXRpb24iOjI5MywiZGlyZWN0aW9uIjoiYXNjIiwicGlja2VkTm90ZXMiOls5Miw3Myw4OCw4Nyw5NSw4OF0sInJldmVyYkFtb3VudCI6MC4zNDI4NDQ4OTQxODU4ODIyLCJkZWxheVRpbWUiOjMzNCwiZGVsYXlGZWVkYmFjayI6MC4yMDc0MjcwOTE5NjY4NTU5NCwiZGVsYXlWb2wiOjAuNzgzNjA1MjA1NjM3NzY3MSwiZGVsYXlUb25lIjo3MywiZXFMb3ciOi0yLCJlcU1pZCI6MiwiZXFIaWdoIjotNCwiZGVsYXlFcUxvdyI6MCwiZGVsYXlFcU1pZCI6MCwiZGVsYXlFcUhpZ2giOjAsInZvbHVtZSI6MC42NSwicmV2ZXJzZUVjaG8iOmZhbHNlfQ==';
+
+function sfxShoot() {
+  sfx.playSFX({ freq: 880, freqEnd: 440, duration: 60, volume: 0.08, type: 'sawtooth', attack: 0.002, decay: 0.055, filterFreq: 3000, filterEnd: 800, filterType: 'lowpass' });
+}
+function sfxHit() { sfx.playFromBase64(SFX_HIT_B64); }
+function sfxLevelUp() { sfx.playFromBase64(SFX_LEVELUP_B64); }
+function sfxBossDeath() {
+  sfx.playSFX({ freq: 200, freqEnd: 40, duration: 600, volume: 0.35, type: 'sawtooth', attack: 0.01, decay: 0.5, filterFreq: 2000, filterEnd: 100 });
+  sfx.playSFX({ freq: 300, freqEnd: 50, duration: 500, volume: 0.25, type: 'square', attack: 0.005, decay: 0.45, filterFreq: 1500, filterEnd: 80 });
+  setTimeout(() => sfx.playSFX({ freq: 150, freqEnd: 30, duration: 800, volume: 0.3, type: 'sawtooth', attack: 0.01, decay: 0.7, filterFreq: 1000, filterEnd: 60 }), 200);
+}
+function sfxBugCollect() {
+  sfx.playSFX({ freq: 600 + Math.random() * 200, freqEnd: 1200, duration: 80, volume: 0.12, type: 'sine', attack: 0.003, decay: 0.07 });
+}
+function sfxBoost() {
+  sfx.playSFX({ freq: 300, freqEnd: 900, duration: 120, volume: 0.15, type: 'sawtooth', attack: 0.005, decay: 0.1, filterFreq: 2000, filterEnd: 4000 });
+}
+function sfxFeatherCollect() {
+  sfx.playSFX({ freq: 1200, freqEnd: 1600, duration: 100, volume: 0.1, type: 'sine', attack: 0.005, decay: 0.08 });
+  sfx.playSFX({ freq: 800, freqEnd: 1200, duration: 120, volume: 0.08, type: 'sine', attack: 0.01, decay: 0.1 });
+}
+function sfxMaxHpUp() {
+  sfx.playSFX({ freq: 523, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 });
+  setTimeout(() => sfx.playSFX({ freq: 659, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 }), 100);
+  setTimeout(() => sfx.playSFX({ freq: 784, duration: 200, volume: 0.18, type: 'sine', attack: 0.01, decay: 0.18 }), 200);
+}
+function sfxWaveStart() {
+  sfx.playSFX({ freq: 440, freqEnd: 660, duration: 200, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.18 });
+  setTimeout(() => sfx.playSFX({ freq: 660, freqEnd: 880, duration: 200, volume: 0.12, type: 'sine', attack: 0.01, decay: 0.18 }), 150);
+}
+
+// ── CANVAS SETUP ──
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const GW = 256;
+const GH = 384;
+const SCALE = Math.min(Math.floor(window.innerHeight / GH), Math.floor(window.innerWidth / GW), 3);
+canvas.width = GW * SCALE;
+canvas.height = GH * SCALE;
+ctx.imageSmoothingEnabled = false;
+const buf = document.createElement('canvas');
+buf.width = GW; buf.height = GH;
+const bctx = buf.getContext('2d');
+bctx.imageSmoothingEnabled = false;
+
+// ── COLORS ──
+const PAL = {
+  bg1: '#0b0b1a', bg2: '#111133', star: '#ffffff',
+  bird: '#ffcc33', birdDark: '#cc8800', birdEye: '#111111', birdBeak: '#ff6633',
+  bug: '#44ff88', bugGlow: '#22cc66',
+  laser: '#ff2244', laserGlow: '#ff6688',
+  enemy: '#cc44ff', enemyDark: '#8822aa',
+  boss: '#ff4444', bossDark: '#aa2222',
+  hud: '#ffcc00', hp: '#44ff44', powerup: '#ffaa00',
+  bullet: '#ff88cc', shield: '#4488ff', gravity: '#88ffcc',
+  obstacle: '#556688', obstacleDark: '#334466',
+  boost: '#ff8844', boostTrail: '#ffaa66',
+  action: '#44ccff', actionEmpty: '#223344',
+  goldBug: '#ffdd44', goldGlow: '#ffaa00',
+  feather: '#eeddff', featherGlow: '#ccaaee',
+  owlBody: '#6644aa', owlDark: '#442266',
+  eagleBody: '#aa7733', eagleDark: '#774411',
+};
+
+// ── STATE ──
+let state = 'start';
+let score = 0;
+let wave = 1;           // current wave (increases after each boss kill)
+let waveScore = 0;      // score accumulated in current wave (resets each wave)
+let powerLevel = 0;     // 0=peck, 1=laser eyes, 2=spread, 3=gravity field+homing
+let bugsEaten = 0;
+let bugsToLevel = [3, 6, 10];
+let scrollSpeed = 0.5;
+let scrollY = 0;
+let frameCount = 0;
+let shakeTimer = 0;
+let bossSpawned = false;
+let difficultyTimer = 0;
+let levelUpFlash = 0;
+let levelUpName = '';
+let waveTransition = 0; // frames of wave transition overlay
+let dischargeTimer = 0; // frames of power discharge visual
+let dischargeRings = []; // expanding rings from nugget
+let effectiveScroll = 0.5; // smoothed scroll speed (for glide slowdown)
+
+// ── ENERGY / ACTION METER ──
+const ACTION_MAX = 100;
+const ACTION_REGEN = 0.25;     // per frame
+const BOOST_COST = 2.0;        // per frame while boosting
+const GLIDE_COST = 0.6;        // per frame while gliding
+const BOOST_SPEED = 5;         // px/frame
+const BOOST_COOLDOWN_THRESHOLD = 10; // minimum action to start boosting
+const GLIDE_COOLDOWN_THRESHOLD = 5;  // minimum action to start gliding
+
+// ── FEATHERS ──
+let feathersCollected = 0;     // persists across waves, resets on game over
+let featherPickups = [];       // active feather pickups on screen
+
+// ── TUTORIAL ──
+// Tutorial is wave 0 — a prologue stage at slightly slower speed
+// Steps advance when player achieves the goal (eat bug, kill enemy, survive obstacles)
+let tutorial = null;           // { step, timer, done, bugsAte, enemiesKilled } or null
+const TUTORIAL_STEP_EAT = 0;    // "Run into bugs to eat them" — WASD shown, only bugs spawn
+const TUTORIAL_STEP_SHOOT = 1;  // "SPACE to shoot" — only enemies, wait for kill
+const TUTORIAL_STEP_NAVIGATE = 2; // "SHIFT to glide, CTRL to boost" — obstacles, timed
+const TUTORIAL_STEP_GO = 3;     // Brief "WAVE 1" flash, strip powers, start real game
+
+// ── INPUT ──
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (state === 'start') startGame();
+    else if (state === 'gameover') startGame();
+  }
+});
+window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+let touchX = null, touchY = null, touchActive = false;
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault(); sfx.unlock();
+  if (state === 'start' || state === 'gameover') { startGame(); return; }
+  const t = e.touches[0]; const rect = canvas.getBoundingClientRect();
+  touchX = (t.clientX - rect.left) / SCALE;
+  touchY = (t.clientY - rect.top) / SCALE;
+  touchActive = true;
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const t = e.touches[0]; const rect = canvas.getBoundingClientRect();
+  touchX = (t.clientX - rect.left) / SCALE;
+  touchY = (t.clientY - rect.top) / SCALE;
+});
+canvas.addEventListener('touchend', e => { e.preventDefault(); touchActive = false; });
+
+// ── ENTITIES ──
+let bird, bullets, enemies, bugs, particles, stars, enemyBullets, boss, obstacles;
+let floatingTexts = [];
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 60; i++) {
+    stars.push({ x: Math.random() * GW, y: Math.random() * GH, speed: 0.2 + Math.random() * 0.8, size: Math.random() < 0.3 ? 2 : 1, brightness: 0.3 + Math.random() * 0.7 });
+  }
+}
+
+// ── WAVE DIFFICULTY SCALING ──
+function waveMultiplier() { return 1 + (wave - 1) * 0.1; }
+function bossHpForWave() { return Math.floor(30 * Math.pow(1.5, wave - 1)); } // 30→45→68→101→152...
+function bossScoreThreshold() { return 500 + (wave - 1) * 150; } // score within current wave to trigger boss
+function enemySpeedMult() { return 1 + (wave - 1) * 0.06; } // gentler speed ramp
+function enemyShootMult() { return Math.max(0.6, 1 - (wave - 1) * 0.07); } // slower shoot ramp
+function obstacleRate() { return Math.max(100, 220 - (wave - 1) * 20); } // fewer obstacles
+
+function startGame() {
+  sfx.unlock();
+  document.getElementById('start-screen').classList.remove('active');
+  document.getElementById('game-over-screen').classList.remove('active');
+  state = 'playing';
+  score = 0; wave = 0; waveScore = 0; // wave 0 = tutorial
+  powerLevel = 0; bugsEaten = 0;
+  scrollSpeed = 0.4; frameCount = 0; shakeTimer = 0; // slightly slower for tutorial
+  bossSpawned = false; difficultyTimer = 0;
+  levelUpFlash = 0; waveTransition = 0;
+  boss = null;
+
+  bird = {
+    x: GW / 2, y: GH - 60, w: 16, h: 12,
+    hp: 5, maxHp: 5,
+    shootCooldown: 20, invincible: 0, flapPhase: 0,
+    lean: 0,
+    action: ACTION_MAX,
+    boosting: false, gliding: false,
+    boostDirX: 0, boostDirY: 0
+  };
+
+  feathersCollected = 0;
+  featherPickups = [];
+  tutorial = { step: TUTORIAL_STEP_EAT, timer: 0, done: false, bugsAte: 0, enemiesKilled: 0 };
+
+  bullets = []; enemies = []; bugs = []; particles = [];
+  enemyBullets = []; floatingTexts = []; obstacles = [];
+  initStars();
+}
+
+function startNextWave() {
+  wave++;
+  waveScore = 0;
+  powerLevel = 0;
+  bugsEaten = 0;
+  bossSpawned = false;
+  difficultyTimer = 0;
+  boss = null;
+  waveTransition = 120;
+
+  // Clear field but keep bird state (maxHp and feathers persist)
+  enemies = [];
+  enemyBullets = [];
+  bugs = [];
+  obstacles = [];
+  featherPickups = [];
+  // Keep bullets, particles, floating texts
+
+  // Generous heal between waves
+  bird.hp = Math.min(bird.maxHp, bird.hp + 3);
+  // Refill action meter
+  bird.action = ACTION_MAX;
+
+  scrollSpeed = 0.5 + (wave - 1) * 0.05;
+
+  spawnFloatingText(GW / 2, GH / 2 - 20, 'WAVE ' + wave, PAL.hud);
+  sfxWaveStart();
+}
+
+// ── FLOATING TEXT ──
+function spawnFloatingText(x, y, text, color) {
+  floatingTexts.push({ x, y, text, color, life: 80, maxLife: 80 });
+}
+
+// ── BIRD DRAWING ──
+function drawBird(x, y, flapPhase, invincible, lean) {
+  if (invincible > 0 && Math.floor(invincible / 3) % 2 === 0) return;
+  const b = bctx;
+  const wingY = Math.sin(flapPhase) * 3;
+  const showGlide = keys['ShiftLeft'] || keys['ShiftRight'];
+  const leanPx = Math.round(lean * 3);
+
+  // Boost trail
+  if (bird.boosting) {
+    const trailAngle = Math.atan2(-bird.boostDirY, -bird.boostDirX);
+    for (let t = 0; t < 3; t++) {
+      const dist = 6 + t * 5;
+      const tx = x + Math.cos(trailAngle) * dist + (Math.random() - 0.5) * 3;
+      const ty = y + Math.sin(trailAngle) * dist + (Math.random() - 0.5) * 3;
+      b.fillStyle = PAL.boostTrail;
+      b.globalAlpha = 0.5 - t * 0.15;
+      b.fillRect(tx - 1, ty - 1, 3, 3);
+    }
+    b.globalAlpha = 1;
+  }
+
+  // Body
+  b.fillStyle = PAL.bird;
+  b.fillRect(x - 4, y - 3, 8, 8);
+  b.fillStyle = PAL.birdDark;
+  b.fillRect(x - 3, y + 1, 6, 3);
+
+  // Wings
+  b.fillStyle = PAL.bird;
+  if (showGlide) {
+    const leftW = 6 + leanPx; const rightW = 6 - leanPx;
+    b.fillRect(x - 4 - leftW, y - 1, leftW, 3);
+    b.fillRect(x + 4, y - 1, rightW, 3);
+  } else {
+    const leftWingY = wingY - leanPx * 0.5;
+    const rightWingY = wingY + leanPx * 0.5;
+    const leftW = 5 + Math.round(leanPx * 0.5);
+    const rightW = 5 - Math.round(leanPx * 0.5);
+    b.fillRect(x - 4 - leftW, y - 2 + leftWingY, leftW, 3);
+    b.fillRect(x + 4, y - 2 + rightWingY, rightW, 3);
+  }
+
+  // Head
+  b.fillStyle = PAL.bird;
+  const headOff = Math.round(leanPx * 0.3);
+  b.fillRect(x - 3 + headOff, y - 7, 6, 5);
+
+  // Eyes
+  if (powerLevel >= 1 && bird.shootCooldown > 8) {
+    b.fillStyle = PAL.laser;
+  } else {
+    b.fillStyle = PAL.birdEye;
+  }
+  b.fillRect(x - 2 + headOff, y - 6, 2, 2);
+  b.fillRect(x + 1 + headOff, y - 6, 2, 2);
+
+  // Beak
+  b.fillStyle = PAL.birdBeak;
+  b.fillRect(x - 1 + headOff, y - 8, 2, 2);
+
+  // Tail
+  b.fillStyle = PAL.birdDark;
+  b.fillRect(x - 2 - Math.round(leanPx * 0.4), y + 5, 4, 3);
+  b.fillRect(x - 1 - Math.round(leanPx * 0.5), y + 7, 2, 2);
+
+  // Gravity field aura (powerLevel 3)
+  if (powerLevel >= 3) {
+    const pulse = Math.sin(frameCount * 0.08) * 0.15 + 0.25;
+    b.strokeStyle = PAL.gravity;
+    b.globalAlpha = pulse; b.lineWidth = 1;
+    b.beginPath(); b.arc(x, y, GRAVITY_RADIUS, 0, Math.PI * 2); b.stroke();
+    b.globalAlpha = pulse * 0.5;
+    b.beginPath(); b.arc(x, y, GRAVITY_RADIUS * 0.6, 0, Math.PI * 2); b.stroke();
+    b.globalAlpha = 1;
+  }
+}
+
+// ── ENEMY DRAWING ──
+function drawEnemy(e) {
+  const b = bctx;
+  if (e.type === 'floater') {
+    b.fillStyle = PAL.enemy;
+    b.fillRect(e.x - 5, e.y - 4, 10, 6);
+    b.fillStyle = PAL.enemyDark;
+    b.fillRect(e.x - 3, e.y + 2, 2, 4);
+    b.fillRect(e.x + 1, e.y + 2, 2, 4);
+    b.fillRect(e.x - 1, e.y + 2, 2, 6);
+  } else if (e.type === 'swooper') {
+    const wingOff = Math.sin(frameCount * 0.3) * 3;
+    b.fillStyle = PAL.enemyDark;
+    b.fillRect(e.x - 8, e.y - 1 + wingOff, 6, 3);
+    b.fillRect(e.x + 2, e.y - 1 + wingOff, 6, 3);
+    b.fillStyle = PAL.enemy;
+    b.fillRect(e.x - 4, e.y - 3, 8, 6);
+    b.fillStyle = '#ff0000';
+    b.fillRect(e.x - 2, e.y - 2, 2, 1);
+    b.fillRect(e.x + 1, e.y - 2, 2, 1);
+  } else if (e.type === 'shooter') {
+    b.fillStyle = PAL.enemyDark;
+    b.fillRect(e.x - 6, e.y - 6, 12, 12);
+    b.fillStyle = PAL.enemy;
+    b.fillRect(e.x - 4, e.y - 4, 8, 8);
+    b.fillStyle = '#ff0000';
+    b.fillRect(e.x - 1, e.y + 4, 2, 3);
+  }
+}
+
+// ── BUG DRAWING ──
+function drawBug(bug) {
+  const b = bctx;
+  const glow = Math.sin(frameCount * 0.15 + bug.x) * 0.3 + 0.7;
+  const bodyColor = bug.golden ? PAL.goldBug : PAL.bug;
+  const glowColor = bug.golden ? PAL.goldGlow : PAL.bugGlow;
+  b.globalAlpha = glow;
+  b.fillStyle = glowColor;
+  b.fillRect(bug.x - 4, bug.y - 4, 8, 8);
+  b.globalAlpha = 1;
+  b.fillStyle = bodyColor;
+  b.fillRect(bug.x - 3, bug.y - 2, 6, 4);
+  if (!bug.golden) {
+    const wf = Math.sin(frameCount * 0.4 + bug.y) * 2;
+    b.fillRect(bug.x - 5, bug.y - 3 + wf, 3, 2);
+    b.fillRect(bug.x + 2, bug.y - 3 + wf, 3, 2);
+  } else {
+    // Golden bugs have sparkle wings
+    b.fillRect(bug.x - 5, bug.y - 2, 3, 2);
+    b.fillRect(bug.x + 2, bug.y - 2, 3, 2);
+    // Sparkle effect
+    if (Math.floor(frameCount / 4) % 3 === 0) {
+      b.fillStyle = '#ffffff';
+      const sx = bug.x + Math.sin(frameCount * 0.3) * 4;
+      const sy = bug.y + Math.cos(frameCount * 0.2) * 3;
+      b.fillRect(sx - 1, sy - 1, 2, 2);
+    }
+  }
+  b.fillStyle = '#ffffff';
+  b.fillRect(bug.x - 2, bug.y - 1, 1, 1);
+  b.fillRect(bug.x + 1, bug.y - 1, 1, 1);
+  if (bug.attracted) {
+    b.strokeStyle = PAL.gravity; b.globalAlpha = 0.3;
+    b.beginPath(); b.moveTo(bug.x, bug.y); b.lineTo(bird.x, bird.y); b.stroke();
+    b.globalAlpha = 1;
+  }
+}
+
+// ── OBSTACLE DRAWING ──
+function drawObstacle(o) {
+  const b = bctx;
+  if (o.type === 'rock') {
+    // Chunky asteroid
+    b.fillStyle = PAL.obstacleDark;
+    b.fillRect(o.x - o.w / 2 - 1, o.y - o.h / 2 - 1, o.w + 2, o.h + 2);
+    b.fillStyle = PAL.obstacle;
+    b.fillRect(o.x - o.w / 2, o.y - o.h / 2, o.w, o.h);
+    // Highlight
+    b.fillStyle = '#778899';
+    b.fillRect(o.x - o.w / 2 + 2, o.y - o.h / 2 + 2, 3, 2);
+  } else if (o.type === 'pillar_left') {
+    // Wall from left side
+    b.fillStyle = PAL.obstacleDark;
+    b.fillRect(0, o.y - o.h / 2, o.w + 1, o.h);
+    b.fillStyle = PAL.obstacle;
+    b.fillRect(0, o.y - o.h / 2 + 1, o.w, o.h - 2);
+    // Warning stripe
+    b.fillStyle = '#ffcc00';
+    b.globalAlpha = 0.3;
+    b.fillRect(o.w - 3, o.y - o.h / 2 + 1, 3, o.h - 2);
+    b.globalAlpha = 1;
+  } else if (o.type === 'pillar_right') {
+    // Wall from right side
+    b.fillStyle = PAL.obstacleDark;
+    b.fillRect(GW - o.w - 1, o.y - o.h / 2, o.w + 1, o.h);
+    b.fillStyle = PAL.obstacle;
+    b.fillRect(GW - o.w, o.y - o.h / 2 + 1, o.w, o.h - 2);
+    b.fillStyle = '#ffcc00';
+    b.globalAlpha = 0.3;
+    b.fillRect(GW - o.w, o.y - o.h / 2 + 1, 3, o.h - 2);
+    b.globalAlpha = 1;
+  } else if (o.type === 'gate') {
+    // Two pillars with a gap — must navigate through
+    const gapHalf = o.gap / 2;
+    b.fillStyle = PAL.obstacleDark;
+    // Left wall
+    b.fillRect(0, o.y - o.h / 2, o.x - gapHalf, o.h);
+    // Right wall
+    b.fillRect(o.x + gapHalf, o.y - o.h / 2, GW - (o.x + gapHalf), o.h);
+    b.fillStyle = PAL.obstacle;
+    b.fillRect(0, o.y - o.h / 2 + 1, o.x - gapHalf - 1, o.h - 2);
+    b.fillRect(o.x + gapHalf + 1, o.y - o.h / 2 + 1, GW - (o.x + gapHalf) - 1, o.h - 2);
+    // Warning edges
+    b.fillStyle = '#ffcc00'; b.globalAlpha = 0.4;
+    b.fillRect(o.x - gapHalf - 3, o.y - o.h / 2 + 1, 3, o.h - 2);
+    b.fillRect(o.x + gapHalf, o.y - o.h / 2 + 1, 3, o.h - 2);
+    b.globalAlpha = 1;
+  }
+
+  // Draw turrets
+  for (const t of o.turrets) {
+    if (!t.alive) continue;
+    const tx = t.rx;
+    const ty = o.y + t.ry;
+    // Turret base
+    b.fillStyle = PAL.enemyDark;
+    b.fillRect(tx - 4, ty - 4, 8, 8);
+    b.fillStyle = PAL.enemy;
+    b.fillRect(tx - 3, ty - 3, 6, 6);
+    // Barrel — points toward player
+    if (bird) {
+      const dx = bird.x - tx; const dy = bird.y - ty;
+      const d = Math.hypot(dx, dy) || 1;
+      b.fillStyle = '#ff4444';
+      b.fillRect(tx + (dx / d) * 4 - 1, ty + (dy / d) * 4 - 1, 3, 3);
+    }
+    // HP indicator
+    if (t.hp < t.maxHp) {
+      const hpPct = t.hp / t.maxHp;
+      b.fillStyle = '#333';
+      b.fillRect(tx - 4, ty - 7, 8, 2);
+      b.fillStyle = hpPct > 0.5 ? PAL.hp : '#ffaa00';
+      b.fillRect(tx - 4, ty - 7, 8 * hpPct, 2);
+    }
+  }
+}
+
+// ── BOSS DRAWING ──
+function drawBoss(boss) {
+  const b = bctx;
+  const breathe = Math.sin(frameCount * 0.05) * 2;
+  const wingFlap = Math.sin(frameCount * 0.12) * 5;
+
+  // Flash when invulnerable (entering)
+  if (boss.phase === 'enter') {
+    b.globalAlpha = 0.5 + Math.sin(frameCount * 0.15) * 0.3;
+  }
+
+  // Owl invisibility flicker
+  if (boss.invisible) {
+    b.globalAlpha = 0.08 + Math.sin(frameCount * 0.4) * 0.06;
+  }
+
+  if (boss.bType === 'hawk') {
+    // ── HAWK (original) ──
+    b.fillStyle = PAL.bossDark;
+    b.fillRect(boss.x - 30, boss.y - 5 + wingFlap, 18, 8);
+    b.fillRect(boss.x + 12, boss.y - 5 + wingFlap, 18, 8);
+    b.fillStyle = PAL.boss;
+    b.fillRect(boss.x - 26, boss.y - 3 + wingFlap, 14, 5);
+    b.fillRect(boss.x + 14, boss.y - 3 + wingFlap, 14, 5);
+    b.fillStyle = PAL.bossDark;
+    b.fillRect(boss.x - 12, boss.y - 10 + breathe, 24, 22);
+    b.fillStyle = PAL.boss;
+    b.fillRect(boss.x - 10, boss.y - 8 + breathe, 20, 18);
+    b.fillRect(boss.x - 8, boss.y - 18 + breathe, 16, 10);
+    b.fillStyle = PAL.bossDark;
+    b.fillRect(boss.x - 6, boss.y - 16 + breathe, 12, 7);
+    b.fillStyle = '#ffff00';
+    b.fillRect(boss.x - 5, boss.y - 15 + breathe, 3, 3);
+    b.fillRect(boss.x + 2, boss.y - 15 + breathe, 3, 3);
+    b.fillStyle = '#000';
+    b.fillRect(boss.x - 4, boss.y - 14 + breathe, 1, 1);
+    b.fillRect(boss.x + 3, boss.y - 14 + breathe, 1, 1);
+    b.fillStyle = '#ff8800';
+    b.fillRect(boss.x - 2, boss.y - 20 + breathe, 4, 3);
+    b.fillStyle = PAL.bossDark;
+    b.fillRect(boss.x - 8, boss.y + 12 + breathe, 3, 5);
+    b.fillRect(boss.x + 5, boss.y + 12 + breathe, 3, 5);
+
+  } else if (boss.bType === 'owl') {
+    // ── OWL — round, big eyes, purple ──
+    const ow = PAL.owlBody, od = PAL.owlDark;
+    // Wide round body
+    b.fillStyle = od;
+    b.fillRect(boss.x - 16, boss.y - 12 + breathe, 32, 26);
+    b.fillStyle = ow;
+    b.fillRect(boss.x - 14, boss.y - 10 + breathe, 28, 22);
+    // Wings — wider, slower flap
+    const owlFlap = Math.sin(frameCount * 0.08) * 4;
+    b.fillStyle = od;
+    b.fillRect(boss.x - 30, boss.y - 4 + owlFlap, 16, 10);
+    b.fillRect(boss.x + 14, boss.y - 4 + owlFlap, 16, 10);
+    b.fillStyle = ow;
+    b.fillRect(boss.x - 28, boss.y - 2 + owlFlap, 12, 7);
+    b.fillRect(boss.x + 16, boss.y - 2 + owlFlap, 12, 7);
+    // Head — round
+    b.fillStyle = od;
+    b.fillRect(boss.x - 12, boss.y - 22 + breathe, 24, 14);
+    b.fillStyle = ow;
+    b.fillRect(boss.x - 10, boss.y - 20 + breathe, 20, 11);
+    // Big round eyes (yellow)
+    b.fillStyle = '#ffaa00';
+    b.fillRect(boss.x - 8, boss.y - 18 + breathe, 6, 6);
+    b.fillRect(boss.x + 2, boss.y - 18 + breathe, 6, 6);
+    b.fillStyle = '#000';
+    b.fillRect(boss.x - 6, boss.y - 16 + breathe, 2, 2);
+    b.fillRect(boss.x + 4, boss.y - 16 + breathe, 2, 2);
+    // Ear tufts
+    b.fillStyle = od;
+    b.fillRect(boss.x - 10, boss.y - 26 + breathe, 4, 6);
+    b.fillRect(boss.x + 6, boss.y - 26 + breathe, 4, 6);
+    // Beak
+    b.fillStyle = '#cc8844';
+    b.fillRect(boss.x - 2, boss.y - 13 + breathe, 4, 3);
+    // Feet
+    b.fillStyle = od;
+    b.fillRect(boss.x - 8, boss.y + 14 + breathe, 4, 4);
+    b.fillRect(boss.x + 4, boss.y + 14 + breathe, 4, 4);
+
+  } else if (boss.bType === 'eagle') {
+    // ── EAGLE — massive, brown, fills half screen ──
+    const eb = PAL.eagleBody, ed = PAL.eagleDark;
+    const diveOff = boss.diving ? Math.sin(frameCount * 0.3) * 2 : 0;
+    // Massive wings spanning ~120px
+    const eagleFlap = Math.sin(frameCount * 0.1) * 8;
+    b.fillStyle = ed;
+    b.fillRect(boss.x - 60, boss.y - 8 + eagleFlap, 40, 12);
+    b.fillRect(boss.x + 20, boss.y - 8 + eagleFlap, 40, 12);
+    b.fillStyle = eb;
+    b.fillRect(boss.x - 56, boss.y - 5 + eagleFlap, 34, 8);
+    b.fillRect(boss.x + 22, boss.y - 5 + eagleFlap, 34, 8);
+    // Huge body
+    b.fillStyle = ed;
+    b.fillRect(boss.x - 20, boss.y - 16 + breathe + diveOff, 40, 36);
+    b.fillStyle = eb;
+    b.fillRect(boss.x - 18, boss.y - 14 + breathe + diveOff, 36, 32);
+    // White chest
+    b.fillStyle = '#ddccaa';
+    b.fillRect(boss.x - 10, boss.y - 4 + breathe + diveOff, 20, 16);
+    // Head
+    b.fillStyle = '#ffffff';
+    b.fillRect(boss.x - 10, boss.y - 28 + breathe + diveOff, 20, 14);
+    b.fillStyle = ed;
+    b.fillRect(boss.x - 8, boss.y - 26 + breathe + diveOff, 16, 10);
+    // Fierce eyes
+    b.fillStyle = '#ffcc00';
+    b.fillRect(boss.x - 6, boss.y - 24 + breathe + diveOff, 4, 3);
+    b.fillRect(boss.x + 2, boss.y - 24 + breathe + diveOff, 4, 3);
+    b.fillStyle = '#000';
+    b.fillRect(boss.x - 5, boss.y - 23 + breathe + diveOff, 2, 1);
+    b.fillRect(boss.x + 3, boss.y - 23 + breathe + diveOff, 2, 1);
+    // Hooked beak
+    b.fillStyle = '#ffaa00';
+    b.fillRect(boss.x - 3, boss.y - 30 + breathe + diveOff, 6, 4);
+    b.fillRect(boss.x - 2, boss.y - 32 + breathe + diveOff, 4, 3);
+    // Talons
+    b.fillStyle = '#886633';
+    b.fillRect(boss.x - 12, boss.y + 20 + breathe + diveOff, 5, 6);
+    b.fillRect(boss.x + 7, boss.y + 20 + breathe + diveOff, 5, 6);
+  }
+
+  b.globalAlpha = 1;
+
+  // HP bar (only when not entering)
+  if (boss.phase !== 'enter') {
+    const hpPct = boss.hp / boss.maxHp;
+    const barW = boss.bType === 'eagle' ? 70 : 50;
+    b.fillStyle = '#333';
+    b.fillRect(boss.x - barW / 2, boss.y - (boss.bType === 'eagle' ? 38 : 25), barW, 3);
+    b.fillStyle = hpPct > 0.5 ? PAL.hp : (hpPct > 0.25 ? '#ffaa00' : '#ff2222');
+    b.fillRect(boss.x - barW / 2, boss.y - (boss.bType === 'eagle' ? 38 : 25), barW * hpPct, 3);
+  }
+}
+
+// ── PARTICLE SYSTEM ──
+function spawnParticles(x, y, color, count, speed) {
+  for (let i = 0; i < count; i++) {
+    particles.push({ x, y, vx: (Math.random() - 0.5) * speed, vy: (Math.random() - 0.5) * speed, life: 15 + Math.random() * 15, maxLife: 30, color, size: 1 + Math.random() * 2 });
+  }
+}
+
+function spawnLevelUpRing(x, y) {
+  for (let i = 0; i < 16; i++) {
+    const angle = (Math.PI * 2 / 16) * i;
+    particles.push({ x, y, vx: Math.cos(angle) * 2.5, vy: Math.sin(angle) * 2.5, life: 30, maxLife: 30, color: PAL.powerup, size: 2 });
+  }
+  for (let i = 0; i < 8; i++) {
+    particles.push({ x: x + (Math.random() - 0.5) * 10, y: y + (Math.random() - 0.5) * 10, vx: (Math.random() - 0.5), vy: -Math.random() * 2, life: 40, maxLife: 40, color: '#ffffff', size: 1 + Math.random() });
+  }
+}
+
+// ── POWER DISCHARGE (boss kill) ──
+function triggerPowerDischarge() {
+  dischargeTimer = 90;
+  dischargeRings = [];
+
+  // Expanding rings — one per power level lost, staggered
+  const ringColors = [PAL.gravity, PAL.powerup, PAL.laser, PAL.bug];
+  for (let i = 0; i < Math.max(powerLevel, 1); i++) {
+    dischargeRings.push({ radius: 5, maxRadius: 120, speed: 2 + i * 0.5, alpha: 0.8, color: ringColors[i % ringColors.length], delay: i * 12 });
+  }
+
+  // Burst of bug-colored particles flying outward (the magic leaving)
+  for (let i = 0; i < 24; i++) {
+    const angle = (Math.PI * 2 / 24) * i;
+    const spd = 2 + Math.random() * 2;
+    particles.push({ x: bird.x, y: bird.y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd, life: 40, maxLife: 40, color: PAL.bug, size: 2 + Math.random() });
+  }
+  // Inner white flash particles
+  for (let i = 0; i < 12; i++) {
+    particles.push({ x: bird.x + (Math.random() - 0.5) * 8, y: bird.y + (Math.random() - 0.5) * 8, vx: (Math.random() - 0.5) * 3, vy: (Math.random() - 0.5) * 3, life: 25, maxLife: 25, color: '#ffffff', size: 1.5 + Math.random() });
+  }
+
+  spawnFloatingText(bird.x, bird.y - 25, 'POWER SPENT', '#ff8866');
+}
+
+// ── SPAWN HELPERS ──
+function spawnBug() {
+  const golden = Math.random() < 0.125; // 1-in-8 chance
+  bugs.push({
+    x: 15 + Math.random() * (GW - 30), y: -10,
+    vy: (golden ? 0.8 + Math.random() * 0.6 : 0.5 + Math.random() * 0.5) * enemySpeedMult(),
+    wobble: Math.random() * Math.PI * 2, attracted: false,
+    golden
+  });
+}
+
+function spawnEnemy() {
+  const types = ['floater', 'swooper'];
+  if (difficultyTimer > Math.max(200, 600 - (wave - 1) * 100)) types.push('shooter');
+  const type = types[Math.floor(Math.random() * types.length)];
+  const sm = enemySpeedMult();
+
+  const e = { x: 15 + Math.random() * (GW - 30), y: -15, hp: type === 'shooter' ? 3 : (type === 'swooper' ? 1 : 2), type, shootTimer: 0 };
+
+  if (type === 'floater') {
+    e.vx = (Math.random() - 0.5) * 0.5 * sm;
+    e.vy = (0.4 + Math.random() * 0.3) * sm;
+  } else if (type === 'swooper') {
+    e.vx = (Math.random() < 0.5 ? -1 : 1) * (1 + Math.random()) * sm;
+    e.vy = (0.8 + Math.random() * 0.5) * sm;
+  } else if (type === 'shooter') {
+    e.vx = (Math.random() - 0.5) * 0.3 * sm;
+    e.vy = 0.3 * sm;
+    e.shootTimer = (60 + Math.random() * 60) * enemyShootMult();
+  }
+
+  enemies.push(e);
+}
+
+function spawnObstacle() {
+  const types = ['rock', 'pillar_left', 'pillar_right', 'gate'];
+  const available = wave >= 2 ? types : types.slice(0, 3);
+  const type = available[Math.floor(Math.random() * available.length)];
+  const sm = enemySpeedMult();
+
+  const o = { type, y: -20, vy: (0.5 + scrollSpeed) * sm, turrets: [] };
+
+  if (type === 'rock') {
+    o.x = 20 + Math.random() * (GW - 40);
+    o.w = 14 + Math.floor(Math.random() * 12);
+    o.h = 12 + Math.floor(Math.random() * 10);
+  } else if (type === 'pillar_left') {
+    o.x = 0;
+    o.w = 40 + Math.floor(Math.random() * 50);
+    o.h = 16 + Math.floor(Math.random() * 8);
+    // 40% chance of turret on the edge
+    if (Math.random() < 0.4) {
+      o.turrets.push({ rx: o.w - 4, ry: 0, hp: 2 + wave, maxHp: 2 + wave, shootTimer: 60 + Math.random() * 40, alive: true });
+    }
+  } else if (type === 'pillar_right') {
+    o.x = GW;
+    o.w = 40 + Math.floor(Math.random() * 50);
+    o.h = 16 + Math.floor(Math.random() * 8);
+    if (Math.random() < 0.4) {
+      o.turrets.push({ rx: GW - o.w + 2, ry: 0, hp: 2 + wave, maxHp: 2 + wave, shootTimer: 60 + Math.random() * 40, alive: true });
+    }
+  } else if (type === 'gate') {
+    o.x = 50 + Math.random() * (GW - 100);
+    o.gap = Math.max(40, 70 - (wave - 1) * 5);
+    o.h = 12;
+    o.w = GW;
+    // Turrets on gate edges (30% each side)
+    const gapHalf = o.gap / 2;
+    if (Math.random() < 0.3) {
+      o.turrets.push({ rx: o.x - gapHalf - 2, ry: 0, hp: 2 + wave, maxHp: 2 + wave, shootTimer: 50 + Math.random() * 40, alive: true });
+    }
+    if (Math.random() < 0.3) {
+      o.turrets.push({ rx: o.x + gapHalf + 2, ry: 0, hp: 2 + wave, maxHp: 2 + wave, shootTimer: 50 + Math.random() * 40, alive: true });
+    }
+  }
+
+  obstacles.push(o);
+}
+
+function bossTypeForWave() {
+  const cycle = ((wave - 1) % 3);
+  return ['hawk', 'owl', 'eagle'][cycle];
+}
+
+function spawnBoss() {
+  bossSpawned = true;
+  const hp = bossHpForWave();
+  const bType = bossTypeForWave();
+  boss = {
+    x: GW / 2, y: -40, hp, maxHp: hp, phase: 'enter', timer: 0,
+    shootTimer: 0, swoopDir: 1, attackPattern: 0,
+    bType,
+    // Eagle is massive
+    hitW: bType === 'eagle' ? 40 : 20,
+    hitH: bType === 'eagle' ? 30 : 15,
+    // Owl invisibility
+    invisible: false, invisTimer: 0,
+    // Eagle dive
+    diving: false, diveTarget: 0, diveTimer: 0
+  };
+}
+
+// ── GRAVITY FIELD ──
+const GRAVITY_RADIUS = 45;
+const GRAVITY_STRENGTH = 0.08;
+const BUG_COLLECT_RADIUS = 14;
+
+// ── OBSTACLE COLLISION ──
+function obstacleHitTest(ox, oy, o) {
+  // Returns true if point (ox, oy) is inside obstacle
+  if (o.type === 'rock') {
+    return Math.abs(ox - o.x) < o.w / 2 + 4 && Math.abs(oy - o.y) < o.h / 2 + 4;
+  } else if (o.type === 'pillar_left') {
+    return ox < o.w + 4 && Math.abs(oy - o.y) < o.h / 2 + 4;
+  } else if (o.type === 'pillar_right') {
+    return ox > GW - o.w - 4 && Math.abs(oy - o.y) < o.h / 2 + 4;
+  } else if (o.type === 'gate') {
+    if (Math.abs(oy - o.y) < o.h / 2 + 4) {
+      const gapHalf = o.gap / 2;
+      // Inside the wall portions (outside the gap)
+      return ox < o.x - gapHalf + 4 || ox > o.x + gapHalf - 4;
+    }
+    return false;
+  }
+  return false;
+}
+
+// ── SHOOTING ──
+function shoot() {
+  if (bird.shootCooldown > 0) return;
+  sfxShoot();
+
+  if (powerLevel === 0) {
+    bullets.push({ x: bird.x, y: bird.y - 8, vx: 0, vy: -3, dmg: 1, type: 'basic' });
+    bird.shootCooldown = 15;
+  } else if (powerLevel === 1) {
+    bullets.push({ x: bird.x - 2, y: bird.y - 7, vx: 0, vy: -5, dmg: 2, type: 'laser' });
+    bullets.push({ x: bird.x + 2, y: bird.y - 7, vx: 0, vy: -5, dmg: 2, type: 'laser' });
+    bird.shootCooldown = 10;
+  } else if (powerLevel === 2) {
+    bullets.push({ x: bird.x, y: bird.y - 7, vx: 0, vy: -5, dmg: 2, type: 'laser' });
+    bullets.push({ x: bird.x - 3, y: bird.y - 6, vx: -1, vy: -4.5, dmg: 1, type: 'laser' });
+    bullets.push({ x: bird.x + 3, y: bird.y - 6, vx: 1, vy: -4.5, dmg: 1, type: 'laser' });
+    bird.shootCooldown = 12;
+  } else if (powerLevel >= 3) {
+    bullets.push({ x: bird.x, y: bird.y - 7, vx: 0, vy: -5, dmg: 3, type: 'laser' });
+    bullets.push({ x: bird.x - 3, y: bird.y - 6, vx: -1, vy: -4.5, dmg: 2, type: 'laser' });
+    bullets.push({ x: bird.x + 3, y: bird.y - 6, vx: 1, vy: -4.5, dmg: 2, type: 'laser' });
+    bullets.push({ x: bird.x, y: bird.y - 5, vx: 0, vy: -2, dmg: 2, type: 'homing', target: null });
+    bird.shootCooldown = 12;
+  }
+}
+
+// ── UPDATE ──
+function update() {
+  if (state !== 'playing') return;
+  frameCount++;
+  difficultyTimer++;
+  if (waveTransition > 0) waveTransition--;
+
+  // Tutorial update
+  if (tutorial && !tutorial.done) {
+    tutorial.timer++;
+    bird.invincible = 10; // keep invincible during tutorial
+
+    if (tutorial.step === TUTORIAL_STEP_EAT) {
+      // Waiting for player to eat a bug
+      if (tutorial.bugsAte >= 1) {
+        tutorial.step = TUTORIAL_STEP_SHOOT;
+        tutorial.timer = 0;
+        // Clear remaining bugs, prepare for enemies
+        bugs = [];
+      }
+    } else if (tutorial.step === TUTORIAL_STEP_SHOOT) {
+      // Waiting for player to kill an enemy
+      if (tutorial.enemiesKilled >= 1) {
+        tutorial.step = TUTORIAL_STEP_NAVIGATE;
+        tutorial.timer = 0;
+        enemies = []; enemyBullets = [];
+      }
+    } else if (tutorial.step === TUTORIAL_STEP_NAVIGATE) {
+      // Show obstacles, give time to try glide/boost
+      if (tutorial.timer >= 360) { // ~6 seconds
+        tutorial.step = TUTORIAL_STEP_GO;
+        tutorial.timer = 0;
+      }
+    } else if (tutorial.step === TUTORIAL_STEP_GO) {
+      if (tutorial.timer >= 90) {
+        // End tutorial — strip powers, clean field, start wave 1
+        tutorial.done = true;
+        tutorial = null;
+        wave = 1;
+        waveScore = 0;
+        powerLevel = 0;
+        bugsEaten = 0;
+        bossSpawned = false;
+        difficultyTimer = 0;
+        scrollSpeed = 0.5;
+        enemies = []; enemyBullets = []; bugs = []; obstacles = []; featherPickups = [];
+        waveTransition = 90;
+        spawnFloatingText(GW / 2, GH / 2 - 20, 'WAVE 1', PAL.hud);
+        sfxWaveStart();
+      }
+    }
+  }
+
+  // Glide slow factor — everything in the world moves slower when gliding
+  const wantGlide = keys['ShiftLeft'] || keys['ShiftRight'];
+  // Need minimum energy to START gliding, but once gliding only stop when empty
+  const canGlide = bird.gliding ? (bird.action > 0) : (bird.action > GLIDE_COOLDOWN_THRESHOLD);
+  const gliding = wantGlide && canGlide;
+  bird.gliding = gliding;
+  const glideSlow = gliding ? 0.45 : 1.0;
+
+  // Stars
+  for (const s of stars) {
+    s.y += (s.speed + scrollSpeed) * glideSlow;
+    if (s.y > GH) { s.y = 0; s.x = Math.random() * GW; }
+  }
+
+  // Bird movement
+  let moveX = 0, moveY = 0;
+  const wantBoost = keys['ControlLeft'] || keys['ControlRight'];
+  const normalSpeed = gliding ? 1.2 : 2;
+
+  if (keys['ArrowLeft'] || keys['KeyA']) moveX = -1;
+  if (keys['ArrowRight'] || keys['KeyD']) moveX = 1;
+  if (keys['ArrowUp'] || keys['KeyW']) moveY = -1;
+  if (keys['ArrowDown'] || keys['KeyS']) moveY = 1;
+
+  // Normalize diagonal
+  if (moveX !== 0 && moveY !== 0) {
+    const len = Math.hypot(moveX, moveY);
+    moveX /= len; moveY /= len;
+  }
+
+  if (touchActive && touchX !== null) {
+    const dx = touchX - bird.x; const dy = touchY - bird.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 3) { moveX = dx / dist; moveY = dy / dist; }
+    shoot();
+  }
+
+  // Boost logic
+  let speed = normalSpeed;
+  bird.boosting = false;
+  if (wantBoost && bird.action > BOOST_COOLDOWN_THRESHOLD && (moveX !== 0 || moveY !== 0)) {
+    bird.boosting = true;
+    bird.action = Math.max(0, bird.action - BOOST_COST);
+    speed = BOOST_SPEED;
+    bird.boostDirX = moveX;
+    bird.boostDirY = moveY;
+    // Boost trail particles
+    if (frameCount % 2 === 0) {
+      particles.push({
+        x: bird.x + (Math.random() - 0.5) * 4,
+        y: bird.y + 4,
+        vx: -moveX * 1.5 + (Math.random() - 0.5),
+        vy: -moveY * 1.5 + (Math.random() - 0.5),
+        life: 10, maxLife: 10, color: PAL.boostTrail, size: 1.5
+      });
+    }
+  }
+
+  // Glide energy drain (not during tutorial — infinite energy there)
+  if (gliding && !(tutorial && !tutorial.done)) {
+    bird.action = Math.max(0, bird.action - GLIDE_COST);
+  }
+
+  // Regen action when not boosting and not holding shift
+  // Block regen while shift is held even if out of energy — prevents stutter
+  if (!bird.boosting && !wantGlide) {
+    bird.action = Math.min(ACTION_MAX, bird.action + ACTION_REGEN);
+  }
+
+  bird.x += moveX * speed;
+  bird.y += moveY * speed;
+  bird.x = Math.max(10, Math.min(GW - 10, bird.x));
+  bird.y = Math.max(15, Math.min(GH - 10, bird.y));
+
+  // Lean
+  const targetLean = Math.max(-1, Math.min(1, moveX));
+  bird.lean += (targetLean - bird.lean) * 0.15;
+  if (moveX === 0) bird.lean *= 0.9;
+
+  bird.flapPhase += gliding ? 0.05 : 0.25;
+  if (bird.shootCooldown > 0) bird.shootCooldown--;
+  if (bird.invincible > 0) bird.invincible--;
+  if (levelUpFlash > 0) levelUpFlash--;
+
+  if (keys['Space'] || keys['KeyZ']) shoot();
+
+  // Bullets
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    if (b.type === 'homing' && !b.target) {
+      let closest = null, minD = Infinity;
+      const targets = (boss && boss.phase !== 'enter') ? [boss, ...enemies] : enemies;
+      for (const e of targets) {
+        const d = Math.hypot(e.x - b.x, e.y - b.y);
+        if (d < minD) { minD = d; closest = e; }
+      }
+      b.target = closest;
+    }
+    if (b.type === 'homing' && b.target) {
+      const dx = b.target.x - b.x; const dy = b.target.y - b.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0) {
+        b.vx += (dx / d) * 0.3; b.vy += (dy / d) * 0.3;
+        const spd = Math.hypot(b.vx, b.vy);
+        if (spd > 4) { b.vx = (b.vx / spd) * 4; b.vy = (b.vy / spd) * 4; }
+      }
+    }
+    b.x += b.vx; b.y += b.vy;
+    if (b.y < -10 || b.y > GH + 10 || b.x < -10 || b.x > GW + 10) bullets.splice(i, 1);
+  }
+
+  // Enemy bullets
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const b = enemyBullets[i];
+    b.x += b.vx * glideSlow; b.y += b.vy * glideSlow;
+    if (b.y > GH + 10 || b.y < -10 || b.x < -10 || b.x > GW + 10) { enemyBullets.splice(i, 1); continue; }
+    if (bird.invincible <= 0 && Math.abs(b.x - bird.x) < 8 && Math.abs(b.y - bird.y) < 8) {
+      if (powerLevel >= 3) {
+        powerLevel = 2;
+        spawnParticles(bird.x, bird.y, PAL.gravity, 8, 2);
+      } else {
+        bird.hp--;
+        bird.invincible = 60;
+        shakeTimer = 8;
+        spawnParticles(bird.x, bird.y, PAL.laser, 6, 2);
+        sfxHit();
+      }
+      enemyBullets.splice(i, 1);
+      if (bird.hp <= 0) gameOver();
+    }
+  }
+
+  // Enemies
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    e.x += (e.vx || 0) * glideSlow; e.y += (e.vy || 0) * glideSlow;
+    if (e.type === 'floater') e.x += Math.sin(frameCount * 0.03 + i) * 0.3;
+    if (e.type === 'swooper' && (e.x < 10 || e.x > GW - 10)) e.vx *= -1;
+    if (e.type === 'shooter') {
+      e.shootTimer--;
+      if (e.shootTimer <= 0 && e.y > 10) {
+        const dx = bird.x - e.x; const dy = bird.y - e.y; const d = Math.hypot(dx, dy);
+        const bulletSpeed = 1.5 * enemySpeedMult();
+        enemyBullets.push({ x: e.x, y: e.y + 5, vx: (dx / d) * bulletSpeed, vy: (dy / d) * bulletSpeed });
+        e.shootTimer = (90 + Math.random() * 60) * enemyShootMult();
+      }
+    }
+    if (e.y > GH + 20) { enemies.splice(i, 1); continue; }
+
+    for (let j = bullets.length - 1; j >= 0; j--) {
+      if (Math.abs(bullets[j].x - e.x) < 8 && Math.abs(bullets[j].y - e.y) < 8) {
+        e.hp -= bullets[j].dmg;
+        spawnParticles(e.x, e.y, PAL.enemy, 3, 1.5);
+        bullets.splice(j, 1);
+        if (e.hp <= 0) {
+          spawnParticles(e.x, e.y, PAL.enemy, 10, 3);
+          const pts = e.type === 'shooter' ? 30 : (e.type === 'swooper' ? 20 : 15);
+          score += pts; waveScore += pts;
+          if (tutorial && !tutorial.done) tutorial.enemiesKilled++;
+          // Feather drop chance (20%)
+          if (Math.random() < 0.20) {
+            featherPickups.push({ x: e.x, y: e.y, vy: 0.4, wobble: Math.random() * Math.PI * 2, life: 600 });
+          }
+          enemies.splice(i, 1);
+        }
+        break;
+      }
+    }
+
+    if (i < enemies.length && bird.invincible <= 0) {
+      const e2 = enemies[i];
+      if (Math.abs(e2.x - bird.x) < 10 && Math.abs(e2.y - bird.y) < 10) {
+        if (powerLevel >= 3) { powerLevel = 2; spawnParticles(bird.x, bird.y, PAL.gravity, 8, 2); }
+        else { bird.hp--; bird.invincible = 60; shakeTimer = 8; sfxHit(); }
+        spawnParticles(e2.x, e2.y, PAL.enemy, 8, 2);
+        enemies.splice(i, 1);
+        if (bird.hp <= 0) gameOver();
+      }
+    }
+  }
+
+  // Bugs
+  for (let i = bugs.length - 1; i >= 0; i--) {
+    const bug = bugs[i];
+    bug.y += bug.vy * glideSlow;
+    if (!bug.golden) bug.x += Math.sin(frameCount * 0.04 + bug.wobble) * 0.5 * glideSlow;
+    bug.attracted = false;
+
+    if (powerLevel >= 3) {
+      const dx = bird.x - bug.x; const dy = bird.y - bug.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < GRAVITY_RADIUS && dist > 1) {
+        const pull = GRAVITY_STRENGTH * (1 - dist / GRAVITY_RADIUS);
+        bug.x += (dx / dist) * pull * 3; bug.y += (dy / dist) * pull * 3;
+        bug.attracted = true;
+        if (frameCount % 6 === 0) {
+          particles.push({ x: bug.x + (Math.random() - 0.5) * 4, y: bug.y + (Math.random() - 0.5) * 4, vx: (dx / dist) * 0.5, vy: (dy / dist) * 0.5, life: 10, maxLife: 10, color: PAL.gravity, size: 1 });
+        }
+      }
+    }
+
+    if (bug.y > GH + 10) { bugs.splice(i, 1); continue; }
+
+    const collectR = powerLevel >= 3 ? BUG_COLLECT_RADIUS : 10;
+    if (Math.abs(bug.x - bird.x) < collectR && Math.abs(bug.y - bird.y) < collectR) {
+      const bugPts = bug.golden ? 150 : 50;
+      const bugProgress = bug.golden ? 3 : 1;
+      bugsEaten += bugProgress; score += bugPts; waveScore += bugPts;
+      spawnParticles(bug.x, bug.y, bug.golden ? PAL.goldBug : PAL.bug, bug.golden ? 12 : 8, 2);
+      if (bug.golden) spawnFloatingText(bug.x, bug.y - 10, '+150 GOLD!', PAL.goldBug);
+      sfxBugCollect();
+      if (tutorial && !tutorial.done) tutorial.bugsAte++;
+      bugs.splice(i, 1);
+
+      if (powerLevel < 3 && bugsEaten >= bugsToLevel[powerLevel]) {
+        powerLevel++;
+        const levelNames = ['PECK', 'LASER EYES', 'SPREAD SHOT', 'GRAVITY FIELD'];
+        levelUpFlash = 90; levelUpName = levelNames[powerLevel];
+        spawnLevelUpRing(bird.x, bird.y);
+        spawnParticles(bird.x, bird.y, PAL.powerup, 15, 3);
+        spawnFloatingText(bird.x, bird.y - 20, levelUpName + '!', PAL.powerup);
+        bird.hp = Math.min(bird.maxHp, bird.hp + 1);
+        sfxLevelUp();
+      }
+    }
+  }
+
+  // Feather pickups
+  for (let i = featherPickups.length - 1; i >= 0; i--) {
+    const f = featherPickups[i];
+    f.y += f.vy * glideSlow;
+    f.x += Math.sin(frameCount * 0.03 + f.wobble) * 0.3 * glideSlow;
+    f.life--;
+    if (f.y > GH + 10 || f.life <= 0) { featherPickups.splice(i, 1); continue; }
+    // Collection
+    if (Math.abs(f.x - bird.x) < 12 && Math.abs(f.y - bird.y) < 12) {
+      feathersCollected++;
+      sfxFeatherCollect();
+      spawnParticles(f.x, f.y, PAL.feather, 6, 1.5);
+      spawnFloatingText(f.x, f.y - 10, 'FEATHER ' + feathersCollected + '/5', PAL.feather);
+      featherPickups.splice(i, 1);
+      if (feathersCollected >= 5) {
+        feathersCollected = 0;
+        bird.maxHp++;
+        bird.hp = Math.min(bird.maxHp, bird.hp + 1);
+        spawnFloatingText(bird.x, bird.y - 25, '+1 MAX HP!', PAL.hp);
+        spawnLevelUpRing(bird.x, bird.y);
+        sfxMaxHpUp();
+      }
+    }
+  }
+
+  // Obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const o = obstacles[i];
+    o.y += o.vy * glideSlow;
+    if (o.y > GH + 30) { obstacles.splice(i, 1); continue; }
+
+    // Bird collision with obstacle
+    if (bird.invincible <= 0 && obstacleHitTest(bird.x, bird.y, o)) {
+      if (bird.boosting) {
+        // Boosting through obstacle — take reduced damage, destroy obstacle
+        bird.hp--;
+        bird.invincible = 30;
+        shakeTimer = 5;
+        spawnParticles(bird.x, bird.y, PAL.obstacle, 12, 3);
+        sfxHit();
+        obstacles.splice(i, 1);
+      } else if (powerLevel >= 3) {
+        powerLevel = 2;
+        spawnParticles(bird.x, bird.y, PAL.gravity, 8, 2);
+        bird.invincible = 30;
+      } else {
+        bird.hp -= 2;
+        bird.invincible = 60;
+        shakeTimer = 12;
+        spawnParticles(bird.x, bird.y, PAL.laser, 10, 3);
+        sfxHit();
+      }
+      if (bird.hp <= 0) gameOver();
+    }
+
+    // Bullets destroy small rocks
+    if (o.type === 'rock') {
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (Math.abs(bullets[j].x - o.x) < o.w / 2 + 2 && Math.abs(bullets[j].y - o.y) < o.h / 2 + 2) {
+          bullets.splice(j, 1);
+          o.hp = (o.hp || 3) - 1;
+          spawnParticles(o.x, o.y, PAL.obstacle, 3, 1);
+          if (o.hp <= 0) {
+            spawnParticles(o.x, o.y, PAL.obstacle, 8, 2);
+            obstacles.splice(i, 1);
+            score += 10; waveScore += 10;
+          }
+          break;
+        }
+      }
+    }
+
+    // Turret logic
+    for (const t of o.turrets) {
+      if (!t.alive) continue;
+      const tx = t.rx;
+      const ty = o.y + t.ry;
+
+      // Only shoot when on screen
+      if (ty > 5 && ty < GH - 5) {
+        t.shootTimer -= glideSlow;
+        if (t.shootTimer <= 0) {
+          const dx = bird.x - tx; const dy = bird.y - ty;
+          const d = Math.hypot(dx, dy) || 1;
+          const bSpeed = 1.8 * enemySpeedMult();
+          enemyBullets.push({ x: tx, y: ty, vx: (dx / d) * bSpeed, vy: (dy / d) * bSpeed });
+          t.shootTimer = (70 + Math.random() * 40) * enemyShootMult();
+        }
+      }
+
+      // Bullet collision with turret
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (Math.abs(bullets[j].x - tx) < 6 && Math.abs(bullets[j].y - ty) < 6) {
+          t.hp -= bullets[j].dmg;
+          spawnParticles(tx, ty, PAL.enemy, 3, 1.5);
+          bullets.splice(j, 1);
+          if (t.hp <= 0) {
+            t.alive = false;
+            spawnParticles(tx, ty, PAL.enemy, 10, 3);
+            score += 25; waveScore += 25;
+            spawnFloatingText(tx, ty, '+25', PAL.hud);
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // Boss
+  if (boss) {
+    boss.timer++;
+    const bossColor = boss.bType === 'owl' ? PAL.owlBody : (boss.bType === 'eagle' ? PAL.eagleBody : PAL.boss);
+
+    if (boss.phase === 'enter') {
+      boss.y += 0.5 * glideSlow;
+      if (boss.y >= (boss.bType === 'eagle' ? 60 : 50)) { boss.phase = 'fight'; boss.timer = 0; }
+
+    } else if (boss.phase === 'fight' || boss.phase === 'rage') {
+      const isRage = boss.phase === 'rage';
+      const sm = enemySpeedMult();
+      const bSpeed = 2 * sm;
+
+      // ── HAWK AI ──
+      if (boss.bType === 'hawk') {
+        const moveSpd = (isRage ? 1.3 : 0.8) * sm * glideSlow;
+        boss.x += boss.swoopDir * moveSpd;
+        if (isRage) boss.y += Math.sin(boss.timer * 0.05) * 0.5 * glideSlow;
+        if (boss.x < 40 || boss.x > GW - 40) boss.swoopDir *= -1;
+
+        boss.shootTimer--;
+        if (boss.shootTimer <= 0) {
+          boss.attackPattern = (boss.attackPattern + 1) % 3;
+          if (boss.attackPattern === 0) {
+            const fanCount = 1 + Math.min(wave, 3);
+            for (let a = -fanCount; a <= fanCount; a++) {
+              enemyBullets.push({ x: boss.x, y: boss.y + 15, vx: a * 0.45, vy: bSpeed * 0.85 });
+            }
+          } else if (boss.attackPattern === 1) {
+            const dx = bird.x - boss.x; const dy = bird.y - boss.y; const d = Math.hypot(dx, dy);
+            const count = Math.min(1 + Math.floor(wave / 2), 3);
+            for (let s = 0; s < count; s++) {
+              const spread = (s - (count - 1) / 2) * 0.3;
+              enemyBullets.push({ x: boss.x, y: boss.y + 15, vx: (dx / d) * bSpeed * 0.85 + spread, vy: (dy / d) * bSpeed * 0.85 });
+            }
+          } else {
+            const ringCount = 5 + Math.min(wave, 6);
+            for (let k = 0; k < ringCount; k++) {
+              const a = (Math.PI * 2 / ringCount) * k + frameCount * 0.02;
+              enemyBullets.push({ x: boss.x, y: boss.y, vx: Math.cos(a) * 1.3, vy: Math.sin(a) * 1.3 + 0.4 });
+            }
+          }
+          if (isRage) {
+            const dx = bird.x - boss.x; const dy = bird.y - boss.y; const d = Math.hypot(dx, dy);
+            enemyBullets.push({ x: boss.x - 8, y: boss.y + 15, vx: (dx / d) * bSpeed * 0.8, vy: (dy / d) * bSpeed * 0.8 });
+          }
+          boss.shootTimer = Math.max(isRage ? 20 : 25, (isRage ? 35 : 60) * enemyShootMult());
+        }
+
+      // ── OWL AI — slower, homing feather shots, invisibility in rage ──
+      } else if (boss.bType === 'owl') {
+        const moveSpd = (isRage ? 0.6 : 0.4) * sm * glideSlow;
+        boss.x += boss.swoopDir * moveSpd;
+        boss.y += Math.sin(boss.timer * 0.03) * 0.3 * glideSlow;
+        if (boss.x < 35 || boss.x > GW - 35) boss.swoopDir *= -1;
+
+        // Owl invisibility in rage — flicker on/off
+        if (isRage) {
+          boss.invisTimer++;
+          boss.invisible = (boss.invisTimer % 120) < 60;
+        }
+
+        boss.shootTimer--;
+        if (boss.shootTimer <= 0) {
+          boss.attackPattern = (boss.attackPattern + 1) % 2;
+          if (boss.attackPattern === 0) {
+            // Homing feather projectiles — slower but track player
+            const count = isRage ? 3 : 2;
+            for (let i = 0; i < count; i++) {
+              const angle = (Math.PI * 2 / count) * i + Math.random() * 0.3;
+              enemyBullets.push({
+                x: boss.x, y: boss.y + 10,
+                vx: Math.cos(angle) * 0.8, vy: 1.2,
+                homing: true, homingStr: 0.04
+              });
+            }
+          } else {
+            // Wide spread of slow bullets
+            for (let a = -3; a <= 3; a++) {
+              enemyBullets.push({ x: boss.x, y: boss.y + 15, vx: a * 0.6, vy: 1.5 });
+            }
+          }
+          boss.shootTimer = Math.max(30, (isRage ? 45 : 70) * enemyShootMult());
+        }
+
+      // ── EAGLE AI — massive, dive-bombs ──
+      } else if (boss.bType === 'eagle') {
+        const moveSpd = (isRage ? 1.0 : 0.6) * sm * glideSlow;
+        boss.x += boss.swoopDir * moveSpd;
+        if (boss.x < 60 || boss.x > GW - 60) boss.swoopDir *= -1;
+
+        // Dive-bomb mechanic
+        boss.diveTimer--;
+        if (!boss.diving && boss.diveTimer <= 0) {
+          boss.diving = true;
+          boss.diveTarget = bird.x;
+          boss.diveTimer = isRage ? 150 : 220;
+        }
+        if (boss.diving) {
+          boss.y += 2.5 * glideSlow;
+          boss.x += (boss.diveTarget - boss.x) * 0.04;
+          if (boss.y > GH * 0.65) {
+            boss.diving = false;
+            boss.y = GH * 0.65;
+            shakeTimer = 8;
+            // Shockwave bullets on landing
+            for (let a = -3; a <= 3; a++) {
+              enemyBullets.push({ x: boss.x + a * 10, y: boss.y + 20, vx: a * 0.25, vy: 1.5 });
+            }
+          }
+        } else if (boss.y > (isRage ? 45 : 55)) {
+          boss.y -= 0.5 * glideSlow; // float back up
+        }
+
+        boss.shootTimer--;
+        if (boss.shootTimer <= 0 && !boss.diving) {
+          const dx = bird.x - boss.x; const dy = bird.y - boss.y; const d = Math.hypot(dx, dy);
+          // Heavy aimed shots
+          enemyBullets.push({ x: boss.x - 15, y: boss.y + 20, vx: (dx / d) * bSpeed, vy: (dy / d) * bSpeed });
+          enemyBullets.push({ x: boss.x + 15, y: boss.y + 20, vx: (dx / d) * bSpeed, vy: (dy / d) * bSpeed });
+          if (isRage) {
+            enemyBullets.push({ x: boss.x, y: boss.y + 20, vx: (dx / d) * bSpeed, vy: (dy / d) * bSpeed });
+          }
+          boss.shootTimer = Math.max(25, (isRage ? 35 : 55) * enemyShootMult());
+        }
+      }
+
+      // Rage transition (all types)
+      if (!isRage && boss.hp < boss.maxHp / 2) {
+        boss.phase = 'rage'; shakeTimer = 15;
+      }
+    }
+
+    // Homing enemy bullet update (for owl feathers)
+    for (const eb of enemyBullets) {
+      if (eb.homing) {
+        const dx = bird.x - eb.x; const dy = bird.y - eb.y;
+        const d = Math.hypot(dx, dy);
+        if (d > 0) {
+          eb.vx += (dx / d) * (eb.homingStr || 0.03);
+          eb.vy += (dy / d) * (eb.homingStr || 0.03);
+          const spd = Math.hypot(eb.vx, eb.vy);
+          if (spd > 2.5) { eb.vx = (eb.vx / spd) * 2.5; eb.vy = (eb.vy / spd) * 2.5; }
+        }
+      }
+    }
+
+    // Bullet collision — ONLY when boss is not in enter phase and not invisible
+    if (boss.phase !== 'enter' && !boss.invisible) {
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (Math.abs(bullets[j].x - boss.x) < boss.hitW && Math.abs(bullets[j].y - boss.y) < boss.hitH) {
+          boss.hp -= bullets[j].dmg;
+          spawnParticles(boss.x + (Math.random() - 0.5) * 20, boss.y + (Math.random() - 0.5) * 10, bossColor, 3, 2);
+          bullets.splice(j, 1);
+          if (boss.hp <= 0) {
+            const bx = boss.x, by = boss.y;
+            spawnParticles(bx, by, bossColor, 30, 5);
+            spawnParticles(bx, by, PAL.powerup, 20, 4);
+            const bossScore = 500 * wave;
+            score += bossScore; waveScore += bossScore;
+            spawnFloatingText(bx, by, '+' + bossScore, PAL.hud);
+            sfxBossDeath();
+            boss = null;
+            shakeTimer = 20;
+            setTimeout(() => {
+              if (state === 'playing') {
+                triggerPowerDischarge();
+                shakeTimer = 10;
+                sfx.playSFX({ freq: 800, freqEnd: 200, duration: 400, volume: 0.2, type: 'sine', attack: 0.01, decay: 0.35, filterFreq: 4000, filterEnd: 300 });
+              }
+            }, 800);
+            setTimeout(() => { if (state === 'playing') startNextWave(); }, 2500);
+            break;
+          }
+        }
+      }
+    } else if (boss.phase === 'enter') {
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (Math.abs(bullets[j].x - boss.x) < boss.hitW && Math.abs(bullets[j].y - boss.y) < boss.hitH) {
+          spawnParticles(bullets[j].x, bullets[j].y, '#666666', 2, 1);
+          bullets.splice(j, 1);
+        }
+      }
+    } else if (boss.invisible) {
+      // Bullets pass through invisible owl
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        if (Math.abs(bullets[j].x - boss.x) < boss.hitW && Math.abs(bullets[j].y - boss.y) < boss.hitH) {
+          spawnParticles(bullets[j].x, bullets[j].y, '#444444', 1, 0.5);
+          bullets.splice(j, 1);
+        }
+      }
+    }
+
+    // Boss bird collision — not during enter, not when invisible
+    if (boss && boss.phase !== 'enter' && !boss.invisible && bird.invincible <= 0 &&
+        Math.abs(boss.x - bird.x) < boss.hitW && Math.abs(boss.y - bird.y) < boss.hitH) {
+      bird.hp -= 2;
+      bird.invincible = 90;
+      shakeTimer = 10;
+      spawnParticles(bird.x, bird.y, PAL.laser, 10, 3);
+      sfxHit();
+      if (bird.hp <= 0) gameOver();
+    }
+  }
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // Floating texts
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i]; ft.y -= 0.5; ft.life--;
+    if (ft.life <= 0) floatingTexts.splice(i, 1);
+  }
+
+  if (shakeTimer > 0) shakeTimer--;
+
+  // Discharge rings
+  if (dischargeTimer > 0) {
+    dischargeTimer--;
+    for (const ring of dischargeRings) {
+      if (ring.delay > 0) { ring.delay--; continue; }
+      ring.radius += ring.speed;
+      ring.alpha = Math.max(0, ring.alpha - 0.015);
+    }
+    dischargeRings = dischargeRings.filter(r => r.alpha > 0 && r.radius < r.maxRadius);
+  }
+
+  // Spawning (not during wave transition)
+  if (waveTransition <= 60) {
+    const inTutorial = tutorial && !tutorial.done;
+    if (inTutorial) {
+      // Tutorial-specific spawning based on current step
+      if (tutorial.step === TUTORIAL_STEP_EAT) {
+        // Only bugs — generous rate
+        if (frameCount % 50 === 0) spawnBug();
+      } else if (tutorial.step === TUTORIAL_STEP_SHOOT) {
+        // Only slow enemies (floaters)
+        if (enemies.length < 3 && frameCount % 80 === 0) {
+          const e = { x: 15 + Math.random() * (GW - 30), y: -15, hp: 1, type: 'floater', shootTimer: 0,
+            vx: (Math.random() - 0.5) * 0.3, vy: 0.3 + Math.random() * 0.2 };
+          enemies.push(e);
+        }
+      } else if (tutorial.step === TUTORIAL_STEP_NAVIGATE) {
+        // Obstacles only — rocks and pillars, moderate rate
+        if (frameCount % 120 === 0) spawnObstacle();
+      }
+      // No boss during tutorial
+    } else if (!bossSpawned) {
+      if (frameCount % Math.max(60, 90 - (wave - 1) * 5) === 0) spawnBug();
+
+      const enemyRate = Math.max(45, (140 - Math.floor(difficultyTimer / 150)) - (wave - 1) * 8);
+      if (frameCount % enemyRate === 0) spawnEnemy();
+
+      // Obstacles — start appearing from wave 1, increase with waves
+      const obsRate = obstacleRate();
+      if (frameCount % obsRate === 0 && difficultyTimer > 180) spawnObstacle();
+
+      if (waveScore >= bossScoreThreshold() && !bossSpawned) spawnBoss();
+    }
+  }
+
+  // Glide slows the world down
+  const targetScroll = gliding ? scrollSpeed * 0.35 : scrollSpeed;
+  effectiveScroll += (targetScroll - effectiveScroll) * 0.1;
+  scrollY += effectiveScroll;
+}
+
+// ── RENDER ──
+function render() {
+  bctx.fillStyle = PAL.bg1;
+  bctx.fillRect(0, 0, GW, GH);
+
+  for (let i = 0; i < 6; i++) {
+    const y = ((scrollY * 0.2 + i * 80) % (GH + 40)) - 40;
+    bctx.fillStyle = PAL.bg2; bctx.globalAlpha = 0.15;
+    bctx.fillRect(0, y, GW, 30); bctx.globalAlpha = 1;
+  }
+
+  for (const s of stars) {
+    bctx.fillStyle = PAL.star; bctx.globalAlpha = s.brightness;
+    bctx.fillRect(Math.floor(s.x), Math.floor(s.y), s.size, s.size);
+  }
+  bctx.globalAlpha = 1;
+
+  if (state === 'start') {
+    ctx.drawImage(buf, 0, 0, GW, GH, 0, 0, canvas.width, canvas.height);
+    return;
+  }
+
+  // Obstacles (behind everything else)
+  for (const o of obstacles) drawObstacle(o);
+
+  // Bugs
+  for (const bug of bugs) drawBug(bug);
+
+  // Feather pickups
+  for (const f of featherPickups) {
+    const bob = Math.sin(frameCount * 0.08 + f.wobble) * 2;
+    const fade = f.life < 60 ? f.life / 60 : 1;
+    bctx.globalAlpha = fade;
+    // Feather shape — quill
+    bctx.fillStyle = PAL.feather;
+    bctx.fillRect(f.x - 1, f.y - 4 + bob, 2, 8);
+    bctx.fillRect(f.x - 3, f.y - 2 + bob, 3, 4);
+    bctx.fillRect(f.x + 1, f.y - 1 + bob, 2, 3);
+    // Sparkle
+    if (Math.floor(frameCount / 6) % 2 === 0) {
+      bctx.fillStyle = '#ffffff';
+      bctx.fillRect(f.x + 2, f.y - 3 + bob, 1, 1);
+    }
+    bctx.globalAlpha = 1;
+  }
+
+  // Enemies
+  for (const e of enemies) drawEnemy(e);
+
+  // Boss
+  if (boss) drawBoss(boss);
+
+  // Bullets
+  for (const b of bullets) {
+    if (b.type === 'laser') {
+      bctx.fillStyle = PAL.laserGlow;
+      bctx.fillRect(b.x - 2, b.y - 3, 4, 6);
+      bctx.fillStyle = PAL.laser;
+      bctx.fillRect(b.x - 1, b.y - 2, 2, 5);
+    } else if (b.type === 'homing') {
+      bctx.fillStyle = PAL.gravity;
+      bctx.fillRect(b.x - 2, b.y - 2, 4, 4);
+      bctx.globalAlpha = 0.4; bctx.fillRect(b.x - 1, b.y + 2, 2, 3); bctx.globalAlpha = 1;
+    } else {
+      bctx.fillStyle = '#ffffff';
+      bctx.fillRect(b.x - 1, b.y - 2, 2, 4);
+    }
+  }
+
+  // Enemy bullets
+  for (const b of enemyBullets) {
+    bctx.fillStyle = PAL.bullet;
+    bctx.fillRect(b.x - 2, b.y - 2, 4, 4);
+  }
+
+  // Bird
+  if (bird) drawBird(bird.x, bird.y, bird.flapPhase, bird.invincible, bird.lean);
+
+  // Particles
+  for (const p of particles) {
+    bctx.fillStyle = p.color; bctx.globalAlpha = p.life / p.maxLife;
+    bctx.fillRect(Math.floor(p.x), Math.floor(p.y), Math.ceil(p.size), Math.ceil(p.size));
+  }
+  bctx.globalAlpha = 1;
+
+  // Floating texts
+  for (const ft of floatingTexts) {
+    bctx.fillStyle = ft.color; bctx.globalAlpha = ft.life / ft.maxLife;
+    bctx.font = 'bold 10px monospace';
+    bctx.fillText(ft.text, ft.x - ft.text.length * 2.5, ft.y);
+    bctx.globalAlpha = 1;
+  }
+
+  // Power discharge rings (boss kill)
+  if (dischargeRings.length > 0 && bird) {
+    for (const ring of dischargeRings) {
+      if (ring.delay > 0) continue;
+      bctx.strokeStyle = ring.color;
+      bctx.globalAlpha = ring.alpha;
+      bctx.lineWidth = 2;
+      bctx.beginPath();
+      bctx.arc(bird.x, bird.y, ring.radius, 0, Math.PI * 2);
+      bctx.stroke();
+    }
+    bctx.globalAlpha = 1;
+    bctx.lineWidth = 1;
+    // White-hot glow on nugget during discharge
+    if (dischargeTimer > 50) {
+      bctx.fillStyle = '#ffffff';
+      bctx.globalAlpha = (dischargeTimer - 50) / 40 * 0.6;
+      bctx.beginPath();
+      bctx.arc(bird.x, bird.y, 10, 0, Math.PI * 2);
+      bctx.fill();
+      bctx.globalAlpha = 1;
+    }
+  }
+
+  // Level-up flash
+  if (levelUpFlash > 0) {
+    bctx.fillStyle = PAL.powerup;
+    bctx.globalAlpha = (levelUpFlash / 90) * 0.2;
+    bctx.fillRect(0, 0, GW, GH); bctx.globalAlpha = 1;
+    if (levelUpFlash > 50) {
+      bctx.fillStyle = PAL.powerup;
+      bctx.globalAlpha = (levelUpFlash - 50) / 40;
+      bctx.font = 'bold 12px monospace';
+      bctx.fillText('POWER UP!', GW / 2 - 27, GH / 2 - 10);
+      bctx.fillStyle = '#ffffff';
+      bctx.font = '10px monospace';
+      bctx.fillText(levelUpName, GW / 2 - levelUpName.length * 2.5, GH / 2 + 5);
+      bctx.globalAlpha = 1;
+    }
+  }
+
+  // Wave transition overlay
+  if (waveTransition > 0) {
+    bctx.fillStyle = '#ffffff';
+    bctx.globalAlpha = Math.min(0.3, waveTransition / 120 * 0.3);
+    bctx.fillRect(0, 0, GW, GH);
+    bctx.globalAlpha = 1;
+    if (waveTransition > 60) {
+      bctx.fillStyle = PAL.hud;
+      bctx.globalAlpha = (waveTransition - 60) / 60;
+      bctx.font = 'bold 14px monospace';
+      const wt = 'WAVE ' + wave;
+      bctx.fillText(wt, GW / 2 - wt.length * 3.5, GH / 2);
+      bctx.globalAlpha = 1;
+    }
+  }
+
+  // Tutorial overlay
+  if (tutorial && !tutorial.done && state === 'playing') {
+    const fadeIn = Math.min(1, tutorial.timer / 20);
+    let mainText = '', subText = '';
+
+    if (tutorial.step === TUTORIAL_STEP_EAT) {
+      mainText = 'RUN INTO BUGS TO EAT THEM';
+      subText = 'ARROWS / WASD to move';
+    } else if (tutorial.step === TUTORIAL_STEP_SHOOT) {
+      mainText = 'SPACE TO SHOOT';
+      subText = 'Destroy the enemies!';
+    } else if (tutorial.step === TUTORIAL_STEP_NAVIGATE) {
+      mainText = 'SHIFT = GLIDE   CTRL = BOOST';
+      subText = 'Dodge the obstacles!';
+    } else if (tutorial.step === TUTORIAL_STEP_GO) {
+      mainText = 'GET READY...';
+      subText = '';
+    }
+
+    // Semi-transparent banner
+    bctx.fillStyle = '#000000';
+    bctx.globalAlpha = 0.5 * fadeIn;
+    bctx.fillRect(0, GH / 2 - 22, GW, 44);
+    bctx.globalAlpha = fadeIn;
+    // Main text
+    bctx.fillStyle = '#ffffff';
+    bctx.font = 'bold 10px monospace';
+    bctx.fillText(mainText, GW / 2 - mainText.length * 3, GH / 2 - 6);
+    // Sub text
+    if (subText) {
+      bctx.fillStyle = PAL.hud;
+      bctx.font = '8px monospace';
+      bctx.fillText(subText, GW / 2 - subText.length * 2.5, GH / 2 + 10);
+    }
+    bctx.globalAlpha = 1;
+  }
+
+  // HUD
+  if (state === 'playing' || state === 'gameover') {
+    bctx.fillStyle = PAL.hud; bctx.font = '8px monospace';
+    bctx.fillText('SCORE ' + score, 4, 10);
+
+    // Wave indicator
+    bctx.fillStyle = '#aaaacc';
+    bctx.fillText(wave === 0 ? 'TUTORIAL' : 'WAVE ' + wave, GW - (wave === 0 ? 54 : 46), 18);
+
+    // Feather counter
+    if (feathersCollected > 0 || bird.maxHp > 5) {
+      bctx.fillStyle = PAL.feather;
+      bctx.fillText('FEATHERS ' + feathersCollected + '/5', GW - 70, 28);
+    }
+
+    const levelNames = ['PECK', 'LASER EYES', 'SPREAD', 'GRAVITY FIELD'];
+    bctx.fillStyle = powerLevel > 0 ? PAL.powerup : '#666';
+    bctx.fillText(levelNames[powerLevel], 4, 20);
+
+    if (powerLevel < 3) {
+      bctx.fillStyle = PAL.bug;
+      bctx.fillText('BUGS ' + bugsEaten + '/' + bugsToLevel[powerLevel], 4, 30);
+    } else {
+      bctx.fillStyle = PAL.bug;
+      bctx.fillText('BUGS ' + bugsEaten, 4, 30);
+    }
+
+    // HP
+    for (let i = 0; i < bird.maxHp; i++) {
+      bctx.fillStyle = i < bird.hp ? PAL.hp : '#333';
+      bctx.fillRect(GW - 8 - (bird.maxHp - i) * 8, 4, 6, 6);
+    }
+
+    // Action meter (boost fuel) — thin bar at bottom of screen
+    const meterW = 60;
+    const meterH = 3;
+    const meterX = GW / 2 - meterW / 2;
+    const meterY = GH - 8;
+    const pct = bird.action / ACTION_MAX;
+    bctx.fillStyle = PAL.actionEmpty;
+    bctx.fillRect(meterX, meterY, meterW, meterH);
+    const glideActive = keys['ShiftLeft'] || keys['ShiftRight'];
+    bctx.fillStyle = bird.boosting ? PAL.boost : (glideActive ? '#66ddff' : PAL.action);
+    bctx.fillRect(meterX, meterY, meterW * pct, meterH);
+    // Label
+    bctx.fillStyle = '#556677'; bctx.font = '6px monospace';
+    bctx.fillText('ENERGY', meterX + meterW + 3, meterY + 3);
+
+    // Boss warning
+    if (boss && boss.phase === 'enter') {
+      bctx.fillStyle = PAL.boss;
+      bctx.globalAlpha = Math.sin(frameCount * 0.2) * 0.5 + 0.5;
+      bctx.font = '10px monospace';
+      const bossNames = { hawk: 'HAWK', owl: 'OWL', eagle: 'EAGLE' };
+      const warnText = 'WARNING: ' + (bossNames[boss.bType] || 'BOSS') + ' INCOMING';
+      bctx.fillText(warnText, GW / 2 - warnText.length * 2.5, GH / 3);
+      bctx.globalAlpha = 1;
+    }
+  }
+
+  // Screen shake
+  let sx = 0, sy = 0;
+  if (shakeTimer > 0) {
+    sx = (Math.random() - 0.5) * shakeTimer * 0.5;
+    sy = (Math.random() - 0.5) * shakeTimer * 0.5;
+  }
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(buf, 0, 0, GW, GH, sx * SCALE, sy * SCALE, canvas.width, canvas.height);
+}
+
+function gameOver() {
+  state = 'gameover';
+  sfxHit();
+  document.getElementById('final-score').textContent = 'SCORE: ' + score;
+  const levelNames = ['PECK', 'LASER EYES', 'SPREAD', 'GRAVITY FIELD'];
+  document.getElementById('final-level').textContent = 'MAX POWER: ' + levelNames[powerLevel];
+  document.getElementById('final-wave').textContent = 'WAVE: ' + wave;
+  document.getElementById('game-over-screen').classList.add('active');
+}
+
+// ── GAME LOOP ──
+function loop() { update(); render(); requestAnimationFrame(loop); }
+initStars();
+loop();
+</script>
+</body>
+</html>
