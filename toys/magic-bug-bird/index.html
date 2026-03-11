@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Magic Bug Bird</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b0b1a'/%3E%3Cellipse cx='16' cy='14' rx='7' ry='8' fill='%23ffcc33'/%3E%3Cellipse cx='16' cy='14' rx='5' ry='6' fill='%23cc8800'/%3E%3Cellipse cx='16' cy='12' rx='5' ry='5' fill='%23ffcc33'/%3E%3Ccircle cx='14' cy='11' r='1.5' fill='%23111'/%3E%3Cpolygon points='10,13 7,12 10,14' fill='%23ff6633'/%3E%3Cpolygon points='12,22 16,28 20,22' fill='%23ffcc33'/%3E%3Cpolygon points='14,22 16,26 18,22' fill='%23cc8800'/%3E%3Cpolygon points='8,12 4,8 9,14' fill='%23ffcc33'/%3E%3Cpolygon points='24,12 28,8 23,14' fill='%23ffcc33'/%3E%3Ccircle cx='22' cy='6' r='2' fill='%2344ff88' opacity='0.8'/%3E%3Ccircle cx='8' cy='4' r='1.5' fill='%2344ff88' opacity='0.6'/%3E%3C/svg%3E">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -78,6 +79,50 @@
   }
   .score-display { font-size: 24px; color: #ffcc00; margin: 10px 0; }
   .level-display { font-size: 16px; color: #88ff88; margin: 5px 0; }
+
+  /* Mobile touch controls */
+  #touch-controls {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .touch-btn {
+    position: absolute;
+    bottom: 16px;
+    width: 72px;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1.5px solid rgba(255, 255, 255, 0.20);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .touch-btn.active {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  #btn-glide { left: 16px; }
+  #btn-boost { right: 16px; }
+  .mobile-only { display: none; }
+  body.is-mobile .desktop-only { display: none; }
+  body.is-mobile .mobile-only { display: block; }
+  body.is-mobile #touch-controls { display: block; }
+  body.is-mobile canvas { border: none; }
 </style>
 </head>
 <body>
@@ -87,16 +132,23 @@
     <h1>MAGIC BUG BIRD</h1>
     <div class="subtitle">Vertical shoot-em-up with mystical insects</div>
     <div class="subtitle">Devour glowing bugs to unlock devastating powers</div>
-    <div class="controls">
+    <div class="controls desktop-only">
       <span>MOVE: Arrows / WASD</span>
-      <span>SHOOT: Space / Z</span>
+      <span>SHOOT: Space</span>
     </div>
-    <div class="controls">
+    <div class="controls desktop-only">
       <span>GLIDE: Hold Shift</span>
       <span>BOOST: Hold Z</span>
     </div>
-    <div class="prompt">PRESS SPACE TO START</div>
-    <div class="controls" style="margin-top: 8px;"><span>ENTER to skip tutorial</span></div>
+    <div class="controls mobile-only">
+      <span>DRAG to move · AUTO-FIRE</span>
+    </div>
+    <div class="controls mobile-only">
+      <span>GLIDE &amp; BOOST buttons below</span>
+    </div>
+    <div class="prompt desktop-only">PRESS SPACE TO START</div>
+    <div class="prompt mobile-only">TAP TO START</div>
+    <div class="controls desktop-only" style="margin-top: 8px;"><span>ENTER to skip tutorial</span></div>
   </div>
   <div id="game-over-screen">
     <h1>GAME OVER</h1>
@@ -104,8 +156,14 @@
     <div class="level-display" id="final-level"></div>
     <div class="level-display" id="final-wave"></div>
     <br>
-    <div class="prompt">PRESS SPACE TO RETRY</div>
+    <div class="prompt desktop-only">PRESS SPACE TO RETRY</div>
+    <div class="prompt mobile-only">TAP TO RETRY</div>
   </div>
+</div>
+
+<div id="touch-controls">
+  <button class="touch-btn" id="btn-glide">GLIDE</button>
+  <button class="touch-btn" id="btn-boost">BOOST</button>
 </div>
 
 <script src="mrfd.js"></script>
@@ -145,14 +203,22 @@ function sfxWaveStart() {
   setTimeout(() => sfx.playSFX({ freq: 660, freqEnd: 880, duration: 200, volume: 0.12, type: 'sine', attack: 0.01, decay: 0.18 }), 150);
 }
 
+// ── MOBILE DETECTION ──
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+if (isMobile) document.body.classList.add('is-mobile');
+
 // ── CANVAS SETUP ──
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const GW = 256;
 const GH = 384;
-const SCALE = Math.min(Math.floor(window.innerHeight / GH), Math.floor(window.innerWidth / GW), 3);
-canvas.width = GW * SCALE;
-canvas.height = GH * SCALE;
+// Mobile: fill screen width (leave room for touch buttons at bottom)
+const mobileMaxH = isMobile ? (window.innerHeight - 90) : window.innerHeight;
+const SCALE = isMobile
+  ? Math.min(window.innerWidth / GW, mobileMaxH / GH)
+  : Math.min(Math.floor(window.innerHeight / GH), Math.floor(window.innerWidth / GW), 3);
+canvas.width = Math.floor(GW * SCALE);
+canvas.height = Math.floor(GH * SCALE);
 ctx.imageSmoothingEnabled = false;
 const buf = document.createElement('canvas');
 buf.width = GW; buf.height = GH;
@@ -238,22 +304,79 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
-let touchX = null, touchY = null, touchActive = false;
+// ── TOUCH CONTROLS ──
+let touchActive = false;
+let touchMoveX = 0, touchMoveY = 0;  // normalized direction for bird movement
+let touchGlide = false, touchBoost = false;
+let touchAnchorX = 0, touchAnchorY = 0;  // where finger first touched (screen coords)
+let touchMoveFinger = null;  // identifier for the movement finger
+
+// Movement touch — relative drag on canvas
 canvas.addEventListener('touchstart', e => {
   e.preventDefault(); sfx.unlock();
   if (state === 'start' || state === 'gameover') { startGame(); return; }
-  const t = e.touches[0]; const rect = canvas.getBoundingClientRect();
-  touchX = (t.clientX - rect.left) / SCALE;
-  touchY = (t.clientY - rect.top) / SCALE;
-  touchActive = true;
+  // Use first new touch as movement finger
+  for (const t of e.changedTouches) {
+    if (touchMoveFinger === null) {
+      touchMoveFinger = t.identifier;
+      touchAnchorX = t.clientX;
+      touchAnchorY = t.clientY;
+      touchActive = true;
+      break;
+    }
+  }
 });
 canvas.addEventListener('touchmove', e => {
   e.preventDefault();
-  const t = e.touches[0]; const rect = canvas.getBoundingClientRect();
-  touchX = (t.clientX - rect.left) / SCALE;
-  touchY = (t.clientY - rect.top) / SCALE;
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchMoveFinger) {
+      const dx = t.clientX - touchAnchorX;
+      const dy = t.clientY - touchAnchorY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const deadzone = 6; // px
+      if (dist > deadzone) {
+        touchMoveX = dx / dist;
+        touchMoveY = dy / dist;
+        // Re-anchor so it tracks continuously (relative drag, not absolute)
+        touchAnchorX = t.clientX;
+        touchAnchorY = t.clientY;
+      } else {
+        touchMoveX = 0;
+        touchMoveY = 0;
+      }
+      break;
+    }
+  }
 });
-canvas.addEventListener('touchend', e => { e.preventDefault(); touchActive = false; });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchMoveFinger) {
+      touchMoveFinger = null;
+      touchActive = false;
+      touchMoveX = 0;
+      touchMoveY = 0;
+      break;
+    }
+  }
+});
+canvas.addEventListener('touchcancel', e => {
+  touchMoveFinger = null; touchActive = false; touchMoveX = 0; touchMoveY = 0;
+});
+
+// Glide & Boost buttons
+if (isMobile) {
+  const btnGlide = document.getElementById('btn-glide');
+  const btnBoost = document.getElementById('btn-boost');
+
+  btnGlide.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchGlide = true; btnGlide.classList.add('active'); sfx.unlock(); });
+  btnGlide.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchGlide = false; btnGlide.classList.remove('active'); });
+  btnGlide.addEventListener('touchcancel', e => { touchGlide = false; btnGlide.classList.remove('active'); });
+
+  btnBoost.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); touchBoost = true; btnBoost.classList.add('active'); sfx.unlock(); });
+  btnBoost.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); touchBoost = false; btnBoost.classList.remove('active'); });
+  btnBoost.addEventListener('touchcancel', e => { touchBoost = false; btnBoost.classList.remove('active'); });
+}
 
 // ── ENTITIES ──
 let bird, bullets, enemies, bugs, particles, stars, enemyBullets, boss, obstacles;
@@ -960,7 +1083,7 @@ function update() {
   }
 
   // Glide slow factor — everything in the world moves slower when gliding
-  const wantGlide = keys['ShiftLeft'] || keys['ShiftRight'];
+  const wantGlide = keys['ShiftLeft'] || keys['ShiftRight'] || touchGlide;
   // Need minimum energy to START gliding, but once gliding only stop when empty
   const canGlide = bird.gliding ? (bird.action > 0) : (bird.action > GLIDE_COOLDOWN_THRESHOLD);
   const gliding = wantGlide && canGlide;
@@ -975,7 +1098,7 @@ function update() {
 
   // Bird movement
   let moveX = 0, moveY = 0;
-  const wantBoost = keys['KeyZ'];
+  const wantBoost = keys['KeyZ'] || touchBoost;
   const normalSpeed = gliding ? 1.2 : 2;
 
   if (keys['ArrowLeft'] || keys['KeyA']) moveX = -1;
@@ -989,11 +1112,13 @@ function update() {
     moveX /= len; moveY /= len;
   }
 
-  if (touchActive && touchX !== null) {
-    const dx = touchX - bird.x; const dy = touchY - bird.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > 3) { moveX = dx / dist; moveY = dy / dist; }
-    shoot();
+  // Touch: relative drag movement + auto-fire
+  if (touchActive) {
+    if (touchMoveX !== 0 || touchMoveY !== 0) {
+      moveX = touchMoveX;
+      moveY = touchMoveY;
+    }
+    shoot(); // auto-fire while touching
   }
 
   // Boost logic
@@ -1043,7 +1168,7 @@ function update() {
   if (bird.invincible > 0) bird.invincible--;
   if (levelUpFlash > 0) levelUpFlash--;
 
-  if (keys['Space'] || keys['KeyZ']) shoot();
+  if (keys['Space']) shoot();
 
   // Bullets
   for (let i = bullets.length - 1; i >= 0; i--) {
@@ -1723,12 +1848,12 @@ function render() {
 
     if (tutorial.step === TUTORIAL_STEP_EAT) {
       mainText = 'RUN INTO BUGS TO EAT THEM';
-      subText = 'ARROWS / WASD to move';
+      subText = isMobile ? 'Drag to move' : 'ARROWS / WASD to move';
     } else if (tutorial.step === TUTORIAL_STEP_SHOOT) {
-      mainText = 'SPACE TO SHOOT';
+      mainText = isMobile ? 'AUTO-FIRE ON!' : 'SPACE TO SHOOT';
       subText = 'Destroy the enemies!';
     } else if (tutorial.step === TUTORIAL_STEP_NAVIGATE) {
-      mainText = 'SHIFT = GLIDE   Z = BOOST';
+      mainText = isMobile ? 'USE GLIDE & BOOST BUTTONS' : 'SHIFT = GLIDE   Z = BOOST';
       subText = 'Dodge the obstacles!';
     } else if (tutorial.step === TUTORIAL_STEP_GO) {
       mainText = 'GET READY...';
