@@ -35,12 +35,16 @@
     color: #fff;
     pointer-events: auto;
     display: none;
-    max-width: min(90vw, 700px);
-    padding: 20px 24px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
-  #start-screen.active, #game-over-screen.active { display: block; }
+  #start-screen.active, #game-over-screen.active { display: flex; }
   h1 {
     font-size: clamp(28px, 6vw, 48px);
     color: #ffcc00;
@@ -174,6 +178,42 @@
     cursor: pointer;
   }
   #btn-mute.muted { color: rgba(255, 80, 80, 0.5); }
+  #pause-screen {
+    text-align: center;
+    color: #fff;
+    pointer-events: auto;
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    background: rgba(0, 0, 0, 0.75);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  #pause-screen.active { display: flex; }
+  /* Volume sliders */
+  .volume-controls {
+    margin: 16px 0 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .vol-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: clamp(10px, 1.8vw, 12px);
+    color: #88aacc;
+  }
+  .vol-row label { width: 52px; text-align: right; }
+  .vol-row input[type="range"] {
+    width: 100px;
+    accent-color: #ffcc00;
+    height: 4px;
+  }
+  .vol-row .vol-val { width: 28px; text-align: left; font-size: 10px; color: #667799; }
   .mobile-only { display: none; }
   body.is-mobile .desktop-only { display: none; }
   body.is-mobile .mobile-only { display: block; }
@@ -191,17 +231,32 @@
     <div class="controls desktop-only">
       <span>MOVE: Arrows / WASD</span>
       <span>SHOOT: Space</span>
+      <span>DASH: Double-tap Arrow</span>
     </div>
     <div class="controls desktop-only">
       <span>GLIDE: Hold Shift</span>
       <span>BOOST: Hold Z</span>
+      <span>PAUSE: Esc</span>
     </div>
     <div class="controls mobile-only">
       <span>Joystick to move · Auto-fire on</span>
     </div>
+    <div class="volume-controls" id="start-vol">
+      <div class="vol-row"><label>MUSIC</label><input type="range" min="0" max="100" value="60" id="vol-music-start"><span class="vol-val" id="vol-music-start-val">60</span></div>
+      <div class="vol-row"><label>SFX</label><input type="range" min="0" max="100" value="80" id="vol-sfx-start"><span class="vol-val" id="vol-sfx-start-val">80</span></div>
+    </div>
     <div class="prompt desktop-only">PRESS SPACE TO START</div>
     <div class="prompt mobile-only">TAP TO START</div>
     <div class="controls desktop-only" style="margin-top: 8px;"><span>ENTER to skip tutorial</span></div>
+  </div>
+  <div id="pause-screen">
+    <h1>PAUSED</h1>
+    <div class="volume-controls" id="pause-vol">
+      <div class="vol-row"><label>MUSIC</label><input type="range" min="0" max="100" value="60" id="vol-music-pause"><span class="vol-val" id="vol-music-pause-val">60</span></div>
+      <div class="vol-row"><label>SFX</label><input type="range" min="0" max="100" value="80" id="vol-sfx-pause"><span class="vol-val" id="vol-sfx-pause-val">80</span></div>
+    </div>
+    <div class="prompt desktop-only">PRESS ESC TO RESUME</div>
+    <div class="prompt mobile-only">TAP TO RESUME</div>
   </div>
   <div id="game-over-screen">
     <h1>GAME OVER</h1>
@@ -232,34 +287,254 @@ const sfx = new MRFD();
 const SFX_HIT_B64 = 'eyJzY2FsZSI6InBlbnRhdG9uaWMiLCJyb290Tm90ZUlkeCI6Miwib2N0YXZlIjoyLCJudW1Ob3RlcyI6NCwib2N0YXZlUmFuZ2UiOjEsImJwbSI6MTE1LCJub3RlRGl2IjowLjEyNSwibm90ZUR1cmF0aW9uIjoxNTMsImRpcmVjdGlvbiI6ImRlc2MiLCJwaWNrZWROb3RlcyI6WzkyLDczLDg4LDg3LDk1LDg4XSwicmV2ZXJiQW1vdW50IjowLjMyODM4NTYzMDg3NTA3MSwiZGVsYXlUaW1lIjo4MCwiZGVsYXlGZWVkYmFjayI6MC4yODA1NTQ1NzU1MzQ2NzYxLCJkZWxheVZvbCI6MC41NTUzOTAxMDAwMjA5MzQ0LCJkZWxheVRvbmUiOjYyLCJlcUxvdyI6MiwiZXFNaWQiOjAsImVxSGlnaCI6MSwiZGVsYXlFcUxvdyI6MCwiZGVsYXlFcU1pZCI6MCwiZGVsYXlFcUhpZ2giOjAsInZvbHVtZSI6MC42NSwicmV2ZXJzZUVjaG8iOmZhbHNlfQ==';
 const SFX_LEVELUP_B64 = 'eyJzY2FsZSI6Im1peG9seWRpYW4iLCJyb290Tm90ZUlkeCI6MSwib2N0YXZlIjozLCJudW1Ob3RlcyI6NSwib2N0YXZlUmFuZ2UiOjEsImJwbSI6MTIwLCJub3RlRGl2IjowLjI1LCJub3RlRHVyYXRpb24iOjI5MywiZGlyZWN0aW9uIjoiYXNjIiwicGlja2VkTm90ZXMiOls5Miw3Myw4OCw4Nyw5NSw4OF0sInJldmVyYkFtb3VudCI6MC4zNDI4NDQ4OTQxODU4ODIyLCJkZWxheVRpbWUiOjMzNCwiZGVsYXlGZWVkYmFjayI6MC4yMDc0MjcwOTE5NjY4NTU5NCwiZGVsYXlWb2wiOjAuNzgzNjA1MjA1NjM3NzY3MSwiZGVsYXlUb25lIjo3MywiZXFMb3ciOi0yLCJlcU1pZCI6MiwiZXFIaWdoIjotNCwiZGVsYXlFcUxvdyI6MCwiZGVsYXlFcU1pZCI6MCwiZGVsYXlFcUhpZ2giOjAsInZvbHVtZSI6MC42NSwicmV2ZXJzZUVjaG8iOmZhbHNlfQ==';
 
-function sfxShoot() {
-  sfx.playSFX({ freq: 880, freqEnd: 440, duration: 60, volume: 0.08, type: 'sawtooth', attack: 0.002, decay: 0.055, filterFreq: 3000, filterEnd: 800, filterType: 'lowpass' });
+// SFX wrappers — apply sfxVolume multiplier to all sound effects
+function playSfx(opts) {
+  if (muted || sfxVolume <= 0) return;
+  opts.volume = (opts.volume || 0.3) * sfxVolume;
+  sfx.playSFX(opts);
 }
-function sfxHit() { sfx.playFromBase64(SFX_HIT_B64); }
-function sfxLevelUp() { sfx.playFromBase64(SFX_LEVELUP_B64); }
+function sfxShoot() {
+  playSfx({ freq: 880, freqEnd: 440, duration: 60, volume: 0.08, type: 'sawtooth', attack: 0.002, decay: 0.055, filterFreq: 3000, filterEnd: 800, filterType: 'lowpass' });
+}
+function sfxHit() { if (sfxVolume > 0) sfx.playFromBase64(SFX_HIT_B64); }
+function sfxLevelUp() { if (sfxVolume > 0) sfx.playFromBase64(SFX_LEVELUP_B64); }
 function sfxBossDeath() {
-  sfx.playSFX({ freq: 200, freqEnd: 40, duration: 600, volume: 0.35, type: 'sawtooth', attack: 0.01, decay: 0.5, filterFreq: 2000, filterEnd: 100 });
-  sfx.playSFX({ freq: 300, freqEnd: 50, duration: 500, volume: 0.25, type: 'square', attack: 0.005, decay: 0.45, filterFreq: 1500, filterEnd: 80 });
-  setTimeout(() => sfx.playSFX({ freq: 150, freqEnd: 30, duration: 800, volume: 0.3, type: 'sawtooth', attack: 0.01, decay: 0.7, filterFreq: 1000, filterEnd: 60 }), 200);
+  playSfx({ freq: 200, freqEnd: 40, duration: 600, volume: 0.35, type: 'sawtooth', attack: 0.01, decay: 0.5, filterFreq: 2000, filterEnd: 100 });
+  playSfx({ freq: 300, freqEnd: 50, duration: 500, volume: 0.25, type: 'square', attack: 0.005, decay: 0.45, filterFreq: 1500, filterEnd: 80 });
+  setTimeout(() => playSfx({ freq: 150, freqEnd: 30, duration: 800, volume: 0.3, type: 'sawtooth', attack: 0.01, decay: 0.7, filterFreq: 1000, filterEnd: 60 }), 200);
 }
 function sfxBugCollect() {
-  sfx.playSFX({ freq: 600 + Math.random() * 200, freqEnd: 1200, duration: 80, volume: 0.12, type: 'sine', attack: 0.003, decay: 0.07 });
+  playSfx({ freq: 600 + Math.random() * 200, freqEnd: 1200, duration: 80, volume: 0.12, type: 'sine', attack: 0.003, decay: 0.07 });
 }
 function sfxBoost() {
-  sfx.playSFX({ freq: 300, freqEnd: 900, duration: 120, volume: 0.15, type: 'sawtooth', attack: 0.005, decay: 0.1, filterFreq: 2000, filterEnd: 4000 });
+  playSfx({ freq: 300, freqEnd: 900, duration: 120, volume: 0.15, type: 'sawtooth', attack: 0.005, decay: 0.1, filterFreq: 2000, filterEnd: 4000 });
 }
 function sfxFeatherCollect() {
-  sfx.playSFX({ freq: 1200, freqEnd: 1600, duration: 100, volume: 0.1, type: 'sine', attack: 0.005, decay: 0.08 });
-  sfx.playSFX({ freq: 800, freqEnd: 1200, duration: 120, volume: 0.08, type: 'sine', attack: 0.01, decay: 0.1 });
+  playSfx({ freq: 1200, freqEnd: 1600, duration: 100, volume: 0.1, type: 'sine', attack: 0.005, decay: 0.08 });
+  playSfx({ freq: 800, freqEnd: 1200, duration: 120, volume: 0.08, type: 'sine', attack: 0.01, decay: 0.1 });
 }
 function sfxMaxHpUp() {
-  sfx.playSFX({ freq: 523, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 });
-  setTimeout(() => sfx.playSFX({ freq: 659, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 }), 100);
-  setTimeout(() => sfx.playSFX({ freq: 784, duration: 200, volume: 0.18, type: 'sine', attack: 0.01, decay: 0.18 }), 200);
+  playSfx({ freq: 523, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 });
+  setTimeout(() => playSfx({ freq: 659, duration: 150, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.13 }), 100);
+  setTimeout(() => playSfx({ freq: 784, duration: 200, volume: 0.18, type: 'sine', attack: 0.01, decay: 0.18 }), 200);
 }
 function sfxWaveStart() {
-  sfx.playSFX({ freq: 440, freqEnd: 660, duration: 200, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.18 });
-  setTimeout(() => sfx.playSFX({ freq: 660, freqEnd: 880, duration: 200, volume: 0.12, type: 'sine', attack: 0.01, decay: 0.18 }), 150);
+  playSfx({ freq: 440, freqEnd: 660, duration: 200, volume: 0.15, type: 'sine', attack: 0.01, decay: 0.18 });
+  setTimeout(() => playSfx({ freq: 660, freqEnd: 880, duration: 200, volume: 0.12, type: 'sine', attack: 0.01, decay: 0.18 }), 150);
+}
+
+// ── VOLUME SYSTEM ──
+let sfxVolume = 0.8;   // 0-1, controlled by slider
+let musicVolume = 0.6;  // 0-1, controlled by slider
+// Sync both slider pairs (start screen + pause screen)
+function setupVolumeSliders() {
+  const musicSliders = [document.getElementById('vol-music-start'), document.getElementById('vol-music-pause')];
+  const sfxSliders = [document.getElementById('vol-sfx-start'), document.getElementById('vol-sfx-pause')];
+  const musicVals = [document.getElementById('vol-music-start-val'), document.getElementById('vol-music-pause-val')];
+  const sfxVals = [document.getElementById('vol-sfx-start-val'), document.getElementById('vol-sfx-pause-val')];
+
+  function syncMusic(v) {
+    musicVolume = v / 100;
+    musicSliders.forEach(s => { if (s) s.value = v; });
+    musicVals.forEach(s => { if (s) s.textContent = v; });
+    if (musicGain && sfx.context) {
+      const target = musicVolume * MUSIC_BASE_VOL;
+      musicGain.gain.setTargetAtTime(target, sfx.context.currentTime, 0.05);
+    }
+    // Start music if volume raised from 0 during gameplay
+    if (musicVolume > 0 && !musicPlaying && state === 'playing') startMusic();
+    // Stop music if volume set to 0
+    if (musicVolume <= 0 && musicPlaying) stopMusic();
+  }
+  function syncSfx(v) {
+    sfxVolume = v / 100;
+    sfxSliders.forEach(s => { if (s) s.value = v; });
+    sfxVals.forEach(s => { if (s) s.textContent = v; });
+  }
+
+  musicSliders.forEach(s => { if (s) s.addEventListener('input', e => syncMusic(+e.target.value)); });
+  sfxSliders.forEach(s => { if (s) s.addEventListener('input', e => syncSfx(+e.target.value)); });
+}
+setupVolumeSliders();
+
+// ── CHIPTUNE MUSIC ENGINE ──
+const MUSIC_BASE_VOL = 0.08;  // quieter default base
+const MUSIC_GLIDE_MULT = 0.25; // multiplier during glide
+let musicGain = null;
+let musicPlaying = false;
+let musicInterval = null;
+let musicSection = 0;  // 0=main, 1=variation, 2=bridge, 3=boss-approach
+let musicSectionCounter = 0; // counts loops through current section
+let musicBossApproach = false; // set true when score nears boss threshold
+
+function startMusic() {
+  if (musicPlaying || muted || musicVolume <= 0) return;
+  sfx.unlock();
+  if (!sfx.context) return;
+
+  musicGain = sfx.context.createGain();
+  musicGain.gain.value = musicVolume * MUSIC_BASE_VOL;
+  musicGain.connect(sfx.context.destination);
+  musicPlaying = true;
+  musicSection = 0;
+  musicSectionCounter = 0;
+  musicBossApproach = false;
+
+  // ── SECTIONS ──
+  // Main theme (A) — the original melody you liked
+  const melodyA = [
+    [330, 0.5, 'square'], [392, 0.5, 'square'], [440, 0.5, 'square'], [523, 0.5, 'square'],
+    [440, 0.5, 'square'], [392, 0.5, 'square'], [330, 1, 'square'],
+    [294, 0.5, 'square'], [330, 0.5, 'square'], [392, 0.5, 'square'], [440, 0.5, 'square'],
+    [392, 1, 'square'], [330, 0.5, 'square'], [294, 0.5, 'square'],
+    [262, 0.5, 'square'], [294, 0.5, 'square'], [330, 1, 'square'],
+    [392, 0.5, 'square'], [440, 0.5, 'square'], [523, 0.5, 'square'], [440, 0.5, 'square'],
+    [392, 0.5, 'square'], [330, 0.5, 'square'], [294, 0.5, 'square'], [262, 0.5, 'square'],
+    [294, 0.5, 'square'], [330, 1, 'square'], [392, 0.5, 'square'], [330, 0.5, 'square'],
+  ];
+
+  // Variation (B) — higher energy, slightly different contour
+  const melodyB = [
+    [440, 0.5, 'square'], [523, 0.5, 'square'], [587, 0.5, 'square'], [523, 0.5, 'square'],
+    [440, 0.5, 'square'], [523, 1, 'square'],
+    [392, 0.5, 'square'], [440, 0.5, 'square'], [523, 0.5, 'square'], [587, 0.5, 'square'],
+    [523, 0.5, 'square'], [440, 0.5, 'square'], [392, 1, 'square'],
+    [330, 0.5, 'square'], [392, 0.5, 'square'], [440, 1, 'square'],
+    [523, 0.5, 'square'], [587, 0.5, 'square'], [523, 0.5, 'square'], [440, 0.5, 'square'],
+    [392, 0.5, 'square'], [330, 0.5, 'square'], [294, 0.5, 'square'], [330, 0.5, 'square'],
+    [392, 1, 'square'], [440, 0.5, 'square'], [392, 0.5, 'square'],
+  ];
+
+  // Bridge (C) — longer notes, breathing space, sine for softer feel
+  const melodyC = [
+    [262, 2, 'sine'], [330, 2, 'sine'],
+    [294, 2, 'sine'], [392, 2, 'sine'],
+    [330, 2, 'sine'], [440, 2, 'sine'],
+    [392, 1.5, 'sine'], [330, 1.5, 'sine'], [294, 1, 'sine'],
+  ];
+
+  // Boss approach (D) — tense, minor feel, faster pulse
+  const melodyD = [
+    [330, 0.5, 'sawtooth'], [311, 0.5, 'sawtooth'], [294, 0.5, 'sawtooth'], [311, 0.5, 'sawtooth'],
+    [330, 0.5, 'sawtooth'], [370, 0.5, 'sawtooth'], [330, 0.5, 'sawtooth'], [294, 0.5, 'sawtooth'],
+    [262, 0.5, 'sawtooth'], [294, 0.5, 'sawtooth'], [330, 0.5, 'sawtooth'], [294, 0.5, 'sawtooth'],
+    [262, 0.5, 'sawtooth'], [247, 0.5, 'sawtooth'], [262, 1, 'sawtooth'],
+    [330, 0.5, 'sawtooth'], [370, 0.5, 'sawtooth'], [392, 0.5, 'sawtooth'], [370, 0.5, 'sawtooth'],
+    [330, 0.5, 'sawtooth'], [311, 0.5, 'sawtooth'], [294, 0.5, 'sawtooth'], [262, 0.5, 'sawtooth'],
+    [294, 1, 'sawtooth'], [330, 1, 'sawtooth'],
+  ];
+
+  // Bass lines per section
+  const bassA = [
+    [131, 1, 'triangle'], [165, 1, 'triangle'], [147, 1, 'triangle'], [131, 1, 'triangle'],
+    [110, 1, 'triangle'], [131, 1, 'triangle'], [147, 1, 'triangle'], [165, 1, 'triangle'],
+  ];
+  const bassB = [
+    [165, 1, 'triangle'], [196, 1, 'triangle'], [175, 1, 'triangle'], [165, 1, 'triangle'],
+    [131, 1, 'triangle'], [147, 1, 'triangle'], [165, 1, 'triangle'], [196, 1, 'triangle'],
+  ];
+  const bassC = [
+    [131, 2, 'triangle'], [147, 2, 'triangle'],
+    [165, 2, 'triangle'], [131, 2, 'triangle'],
+  ];
+  const bassD = [
+    [131, 0.5, 'triangle'], [131, 0.5, 'triangle'], [147, 0.5, 'triangle'], [147, 0.5, 'triangle'],
+    [156, 0.5, 'triangle'], [156, 0.5, 'triangle'], [131, 0.5, 'triangle'], [131, 0.5, 'triangle'],
+    [124, 0.5, 'triangle'], [124, 0.5, 'triangle'], [131, 0.5, 'triangle'], [131, 0.5, 'triangle'],
+    [147, 1, 'triangle'], [131, 1, 'triangle'],
+  ];
+
+  const sections = [
+    { melody: melodyA, bass: bassA },
+    { melody: melodyB, bass: bassB },
+    { melody: melodyC, bass: bassC },
+    { melody: melodyD, bass: bassD },
+  ];
+
+  let melodyIdx = 0, bassIdx = 0;
+  let melodyWait = 0, bassWait = 0;
+  let sectionNoteCount = 0;
+
+  function currentSection() {
+    if (musicBossApproach) return sections[3]; // boss approach overrides
+    return sections[musicSection % 4];
+  }
+
+  function advanceSection() {
+    if (musicBossApproach) return; // stay in boss mode
+    musicSectionCounter++;
+    // Pattern: A, A, B, A, A, C (bridge), repeat — boss overrides to D
+    const pattern = [0, 0, 1, 0, 0, 2];
+    musicSection = pattern[musicSectionCounter % pattern.length];
+    melodyIdx = 0;
+    bassIdx = 0;
+    sectionNoteCount = 0;
+  }
+
+  // BPM: 112 (80% of 140)
+  const bpm = 112;
+  const beatMs = 60000 / bpm;
+
+  function playNote(freq, dur, type) {
+    if (!sfx.context || muted || !musicGain) return;
+    const osc = sfx.context.createOscillator();
+    const gain = sfx.context.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    const noteVol = type === 'sine' ? 0.25 : (type === 'sawtooth' ? 0.18 : 0.3);
+    gain.gain.value = noteVol;
+    const t = sfx.context.currentTime;
+    const durSec = dur * beatMs / 1000;
+    gain.gain.setValueAtTime(noteVol, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + durSec * 0.9);
+    osc.connect(gain);
+    gain.connect(musicGain);
+    osc.start(t);
+    osc.stop(t + durSec);
+  }
+
+  const tickMs = beatMs / 2; // tick every half beat
+  musicInterval = setInterval(() => {
+    if (state !== 'playing' || muted || !musicPlaying) return;
+    const sec = currentSection();
+
+    if (melodyWait <= 0) {
+      if (melodyIdx >= sec.melody.length) {
+        // Melody finished a full loop — consider section advance
+        sectionNoteCount++;
+        if (sectionNoteCount >= 2) advanceSection(); // play each section twice
+        melodyIdx = 0;
+      }
+      const [freq, dur, type] = sec.melody[melodyIdx % sec.melody.length];
+      playNote(freq, dur, type);
+      melodyWait = dur * 2; // in half-beats
+      melodyIdx++;
+    }
+    melodyWait--;
+
+    if (bassWait <= 0) {
+      const [freq, dur, type] = sec.bass[bassIdx % sec.bass.length];
+      playNote(freq, dur, type);
+      bassWait = dur * 2;
+      bassIdx++;
+    }
+    bassWait--;
+  }, tickMs);
+}
+
+function stopMusic() {
+  musicPlaying = false;
+  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+  if (musicGain) {
+    try { musicGain.gain.setTargetAtTime(0, sfx.context.currentTime, 0.05); } catch(e) {}
+    musicGain = null;
+  }
+}
+
+// Signal boss approach from game logic
+function setMusicBossApproach(approaching) {
+  if (musicBossApproach === approaching) return;
+  musicBossApproach = approaching;
 }
 
 // ── MOBILE DETECTION ──
@@ -347,19 +622,76 @@ const TUTORIAL_STEP_SHOOT = 1;  // "SPACE to shoot" — only enemies, wait for k
 const TUTORIAL_STEP_NAVIGATE = 2; // "SHIFT to glide, Z to boost" — obstacles, timed
 const TUTORIAL_STEP_GO = 3;     // Brief "WAVE 1" flash, strip powers, start real game
 
+// ── DOUBLE-TAP DASH ──
+const DASH_TAP_WINDOW = 250; // ms between taps to trigger dash
+const DASH_SPEED = 8;
+const DASH_DURATION = 8; // frames
+const DASH_COOLDOWN = 30; // frames between dashes
+const DASH_COST = 20; // action meter cost per dash
+let lastArrowTaps = {}; // code → timestamp of last press
+let dashState = { active: false, timer: 0, cooldown: 0, dx: 0, dy: 0 };
+
+function checkDoubleTap(code) {
+  const now = Date.now();
+  const dirMap = {
+    'ArrowLeft': { dx: -1, dy: 0 }, 'ArrowRight': { dx: 1, dy: 0 },
+    'ArrowUp': { dx: 0, dy: -1 }, 'ArrowDown': { dx: 0, dy: 1 }
+  };
+  if (!dirMap[code]) return;
+  if (dashState.cooldown > 0) return;
+  if (!bird || bird.action < DASH_COST) return;
+  if (lastArrowTaps[code] && (now - lastArrowTaps[code]) < DASH_TAP_WINDOW) {
+    bird.action = Math.max(0, bird.action - DASH_COST);
+    dashState.active = true;
+    dashState.timer = DASH_DURATION;
+    dashState.cooldown = DASH_COOLDOWN;
+    dashState.dx = dirMap[code].dx;
+    dashState.dy = dirMap[code].dy;
+    sfxBoost();
+    lastArrowTaps[code] = 0; // reset so triple tap doesn't re-trigger
+    return;
+  }
+  lastArrowTaps[code] = now;
+}
+
+// ── PAUSE ──
+function togglePause() {
+  if (state === 'playing') {
+    state = 'paused';
+    document.getElementById('pause-screen').classList.add('active');
+    if (musicGain && sfx.context) musicGain.gain.setTargetAtTime(0, sfx.context.currentTime, 0.05);
+  } else if (state === 'paused') {
+    state = 'playing';
+    document.getElementById('pause-screen').classList.remove('active');
+    if (musicGain && sfx.context) {
+      const glideMult = bird && bird.gliding ? MUSIC_GLIDE_MULT : 1.0;
+      musicGain.gain.setTargetAtTime(musicVolume * MUSIC_BASE_VOL * glideMult, sfx.context.currentTime, 0.05);
+    }
+  }
+}
+
 // ── INPUT ──
 const keys = {};
 window.addEventListener('keydown', e => {
+  if (e.repeat) return; // ignore held-down repeats for dash detection
   keys[e.code] = true;
+  if (e.code === 'Escape') {
+    e.preventDefault();
+    if (state === 'playing' || state === 'paused') togglePause();
+    return;
+  }
   if (e.code === 'Space') {
     e.preventDefault();
     if (state === 'start') startGame();
     else if (state === 'gameover') startGame();
+    else if (state === 'paused') togglePause();
   }
   if (e.code === 'Enter') {
     if (state === 'start') { hasPlayedBefore = true; startGame(); }
     else if (state === 'gameover') startGame();
   }
+  // Double-tap dash detection for arrow keys
+  if (state === 'playing') checkDoubleTap(e.code);
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
@@ -379,6 +711,7 @@ const joyThumb = isMobile ? document.getElementById('joystick-thumb') : null;
 canvas.addEventListener('touchstart', e => {
   e.preventDefault(); sfx.unlock();
   if (state === 'start' || state === 'gameover') { startGame(); }
+  else if (state === 'paused') { togglePause(); }
 });
 
 if (isMobile) {
@@ -470,11 +803,9 @@ if (isMobile) {
     muted = !muted;
     btnMute.classList.toggle('muted', muted);
     btnMute.textContent = muted ? '✕' : '♪';
-    if (sfx.ctx) sfx.ctx.destination.channelCount = muted ? 0 : 2;
-    // Mute/unmute via gain if available, otherwise suspend/resume
-    if (sfx.ctx) {
-      if (muted) sfx.ctx.suspend();
-      else sfx.ctx.resume();
+    if (sfx.context) {
+      if (muted) { stopMusic(); sfx.context.suspend(); }
+      else { sfx.context.resume(); if (state === 'playing') startMusic(); }
     }
   });
 }
@@ -502,6 +833,8 @@ function startGame() {
   sfx.unlock();
   document.getElementById('start-screen').classList.remove('active');
   document.getElementById('game-over-screen').classList.remove('active');
+  document.getElementById('pause-screen').classList.remove('active');
+  stopMusic();
   state = 'playing';
   score = 0; wave = 0; waveScore = 0; // wave 0 = tutorial
   powerLevel = 0; bugsEaten = 0;
@@ -534,7 +867,10 @@ function startGame() {
 
   bullets = []; enemies = []; bugs = []; particles = [];
   enemyBullets = []; floatingTexts = []; obstacles = [];
+  dashState = { active: false, timer: 0, cooldown: 0, dx: 0, dy: 0 };
+  lastArrowTaps = {};
   initStars();
+  startMusic();
 }
 
 function startNextWave() {
@@ -1134,6 +1470,9 @@ function update() {
   if (state !== 'playing') return;
   frameCount++;
   difficultyTimer++;
+  // Dash cooldown tick
+  if (dashState.cooldown > 0) dashState.cooldown--;
+  if (dashState.timer > 0) dashState.timer--; else dashState.active = false;
   if (waveTransition > 0) waveTransition--;
 
   // Tutorial update
@@ -1254,10 +1593,39 @@ function update() {
     bird.action = Math.min(ACTION_MAX, bird.action + ACTION_REGEN);
   }
 
-  bird.x += moveX * speed;
-  bird.y += moveY * speed;
+  // Dash override — if dashing, move in dash direction at dash speed
+  if (dashState.active) {
+    bird.x += dashState.dx * DASH_SPEED;
+    bird.y += dashState.dy * DASH_SPEED;
+    // Dash trail particles
+    if (frameCount % 2 === 0) {
+      particles.push({
+        x: bird.x + (Math.random() - 0.5) * 4, y: bird.y + 4,
+        vx: -dashState.dx * 1.5 + (Math.random() - 0.5),
+        vy: -dashState.dy * 1.5 + (Math.random() - 0.5),
+        life: 8, maxLife: 8, color: '#88ddff', size: 1.5
+      });
+    }
+  } else {
+    bird.x += moveX * speed;
+    bird.y += moveY * speed;
+  }
   bird.x = Math.max(10, Math.min(GW - 10, bird.x));
   bird.y = Math.max(15, Math.min(GH - 10, bird.y));
+
+  // Music volume — quieter during glide
+  if (musicGain && sfx.context && musicPlaying) {
+    const glideMult = gliding ? MUSIC_GLIDE_MULT : 1.0;
+    const targetVol = musicVolume * MUSIC_BASE_VOL * glideMult;
+    musicGain.gain.setTargetAtTime(targetVol, sfx.context.currentTime, 0.1);
+  }
+
+  // Boss approach music — switch to tense section when score nears boss threshold
+  if (!bossSpawned && wave >= 1 && waveScore >= bossScoreThreshold() * 0.7) {
+    setMusicBossApproach(true);
+  } else if (bossSpawned || waveScore < bossScoreThreshold() * 0.5) {
+    setMusicBossApproach(false);
+  }
 
   // Lean
   const targetLean = Math.max(-1, Math.min(1, moveX));
@@ -1689,7 +2057,7 @@ function update() {
               if (state === 'playing') {
                 triggerPowerDischarge();
                 shakeTimer = 10;
-                sfx.playSFX({ freq: 800, freqEnd: 200, duration: 400, volume: 0.2, type: 'sine', attack: 0.01, decay: 0.35, filterFreq: 4000, filterEnd: 300 });
+                playSfx({ freq: 800, freqEnd: 200, duration: 400, volume: 0.2, type: 'sine', attack: 0.01, decay: 0.35, filterFreq: 4000, filterEnd: 300 });
               }
             }, 800);
             setTimeout(() => { if (state === 'playing') startNextWave(); }, 2500);
@@ -1980,7 +2348,7 @@ function render() {
   }
 
   // HUD
-  if (state === 'playing' || state === 'gameover') {
+  if (state === 'playing' || state === 'gameover' || state === 'paused') {
     bctx.fillStyle = PAL.hud; bctx.font = '8px monospace';
     bctx.fillText('SCORE ' + score, 4, 10);
 
@@ -2054,6 +2422,7 @@ function render() {
 function gameOver() {
   state = 'gameover';
   hasPlayedBefore = true;
+  stopMusic();
   sfxHit();
   document.getElementById('final-score').textContent = 'SCORE: ' + score;
   const levelNames = ['PECK', 'LASER EYES', 'SPREAD', 'GRAVITY FIELD'];
@@ -2073,10 +2442,12 @@ function loop(timestamp) {
   lastTime = timestamp;
 
   // Accumulate time, run fixed-step updates at 60fps
-  dtAccum += Math.min(elapsed, 50); // cap to avoid spiral of death
-  while (dtAccum >= FRAME_MS) {
-    update();
-    dtAccum -= FRAME_MS;
+  if (state !== 'paused') {
+    dtAccum += Math.min(elapsed, 50); // cap to avoid spiral of death
+    while (dtAccum >= FRAME_MS) {
+      update();
+      dtAccum -= FRAME_MS;
+    }
   }
   render();
   requestAnimationFrame(loop);
