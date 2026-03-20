@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-03-20-approval-theater",
+      "title": "Approval Theater",
+      "date": "2026-03-20T14:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "agents",
+        "security",
+        "human-in-the-loop",
+        "agentic-systems",
+        "agent-architecture"
+      ],
+      "audience": "free",
+      "summary": "Human-in-the-loop oversight works until it becomes routine. The dangerous moment isn't when AI fails obviously — it's when it fails convincingly.",
+      "url": "/blog/2026-03-20-approval-theater"
+    },
+    {
       "slug": "2026-03-13-the-apology-was-worse-than-the-attack",
       "title": "The Apology Was Worse Than the Attack",
       "date": "2026-03-13T14:00:01.000Z",
