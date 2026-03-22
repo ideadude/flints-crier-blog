@@ -600,7 +600,7 @@
     </header>
 
     <div class="input-section">
-      <label for="thing-input">What are you naming?</label>
+      <label for="thing-input">What are you naming? <span style="font-weight:400;opacity:0.6;text-transform:none;letter-spacing:0">(takes 3–5 min · more input → better output)</span></label>
       <textarea
         id="thing-input"
         placeholder="e.g. a membership plugin for associations — who uses it, what it does, the feeling it should convey"
@@ -672,7 +672,7 @@
       },
       {
         title: "Final warning.",
-        body: "This is AI slop. It is made with love, but it is slop. The output is probably wrong, possibly infringing, and definitely not a substitute for professional naming services. You are about to receive names from a machine that also thinks a hot dog is a sandwich.<br><br>Godspeed.",
+        body: "This is AI slop. It is made with love, but it is slop. The output is probably wrong, possibly infringing, and definitely not a substitute for professional naming services. You are about to receive names from a machine that also thinks a hot dog is a sandwich.<br><br>Also: this takes 3–5 minutes. It's mining 11 source wells and considering 1,000+ candidates. Get a coffee.<br><br>Godspeed.",
         btn: "I accept all of this. Show me the slop. →",
         final: true
       }
@@ -772,7 +772,7 @@ Mine ALL of these for raw material before generating a single name:
 - Trade / craft vocabulary — smithing, sailing, weaving, farming
 Generate 50-100 raw fragments from this mining before moving on.
 
-STEP 4: Mentally generate AT LEAST 1,000 name candidates across all types: invented/morphed words, evocative real words, compressed phrases, metaphors from adjacent domains, person/place/era names. Do not filter yet — volume is the point. You do not need to write all of them out. In the RAW CANDIDATES section, show only the 50–200 most interesting or surprising ones (compact, comma-separated or one per line, grouped loosely by source). The full mental volume happened; the output is just the best of it.
+STEP 4: Mentally generate AT LEAST 1,000 name candidates across all types: invented/morphed words, evocative real words, compressed phrases, metaphors from adjacent domains, person/place/era names. Do not filter yet — volume is the point. You do not need to write all of them out. In the RAW CANDIDATES section, show the 10–20 most interesting candidates from EACH source bucket (Latin, Greek, Myth, Chemistry, Geography, Zoology, Architecture, Astronomy, Physics, History, Trade/Craft) — making sure every bucket is represented. Group by source. The full mental volume happened; the output is a balanced cross-section of the best from each well.
 
 STEP 5: Filter. Pull 15-20 strongest. Run each through: attention, processing fluency (say/spell/remember), surprisingly familiar test, category noise check, expandability, story potential.
 
@@ -828,6 +828,7 @@ Rules:
     // ── Loading messages ─────────────────────────────────────────────────────
 
     const LOADING_MESSAGES = [
+      // Source mining
       '↳ mapping the category landscape...',
       '↳ consulting the periodic table for symbolic weight...',
       '↳ raiding the Latin roots...',
@@ -838,6 +839,15 @@ Rules:
       '↳ asking the astronomers...',
       '↳ rifling through trade vocabulary...',
       '↳ rummaging through 15th century shipbuilding terms...',
+      '↳ consulting the zoologists. yes, really.',
+      '↳ checking the periodic table again. iridium might be onto something.',
+      '↳ reading the geography bucket. rivers have good energy.',
+      '↳ asking physics what "tension" actually sounds like as a word...',
+      '↳ going through historical eras. the bronze age was underrated.',
+      '↳ checking what the Egyptians called related concepts...',
+      '↳ the architecture bucket is yielding things. stay tuned.',
+      '↳ asking the trade vocabulary. smiths knew what they were doing.',
+      // Volume
       '↳ generating candidates... (this is the part where volume wins)',
       '↳ still considering... the methodology demands 1,000+ in the mental buffer',
       '↳ we\'re in the hundreds now. pushing through.',
@@ -845,20 +855,58 @@ Rules:
       '↳ showing you 200 of them. Placek would say that\'s not enough. he\'s right.',
       '↳ "naming is not a creative act. it\'s a mining act." — Placek, probably',
       '↳ somewhere in here is a word nobody\'s thought to use yet...',
+      '↳ a surprising number of these are just "flux" with different vowels.',
+      '↳ the AI has a known bias toward fire metaphors. correcting for that now.',
+      '↳ three of these are already dog food brands. removing.',
+      '↳ one of these is the name of a minor demon. keeping it in. you\'ll know.',
+      '↳ one of these is a great name but the .com is a parking page asking $4,800.',
+      '↳ several of these are just vibes with consonants. this is normal.',
+      // Filtering
       '↳ rejecting the obvious ones...',
       '↳ rejecting the too-clever ones...',
       '↳ rejecting the ones that sound like pharma drugs...',
+      '↳ rejecting the ones that are just Latin for "fast"...',
+      '↳ rejecting the ones that are just Latin for "light"...',
+      '↳ rejecting the ones that are just Greek for "together"...',
       '↳ running the surprisingly-familiar test...',
       '↳ culling anything that requires a pronunciation guide...',
-      '↳ eliminating the ones that are just Latin for "fast"...',
       '↳ stress-testing: can a sales rep say this without wincing?',
+      '↳ stress-testing: can a 60-year-old say it on the phone without asking for the spelling?',
+      '↳ stress-testing: does it survive autocorrect?',
       '↳ the shortlist is forming...',
       '↳ reconsidering #3. it might actually be #1.',
       '↳ this is the hard call part. trust the process.',
-      '↳ almost there. the best name usually makes you slightly nervous.',
+      '↳ the best name usually makes you slightly uncomfortable. that\'s the sign.',
+      '↳ almost there. the hard call requires a moment.',
       '↳ making the hard call...',
       '↳ still making the hard call...',
     ];
+
+    // ── Random seeds ─────────────────────────────────────────────────────────
+
+    const SEED_BANK = {
+      Latin:        ['imago','sublima','levis','saltus','clarum','velox','nitidus','emergo','cursus','solidus','transitus','novare','pluma','exuro','pervio'],
+      Greek:        ['ekdysis','metabasis','kairos','anabasis','palingenesis','ekstasis','kinesis','stasis','allagē','eleuther','katharsis','metabole'],
+      Myth:         ['bifrost','ariadne','khepri','ratatosk','skidbladnir','bennu','zephyr','daedalus','janus','hermes','terminus','aura','eos','vesta'],
+      Chemistry:    ['sublimation','anneal','obsidian','pumice','lattice','crucible','flux','catalyst','alloy','smelt','calcite','silica','iridium','argon'],
+      Geography:    ['rubicon','tarn','tor','mesa','cairn','sill','escarpment','fjord','basalt','meridian','narrows','shale','strait','passage'],
+      Zoology:      ['molt','ecdysis','eclosion','exuvia','instar','fledge','chrysalis','slough','peregrine','stonefly','emergent','imago'],
+      Architecture: ['threshold','reveal','clerestory','keystone','cantilever','soffit','purlin','lintel','jamb','fascia','plinth'],
+      Astronomy:    ['transit','ingress','egress','epoch','apogee','node','vela','perihelion','solstice','liminal','cygnus'],
+      Physics:      ['laminar','resonance','coherent','kinetic','phase','momentum','sublimation','vector','flux','crystalline'],
+      History:      ['rubicon','exodus','vanguard','anabasis','emigré','clearance','reformation','dissolution','pathfinder','pioneer'],
+      Craft:        ['escapement','burnish','anneal','pare','hone','shuttle','tack','distill','temper','crucible','kiln'],
+    };
+
+    function getRandomSeeds() {
+      const buckets = Object.keys(SEED_BANK);
+      const shuffled = [...buckets].sort(() => Math.random() - 0.5);
+      const count = 4 + Math.floor(Math.random() * 2);
+      return shuffled.slice(0, count).map(bucket => {
+        const words = SEED_BANK[bucket];
+        return `${words[Math.floor(Math.random() * words.length)]} (${bucket})`;
+      }).join(', ');
+    }
 
     // ── App state ─────────────────────────────────────────────────────────────
 
@@ -934,7 +982,7 @@ Rules:
         const el = document.getElementById('phase-current');
         el.style.opacity = '0';
         setTimeout(() => { el.textContent = LOADING_MESSAGES[msgIndex]; el.style.opacity = '1'; }, 300);
-        phaseTimer = setTimeout(next, 4500);
+        phaseTimer = setTimeout(next, 6500);
       }
       phaseTimer = setTimeout(next, 4500);
     }
@@ -957,8 +1005,9 @@ Rules:
       sections.landscape = extractSection('CATEGORY LANDSCAPE', ['SOURCE MINING', 'RAW CANDIDATES', 'TOP 5', 'HONORABLE', 'WHAT TO AVOID', 'THE PICK', '---']);
       sections.mining = extractSection('SOURCE MINING HIGHLIGHTS', ['RAW CANDIDATES', 'TOP 5', 'HONORABLE', 'WHAT TO AVOID', 'THE PICK', '---']);
       sections.raw = extractSection('RAW CANDIDATES', ['TOP 5', 'HONORABLE', 'WHAT TO AVOID', 'THE PICK', '---']);
-      sections.top5Raw = extractSection('TOP 5', ['HONORABLE', 'WHAT TO AVOID', 'THE PICK', '---']);
-      sections.honorable = extractSection('HONORABLE MENTIONS', ['WHAT TO AVOID', 'THE PICK', '---']);
+      // Don't use --- as end boundary here — model puts --- between each entry
+      sections.top5Raw = extractSection('TOP 5', ['HONORABLE MENTIONS', 'WHAT TO AVOID', 'THE PICK']);
+      sections.honorable = extractSection('HONORABLE MENTIONS', ['WHAT TO AVOID', 'THE PICK']);
       sections.avoid = extractSection('WHAT TO AVOID', ['THE PICK', '---']);
       sections.pick = extractSection('THE PICK', ['---', '$']);
       const m = text.match(/NAMING:\s*(.+)/i);
@@ -1000,7 +1049,16 @@ Rules:
       return clean.split(/[|,\n]+/).map(s => s.trim()).filter(s => s.length > 1 && s.length < 25).slice(0, 40);
     }
 
-    function renderResults(text) {
+    function stripMarkdown(text) {
+      return text
+        .replace(/\*\*/g, '')
+        .replace(/(?<![a-z])\*(?![a-z])/gi, '')
+        .replace(/^#+\s+/gm, '')
+        .replace(/`([^`]+)`/g, '$1');
+    }
+
+    function renderResults(rawText) {
+      const text = stripMarkdown(rawText);
       const sections = parseOutput(text);
       const top5 = parseTop5(sections.top5Raw);
       const pickName = parsePickName(sections.pick);
@@ -1029,6 +1087,11 @@ Rules:
         html += `<div class="card"><div class="card-header">Top 5</div><div class="top5-grid">${items}</div></div>`;
       }
 
+      if (sections.honorable) {
+        const items = sections.honorable.split('\n').filter(l => l.trim().length > 2).map(l => `<div class="avoid-item" style="color:var(--text);opacity:0.7">${l.replace(/^[-*•]\s*/, '').replace(/\*\*/g, '')}</div>`).join('');
+        if (items) html += `<div class="card"><div class="card-header">Honorable Mentions</div><div class="avoid-list">${items}</div></div>`;
+      }
+
       if (sections.context || sections.landscape) {
         html += `<div class="card">`;
         if (sections.context) html += `<div class="card-header">What I'm Working With</div><p style="font-size:0.82rem;line-height:1.6;color:var(--muted);${sections.landscape ? 'margin-bottom:1rem' : ''}">${sections.context}</p>`;
@@ -1043,11 +1106,6 @@ Rules:
       if (sections.avoid) {
         const items = sections.avoid.split('\n').filter(l => l.trim().length > 2).map(l => `<div class="avoid-item">${l.replace(/^[-*•]\s*/, '').replace(/\*\*/g, '')}</div>`).join('');
         html += `<div class="card"><div class="card-header">✕ What to Avoid</div><div class="avoid-list">${items}</div></div>`;
-      }
-
-      if (sections.honorable) {
-        const items = sections.honorable.split('\n').filter(l => l.trim().length > 2).map(l => `<div class="avoid-item" style="color:var(--text);opacity:0.7">${l.replace(/^[-*•]\s*/, '').replace(/\*\*/g, '')}</div>`).join('');
-        if (items) html += `<div class="card"><div class="card-header">Honorable Mentions</div><div class="avoid-list">${items}</div></div>`;
       }
 
       if (sections.raw) {
@@ -1096,7 +1154,7 @@ Rules:
             system: SYSTEM_PROMPT,
             messages: [{
               role: 'user',
-              content: `The thing to be named is: ${input}\n\nApply the full source-mining approach: mine all sources, consider 1,000+ candidates mentally, output the 50–200 most interesting raw ones, filter to top 5, make the hard call. Plain text output only, no markdown formatting.`
+              content: `The thing to be named is: ${input}\n\nTo push your mining in an unexpected direction this run, begin by exploring these seed words: ${getRandomSeeds()}. Let them pull you into territory you might not otherwise visit. The seeds don't need to become the final name — they're just entry points.\n\nApply the full source-mining approach: mine all sources, consider 1,000+ candidates mentally, output the best from each bucket (10-20 per source), filter to top 5, make the hard call. Plain text only, no markdown.`
             }]
           })
         });
