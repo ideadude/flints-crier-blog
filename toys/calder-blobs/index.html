@@ -153,6 +153,10 @@ canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
     </select>
   </div>
   <div class="ctrl">
+    <label>blur <span id="v-blur">0</span></label>
+    <input type="range" id="r-blur" min="0" max="100" step="1" value="0">
+  </div>
+  <div class="ctrl">
     <label>vignette <span id="v-vignette">0</span></label>
     <input type="range" id="r-vignette" min="0" max="1" step="0.05" value="0">
   </div>
@@ -170,7 +174,7 @@ const S = {
   minSize: 0.12, maxSize: 0.45, texture: 0.6,
   palette: 'calder', bg: 'paper',
   halftone: 0, dotSize: 8, htMode: 0,
-  vignette: 0
+  blur: 0, vignette: 0
 };
 
 const PALETTES = {
@@ -339,6 +343,41 @@ function drawBlobPainterly(blob) {
     traceBlobPath(pts); ctx.fillStyle = grad; ctx.fill();
   }
   ctx.restore();
+}
+
+// --- Gaussian blur post-process ---
+// Uses an offscreen canvas to apply CSS filter blur to the current frame
+let _blurCanvas = null, _blurCtx = null;
+
+function applyBlur() {
+  if (S.blur < 1) return;
+
+  // Map 0-100 to 0-50px of actual blur (50px is very heavy)
+  const px = S.blur * 0.5 * DPR;
+  const cw = canvas.width, ch = canvas.height;
+
+  // Lazy-init offscreen canvas
+  if (!_blurCanvas || _blurCanvas.width !== cw || _blurCanvas.height !== ch) {
+    _blurCanvas = document.createElement('canvas');
+    _blurCanvas.width = cw;
+    _blurCanvas.height = ch;
+    _blurCtx = _blurCanvas.getContext('2d');
+  }
+
+  // Copy current canvas to offscreen
+  _blurCtx.clearRect(0, 0, cw, ch);
+  _blurCtx.drawImage(canvas, 0, 0);
+
+  // Clear main canvas and redraw with blur filter
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.filter = `blur(${px}px)`;
+  ctx.drawImage(_blurCanvas, 0, 0);
+  ctx.filter = 'none';
+  ctx.restore();
+  // Restore the DPR transform
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
 
 // --- Halftone post-process ---
@@ -609,6 +648,7 @@ function animate() {
   }
 
   // Post-process effects
+  applyBlur();
   applyHalftone();
   applyVignette();
 
@@ -637,6 +677,8 @@ function syncUI() {
   document.getElementById('v-texture').textContent = S.texture;
   document.getElementById('s-palette').value = S.palette;
   document.getElementById('s-bg').value = S.bg;
+  document.getElementById('r-blur').value = S.blur;
+  document.getElementById('v-blur').textContent = S.blur;
   document.getElementById('r-halftone').value = S.halftone;
   document.getElementById('v-halftone').textContent = S.halftone;
   document.getElementById('r-dotsize').value = S.dotSize;
@@ -660,6 +702,7 @@ function bindUIEvents() {
   wire('r-minsize', 'minSize', 'v-minsize', parseFloat);
   wire('r-maxsize', 'maxSize', 'v-maxsize', parseFloat);
   wire('r-texture', 'texture', 'v-texture', parseFloat);
+  wire('r-blur', 'blur', 'v-blur', parseInt);
   wire('r-halftone', 'halftone', 'v-halftone', parseFloat);
   wire('r-dotsize', 'dotSize', 'v-dotsize', parseInt);
   wire('r-vignette', 'vignette', 'v-vignette', parseFloat);
@@ -685,8 +728,8 @@ function bindUIEvents() {
   document.getElementById('s-bg').addEventListener('change', e => { S.bg = e.target.value; });
 }
 
-const SHARE_KEYS_NUM = ['count','drift','wobble','minSize','maxSize','texture','halftone','dotSize','vignette'];
-const SHARE_KEYS_INT = new Set(['count','dotSize','htMode']);
+const SHARE_KEYS_NUM = ['count','drift','wobble','minSize','maxSize','texture','blur','halftone','dotSize','vignette'];
+const SHARE_KEYS_INT = new Set(['count','dotSize','htMode','blur']);
 
 function encodeURL() {
   const p = new URLSearchParams();
@@ -717,6 +760,7 @@ function randomizeCfg() {
   S.maxSize = Math.round((0.2 + Math.random() * 0.5) * 100) / 100;
   if (S.maxSize < S.minSize + 0.05) S.maxSize = S.minSize + 0.1;
   S.texture = Math.round(Math.random() * 20) / 20;
+  S.blur = Math.random() < 0.6 ? 0 : Math.floor(Math.random() * 60);
   S.halftone = Math.random() < 0.5 ? 0 : Math.round(Math.random() * 20) / 20;
   S.dotSize = 3 + Math.floor(Math.random() * 22);
   S.htMode = Math.floor(Math.random() * 4);
