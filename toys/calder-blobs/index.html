@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calder Blobs</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #f5f0e8; }
+canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+
+#info {
+  position: fixed; bottom: 12px; left: 12px;
+  font-family: 'Courier New', monospace; font-size: 11px;
+  color: #999; letter-spacing: 0.08em; pointer-events: none;
+  text-transform: lowercase;
+}
+#nav-hint {
+  position: fixed; bottom: 12px; right: 12px;
+  font-family: 'Courier New', monospace; font-size: 11px;
+  color: #999; letter-spacing: 0.08em; pointer-events: none;
+  transition: opacity 0.3s;
+}
+#panel {
+  position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
+  background: rgba(40, 35, 30, 0.94); backdrop-filter: blur(8px);
+  padding: 20px 16px; overflow-y: auto; z-index: 100;
+  transition: right 0.3s ease; font-family: 'Courier New', monospace;
+  color: #c0b8a8;
+}
+#panel.open { right: 0; }
+#panel h3 {
+  font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
+  margin-bottom: 16px; color: #e8e0d0; display: flex; justify-content: space-between; align-items: center;
+}
+.section-label {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #706858; margin: 18px 0 10px 0; padding-top: 10px;
+  border-top: 1px solid rgba(200,180,140,0.15);
+}
+#dice-btn {
+  background: none; border: 1px solid rgba(200,180,140,0.3); color: #c0b8a8;
+  font-size: 16px; padding: 2px 8px; cursor: pointer; border-radius: 3px;
+}
+#dice-btn:hover { color: #fff; border-color: rgba(200,180,140,0.6); }
+.ctrl { margin-bottom: 14px; }
+.ctrl label {
+  display: flex; justify-content: space-between; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; color: #a09888;
+}
+.ctrl label span { color: #d0c8b8; }
+.ctrl input[type="range"] {
+  width: 100%; -webkit-appearance: none; height: 3px;
+  background: rgba(200,180,140,0.25); border-radius: 2px; outline: none;
+}
+.ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  background: #c0b8a8; border-radius: 50%; cursor: pointer;
+}
+.ctrl select {
+  width: 100%; background: rgba(60,50,40,0.8); color: #c0b8a8;
+  border: 1px solid rgba(200,180,140,0.25); padding: 4px 8px;
+  font-family: 'Courier New', monospace; font-size: 11px;
+}
+#settings-btn {
+  position: fixed; top: 12px; right: 12px; z-index: 90;
+  background: rgba(40,35,30,0.6); border: 1px solid rgba(200,180,140,0.3);
+  color: #a09888; font-family: 'Courier New', monospace; font-size: 12px;
+  padding: 5px 10px; cursor: pointer; letter-spacing: 0.08em;
+}
+#settings-btn:hover { color: #e8e0d0; border-color: rgba(200,180,140,0.6); }
+#share-btn, #new-btn {
+  display: block; width: 100%; padding: 7px 0; margin-top: 6px;
+  background: rgba(40,35,30,0.5); color: #a09888;
+  border: 1px solid rgba(200,180,140,0.3);
+  font-family: 'Courier New', monospace; font-size: 11px;
+  letter-spacing: 0.12em; cursor: pointer;
+}
+#share-btn { margin-top: 10px; }
+#share-btn:hover, #new-btn:hover { color: #e8e0d0; border-color: rgba(200,180,140,0.55); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="info">click / space: new &middot; &larr;&rarr;: browse &middot; s: settings &middot; h: hide ui</div>
+<div id="nav-hint"></div>
+<button id="settings-btn">&#9881; settings</button>
+
+<div id="panel">
+  <h3>calder blobs <button id="dice-btn">&#127922;</button></h3>
+
+  <div class="ctrl">
+    <label>blobs <span id="v-count">8</span></label>
+    <input type="range" id="r-count" min="4" max="16" step="1" value="8">
+  </div>
+  <div class="ctrl">
+    <label>drift speed <span id="v-drift">0.3</span></label>
+    <input type="range" id="r-drift" min="0" max="1" step="0.05" value="0.3">
+  </div>
+  <div class="ctrl">
+    <label>wobble <span id="v-wobble">0.4</span></label>
+    <input type="range" id="r-wobble" min="0" max="1" step="0.05" value="0.4">
+  </div>
+  <div class="ctrl">
+    <label>min size <span id="v-minsize">0.12</span></label>
+    <input type="range" id="r-minsize" min="0.05" max="0.3" step="0.01" value="0.12">
+  </div>
+  <div class="ctrl">
+    <label>max size <span id="v-maxsize">0.45</span></label>
+    <input type="range" id="r-maxsize" min="0.2" max="0.7" step="0.01" value="0.45">
+  </div>
+  <div class="ctrl">
+    <label>texture <span id="v-texture">0.6</span></label>
+    <input type="range" id="r-texture" min="0" max="1" step="0.05" value="0.6">
+  </div>
+  <div class="ctrl">
+    <label>palette</label>
+    <select id="s-palette">
+      <option value="calder">calder classic</option>
+      <option value="calder-warm">calder warm</option>
+      <option value="gouache">gouache</option>
+      <option value="earth">earth tones</option>
+      <option value="mono">monochrome</option>
+    </select>
+  </div>
+  <div class="ctrl">
+    <label>background</label>
+    <select id="s-bg">
+      <option value="paper">paper white</option>
+      <option value="cream">cream</option>
+      <option value="warm-gray">warm gray</option>
+      <option value="black">black</option>
+    </select>
+  </div>
+
+  <div class="section-label">effects</div>
+
+  <div class="ctrl">
+    <label>halftone <span id="v-halftone">0</span></label>
+    <input type="range" id="r-halftone" min="0" max="1" step="0.05" value="0">
+  </div>
+  <div class="ctrl">
+    <label>dot size <span id="v-dotsize">8</span></label>
+    <input type="range" id="r-dotsize" min="3" max="24" step="1" value="8">
+  </div>
+  <div class="ctrl">
+    <label>halftone mode</label>
+    <select id="s-htmode">
+      <option value="0">halftone dots</option>
+      <option value="1">grain dither</option>
+      <option value="2">scanlines</option>
+      <option value="3">crosshatch</option>
+    </select>
+  </div>
+  <div class="ctrl">
+    <label>vignette <span id="v-vignette">0</span></label>
+    <input type="range" id="r-vignette" min="0" max="1" step="0.05" value="0">
+  </div>
+
+  <button id="new-btn">&#8635; new composition</button>
+  <button id="share-btn">&#8679; share settings</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+const S = {
+  count: 8, drift: 0.3, wobble: 0.4,
+  minSize: 0.12, maxSize: 0.45, texture: 0.6,
+  palette: 'calder', bg: 'paper',
+  halftone: 0, dotSize: 8, htMode: 0,
+  vignette: 0
+};
+
+const PALETTES = {
+  'calder': ['#E03025','#E03025','#F5C018','#F5C018','#1B5BA0','#1B5BA0','#2A2A2A','#2A2A2A','#1B5BA0'],
+  'calder-warm': ['#E03025','#E03025','#F5C018','#F5C018','#E8782A','#1B5BA0','#2A2A2A','#C04020'],
+  'gouache': ['#D94040','#E8A030','#3070B0','#2A2A2A','#D06828','#1B8060','#6040A0'],
+  'earth': ['#8B4513','#A0522D','#CD853F','#D2B48C','#556B2F','#2F4F4F','#3A3A3A'],
+  'mono': ['#1A1A1A','#2A2A2A','#3A3A3A','#555555','#777777','#999999']
+};
+
+const BGS = { 'paper':'#f5f0e8', 'cream':'#f0e8d8', 'warm-gray':'#d5cfc5', 'black':'#1a1816' };
+
+let blobs = [], W, H, DPR;
+
+// --- History ---
+const compHistory = [];
+let historyIdx = -1;
+const MAX_HISTORY = 50;
+
+function snapshotBlobs() {
+  return blobs.map(b => ({
+    color: b.color, cx: b.cx, cy: b.cy, vx: b.vx, vy: b.vy,
+    strokes: b.strokes, seed: b.seed,
+    points: b.points.map(p => ({ baseX: p.baseX, baseY: p.baseY, phase: p.phase }))
+  }));
+}
+
+function restoreBlobs(snap) {
+  blobs = snap.map(b => ({
+    color: b.color, cx: b.cx, cy: b.cy, vx: b.vx, vy: b.vy,
+    strokes: b.strokes, seed: b.seed,
+    points: b.points.map(p => ({ x: p.baseX, y: p.baseY, baseX: p.baseX, baseY: p.baseY, phase: p.phase }))
+  }));
+}
+
+function updateNavHint() {
+  const el = document.getElementById('nav-hint');
+  if (compHistory.length <= 1) { el.textContent = ''; return; }
+  el.textContent = `${historyIdx + 1} / ${compHistory.length}`;
+}
+
+// --- Resize ---
+function resize() {
+  DPR = window.devicePixelRatio || 1;
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+// --- Seeded PRNG ---
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// --- Color helpers ---
+function hexToRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+}
+function rgbStr(r,g,b) { return `rgb(${r},${g},${b})`; }
+
+function varyColorSeeded(hex, amount, rng) {
+  let [r,g,b] = hexToRgb(hex);
+  const shift = (rng() - 0.5) * amount * 2;
+  return rgbStr(Math.round(Math.max(0,Math.min(255,r+shift))),
+                Math.round(Math.max(0,Math.min(255,g+shift*0.8))),
+                Math.round(Math.max(0,Math.min(255,b+shift*0.6))));
+}
+function darkenColor(hex, f) {
+  let [r,g,b] = hexToRgb(hex);
+  return rgbStr(Math.round(r*f), Math.round(g*f), Math.round(b*f));
+}
+function lightenColor(hex, f) {
+  let [r,g,b] = hexToRgb(hex);
+  return rgbStr(Math.round(r+(255-r)*f), Math.round(g+(255-g)*f), Math.round(b+(255-b)*f));
+}
+
+// --- Blob path ---
+function traceBlobPath(points) {
+  const n = points.length;
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const p0 = points[(i-1+n)%n], p1 = points[i], p2 = points[(i+1)%n], p3 = points[(i+2)%n];
+    const t = 0.28;
+    if (i === 0) ctx.moveTo(p1.x, p1.y);
+    ctx.bezierCurveTo(
+      p1.x + (p2.x-p0.x)*t, p1.y + (p2.y-p0.y)*t,
+      p2.x - (p3.x-p1.x)*t, p2.y - (p3.y-p1.y)*t,
+      p2.x, p2.y);
+  }
+  ctx.closePath();
+}
+
+// --- Pre-generate brushstrokes ---
+function generateStrokes(color, bw, bh, seed) {
+  const rng = mulberry32(seed);
+  const strokes = [];
+  const strokeAngle = (rng() - 0.5) * Math.PI * 0.6;
+  const cosA = Math.cos(strokeAngle), sinA = Math.sin(strokeAngle);
+  const numStrokes = Math.floor(8 + 20 * Math.sqrt(bw * bh) / 200);
+
+  for (let i = 0; i < numStrokes; i++) {
+    const nx = rng(), ny = rng();
+    const halfLen = (0.3 + rng() * 0.7) * Math.max(bw, bh) * 0.35;
+    const sw = 3 + rng() * 12;
+    const roll = rng();
+    let strokeColor;
+    if (roll < 0.3) strokeColor = darkenColor(color, 0.75 + rng() * 0.15);
+    else if (roll < 0.6) strokeColor = lightenColor(color, 0.08 + rng() * 0.12);
+    else strokeColor = varyColorSeeded(color, 40, rng);
+    strokes.push({
+      nx, ny, halfLen, sw, strokeColor,
+      alpha: 0.08 + rng() * 0.18,
+      cosA, sinA,
+      curveX: (rng() - 0.5) * 3, curveY: (rng() - 0.5) * 3
+    });
+  }
+  return strokes;
+}
+
+// --- Painterly blob rendering ---
+function drawBlobPainterly(blob) {
+  const pts = blob.points;
+  if (pts.length < 3) return;
+  const tex = S.texture;
+
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  for (const p of pts) {
+    if (p.x<minX) minX=p.x; if (p.y<minY) minY=p.y;
+    if (p.x>maxX) maxX=p.x; if (p.y>maxY) maxY=p.y;
+  }
+  const bw=maxX-minX, bh=maxY-minY, bcx=(minX+maxX)/2;
+
+  ctx.save();
+  traceBlobPath(pts); ctx.fillStyle = blob.color; ctx.fill();
+
+  if (tex > 0.05 && blob.strokes) {
+    traceBlobPath(pts); ctx.clip();
+    ctx.lineCap = 'round';
+    for (const s of blob.strokes) {
+      const sx=minX+s.nx*bw, sy=minY+s.ny*bh;
+      const x1=sx-s.cosA*s.halfLen, y1=sy-s.sinA*s.halfLen;
+      const x2=sx+s.cosA*s.halfLen, y2=sy+s.sinA*s.halfLen;
+      ctx.globalAlpha = s.alpha * tex;
+      ctx.strokeStyle = s.strokeColor;
+      ctx.lineWidth = s.sw * tex;
+      ctx.beginPath(); ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo((x1+x2)/2+s.curveX*s.sw, (y1+y2)/2+s.curveY*s.sw, x2, y2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 0.06 * tex;
+    traceBlobPath(pts); ctx.strokeStyle = darkenColor(blob.color, 0.5);
+    ctx.lineWidth = 2 + tex * 4; ctx.stroke();
+
+    ctx.globalAlpha = 0.04 * tex;
+    const grad = ctx.createLinearGradient(bcx, minY, bcx, minY + bh);
+    grad.addColorStop(0, lightenColor(blob.color, 0.3));
+    grad.addColorStop(0.5, 'rgba(255,255,255,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    traceBlobPath(pts); ctx.fillStyle = grad; ctx.fill();
+  }
+  ctx.restore();
+}
+
+// --- Halftone post-process ---
+function applyHalftone() {
+  if (S.halftone <= 0.01) return;
+
+  const cw = canvas.width, ch = canvas.height;
+  const dot = Math.max(3, S.dotSize * DPR);
+  const bg = BGS[S.bg] || BGS['paper'];
+  const [bgR, bgG, bgB] = hexToRgb(bg);
+  const blend = S.halftone;
+  const mode = S.htMode;
+
+  // Read pixel data once
+  const imgData = ctx.getImageData(0, 0, cw, ch);
+  const data = imgData.data;
+
+  // Switch to pixel coordinates for post-process
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  // Overlay background at halftone blend strength
+  ctx.fillStyle = bg;
+  ctx.globalAlpha = blend;
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Sample helper
+  function sampleLum(px, py) {
+    const x = Math.max(0, Math.min(cw-1, Math.round(px)));
+    const y = Math.max(0, Math.min(ch-1, Math.round(py)));
+    const i = (y * cw + x) * 4;
+    return (data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114) / 255;
+  }
+  function sampleRGB(px, py) {
+    const x = Math.max(0, Math.min(cw-1, Math.round(px)));
+    const y = Math.max(0, Math.min(ch-1, Math.round(py)));
+    const i = (y * cw + x) * 4;
+    return [data[i], data[i+1], data[i+2]];
+  }
+
+  if (mode === 0) {
+    // --- Halftone dots (45° offset grid) ---
+    const ca = 0.7071, sa = 0.7071;
+    // Iterate in screen space, snap to rotated grid
+    const step = dot;
+    const pad = dot * 2;
+    // Build a set of unique grid cells we've already drawn
+    const drawn = new Set();
+    for (let sy = -pad; sy < ch + pad; sy += step) {
+      for (let sx = -pad; sx < cw + pad; sx += step) {
+        // Rotate to grid space
+        const gx = Math.round((sx * ca + sy * sa) / dot);
+        const gy = Math.round((-sx * sa + sy * ca) / dot);
+        const key = gx * 10000 + gy;
+        if (drawn.has(key)) continue;
+        drawn.add(key);
+        // Grid cell center back to screen space
+        const cx = gx * dot * ca - gy * dot * sa;
+        const cy = gx * dot * sa + gy * dot * ca;
+        if (cx < -dot || cx > cw + dot || cy < -dot || cy > ch + dot) continue;
+
+        const [r,g,b] = sampleRGB(cx, cy);
+        const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+        const radius = Math.sqrt(lum) * dot * 0.52;
+        if (radius < 0.5) continue;
+
+        ctx.globalAlpha = blend;
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (mode === 1) {
+    // --- Grain dither (interleaved gradient noise) ---
+    // Process in blocks for performance
+    for (let by = 0; by < ch; by += dot) {
+      for (let bx = 0; bx < cw; bx += dot) {
+        const [r,g,b] = sampleRGB(bx + dot/2, by + dot/2);
+        const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+        // IGN noise
+        const dx = Math.floor(bx / dot), dy = Math.floor(by / dot);
+        const noise = ((52.9829189 * ((dx * 0.06711056 + dy * 0.00583715) % 1)) % 1 + 1) % 1;
+        if (noise < lum) {
+          ctx.globalAlpha = blend;
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(bx, by, dot, dot);
+        }
+      }
+    }
+  } else if (mode === 2) {
+    // --- Scanlines ---
+    for (let y = 0; y < ch; y += dot * 2) {
+      // Sample row center
+      const midY = y + dot / 2;
+      // Draw scanline band with sampled colors
+      for (let x = 0; x < cw; x += dot) {
+        const [r,g,b] = sampleRGB(x + dot/2, midY);
+        ctx.globalAlpha = blend;
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x, y, dot, dot);
+      }
+      // The alternating gap stays as background (from the overlay)
+    }
+  } else if (mode === 3) {
+    // --- Crosshatch ---
+    const ca = 0.7071, sa = 0.7071;
+    const lw = Math.max(1, dot * 0.3);
+    ctx.lineCap = 'butt';
+    ctx.lineWidth = lw;
+
+    for (let gy = -dot; gy < ch + dot; gy += dot) {
+      for (let gx = -dot; gx < cw + dot; gx += dot) {
+        const [r,g,b] = sampleRGB(gx, gy);
+        const lum = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+        if (lum > 0.65) {
+          // Bright: fill block
+          ctx.globalAlpha = blend;
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(gx - dot/2, gy - dot/2, dot, dot);
+        } else {
+          ctx.globalAlpha = blend;
+          ctx.strokeStyle = `rgb(${r},${g},${b})`;
+          // First diagonal set
+          ctx.beginPath();
+          ctx.moveTo(gx - dot/2, gy - dot/2);
+          ctx.lineTo(gx + dot/2, gy + dot/2);
+          ctx.stroke();
+          if (lum <= 0.3) {
+            // Dark: second diagonal set
+            ctx.beginPath();
+            ctx.moveTo(gx + dot/2, gy - dot/2);
+            ctx.lineTo(gx - dot/2, gy + dot/2);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+// --- Vignette ---
+function applyVignette() {
+  if (S.vignette <= 0.01) return;
+
+  ctx.save();
+  const cx = W / 2, cy = H / 2;
+  const maxR = Math.sqrt(cx * cx + cy * cy);
+  const innerR = maxR * (0.3 + (1 - S.vignette) * 0.4);
+
+  const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, maxR);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  // Warm sepia tint for the vignette edge
+  const warmAlpha = S.vignette * 0.15;
+  grad.addColorStop(0.5, `rgba(40,25,10,${warmAlpha})`);
+  grad.addColorStop(1, `rgba(20,12,5,${S.vignette * 0.7})`);
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+
+// --- Composition generation ---
+function generateComposition() {
+  blobs = [];
+  const pal = PALETTES[S.palette] || PALETTES['calder'];
+  const minDim = Math.min(W, H);
+
+  for (let i = 0; i < S.count; i++) {
+    const cx = W * (0.15 + Math.random() * 0.7);
+    const cy = H * (0.15 + Math.random() * 0.7);
+    const sizeFactor = S.minSize + Math.random() * (S.maxSize - S.minSize);
+    const baseR = minDim * sizeFactor * 0.5;
+    const stretch = 0.6 + Math.random() * 0.9;
+    const angle = Math.random() * Math.PI;
+    const rx = baseR * (stretch > 1 ? stretch : 1);
+    const ry = baseR * (stretch > 1 ? 1 : 1 / Math.max(stretch, 0.6));
+
+    const nPts = 5 + Math.floor(Math.random() * 3);
+    const points = [];
+    for (let j = 0; j < nPts; j++) {
+      const a = (j / nPts) * Math.PI * 2;
+      const rVar = 0.88 + Math.random() * 0.24;
+      let px = Math.cos(a) * rx * rVar, py = Math.sin(a) * ry * rVar;
+      const cos = Math.cos(angle), sin = Math.sin(angle);
+      points.push({
+        x: px*cos - py*sin + cx, y: px*sin + py*cos + cy,
+        baseX: px*cos - py*sin + cx, baseY: px*sin + py*cos + cy,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    const color = pal[Math.floor(Math.random() * pal.length)];
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    for (const p of points) {
+      if(p.x<minX)minX=p.x; if(p.y<minY)minY=p.y;
+      if(p.x>maxX)maxX=p.x; if(p.y>maxY)maxY=p.y;
+    }
+    const seed = Math.floor(Math.random() * 2147483647);
+    blobs.push({
+      points, color, cx, cy,
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+      strokes: generateStrokes(color, maxX-minX, maxY-minY, seed), seed
+    });
+  }
+
+  blobs.sort((a, b) => {
+    const avgA = a.points.reduce((s,p) => s + Math.hypot(p.baseX-a.cx, p.baseY-a.cy), 0) / a.points.length;
+    const avgB = b.points.reduce((s,p) => s + Math.hypot(p.baseX-b.cx, p.baseY-b.cy), 0) / b.points.length;
+    return avgB - avgA;
+  });
+
+  if (historyIdx < compHistory.length - 1) compHistory.splice(historyIdx + 1);
+  compHistory.push(snapshotBlobs());
+  if (compHistory.length > MAX_HISTORY) compHistory.shift();
+  historyIdx = compHistory.length - 1;
+  updateNavHint();
+}
+
+function navHistory(dir) {
+  const i = historyIdx + dir;
+  if (i < 0 || i >= compHistory.length) return;
+  historyIdx = i;
+  restoreBlobs(compHistory[i]);
+  updateNavHint();
+}
+
+// --- Animation ---
+let time = 0;
+let paperNoise = [];
+function generatePaperNoise() {
+  paperNoise = [];
+  for (let i = 0; i < 1200; i++)
+    paperNoise.push({ x: Math.random(), y: Math.random(), light: Math.random() > 0.5 });
+}
+generatePaperNoise();
+
+function animate() {
+  time += 0.016;
+  const bg = BGS[S.bg] || BGS['paper'];
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  if (S.bg !== 'black') {
+    ctx.save(); ctx.globalAlpha = 0.03;
+    for (const n of paperNoise) {
+      ctx.fillStyle = n.light ? '#fff' : '#000';
+      ctx.fillRect(n.x * W, n.y * H, 1, 1);
+    }
+    ctx.restore();
+  }
+
+  for (const blob of blobs) {
+    blob.cx += blob.vx * S.drift;
+    blob.cy += blob.vy * S.drift;
+    if (blob.cx < -W*0.2 || blob.cx > W*1.2) blob.vx *= -1;
+    if (blob.cy < -H*0.2 || blob.cy > H*1.2) blob.vy *= -1;
+    const wa = S.wobble * 8;
+    const dx = blob.vx * S.drift * 0.016, dy = blob.vy * S.drift * 0.016;
+    for (const p of blob.points) {
+      p.baseX += dx; p.baseY += dy;
+      p.x = p.baseX + Math.sin(time*0.5 + p.phase) * wa;
+      p.y = p.baseY + Math.cos(time*0.4 + p.phase*1.3) * wa;
+    }
+    drawBlobPainterly(blob);
+  }
+
+  // Post-process effects
+  applyHalftone();
+  applyVignette();
+
+  requestAnimationFrame(animate);
+}
+
+// --- UI ---
+let panelOpen = false;
+function togglePanel() {
+  panelOpen = !panelOpen;
+  document.getElementById('panel').classList.toggle('open', panelOpen);
+}
+
+function syncUI() {
+  document.getElementById('r-count').value = S.count;
+  document.getElementById('v-count').textContent = S.count;
+  document.getElementById('r-drift').value = S.drift;
+  document.getElementById('v-drift').textContent = S.drift;
+  document.getElementById('r-wobble').value = S.wobble;
+  document.getElementById('v-wobble').textContent = S.wobble;
+  document.getElementById('r-minsize').value = S.minSize;
+  document.getElementById('v-minsize').textContent = S.minSize;
+  document.getElementById('r-maxsize').value = S.maxSize;
+  document.getElementById('v-maxsize').textContent = S.maxSize;
+  document.getElementById('r-texture').value = S.texture;
+  document.getElementById('v-texture').textContent = S.texture;
+  document.getElementById('s-palette').value = S.palette;
+  document.getElementById('s-bg').value = S.bg;
+  document.getElementById('r-halftone').value = S.halftone;
+  document.getElementById('v-halftone').textContent = S.halftone;
+  document.getElementById('r-dotsize').value = S.dotSize;
+  document.getElementById('v-dotsize').textContent = S.dotSize;
+  document.getElementById('s-htmode').value = S.htMode;
+  document.getElementById('r-vignette').value = S.vignette;
+  document.getElementById('v-vignette').textContent = S.vignette;
+}
+
+function bindUIEvents() {
+  const wire = (id, key, valId, parse, cb) => {
+    document.getElementById(id).addEventListener('input', e => {
+      S[key] = parse(e.target.value);
+      document.getElementById(valId).textContent = S[key];
+      if (cb) cb();
+    });
+  };
+  wire('r-count', 'count', 'v-count', parseInt, generateComposition);
+  wire('r-drift', 'drift', 'v-drift', parseFloat);
+  wire('r-wobble', 'wobble', 'v-wobble', parseFloat);
+  wire('r-minsize', 'minSize', 'v-minsize', parseFloat);
+  wire('r-maxsize', 'maxSize', 'v-maxsize', parseFloat);
+  wire('r-texture', 'texture', 'v-texture', parseFloat);
+  wire('r-halftone', 'halftone', 'v-halftone', parseFloat);
+  wire('r-dotsize', 'dotSize', 'v-dotsize', parseInt);
+  wire('r-vignette', 'vignette', 'v-vignette', parseFloat);
+
+  document.getElementById('s-htmode').addEventListener('change', e => {
+    S.htMode = parseInt(e.target.value);
+  });
+
+  document.getElementById('s-palette').addEventListener('change', e => {
+    S.palette = e.target.value;
+    const pal = PALETTES[S.palette];
+    blobs.forEach(b => {
+      b.color = pal[Math.floor(Math.random() * pal.length)];
+      let mnX=Infinity,mnY=Infinity,mxX=-Infinity,mxY=-Infinity;
+      for (const p of b.points) {
+        if(p.x<mnX)mnX=p.x; if(p.y<mnY)mnY=p.y;
+        if(p.x>mxX)mxX=p.x; if(p.y>mxY)mxY=p.y;
+      }
+      b.strokes = generateStrokes(b.color, mxX-mnX, mxY-mnY, b.seed);
+    });
+  });
+
+  document.getElementById('s-bg').addEventListener('change', e => { S.bg = e.target.value; });
+}
+
+const SHARE_KEYS_NUM = ['count','drift','wobble','minSize','maxSize','texture','halftone','dotSize','vignette'];
+const SHARE_KEYS_INT = new Set(['count','dotSize','htMode']);
+
+function encodeURL() {
+  const p = new URLSearchParams();
+  SHARE_KEYS_NUM.forEach(k => p.set(k, S[k]));
+  p.set('htMode', S.htMode);
+  p.set('palette', S.palette);
+  p.set('bg', S.bg);
+  return location.origin + location.pathname + '#' + p.toString();
+}
+
+function loadFromURL() {
+  if (!location.hash || location.hash.length < 2) return;
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (p.size === 0) return;
+  SHARE_KEYS_NUM.forEach(k => {
+    if (p.has(k)) S[k] = SHARE_KEYS_INT.has(k) ? parseInt(p.get(k)) : parseFloat(p.get(k));
+  });
+  if (p.has('htMode')) S.htMode = parseInt(p.get('htMode'));
+  if (p.has('palette')) S.palette = p.get('palette');
+  if (p.has('bg')) S.bg = p.get('bg');
+}
+
+function randomizeCfg() {
+  S.count = 4 + Math.floor(Math.random() * 13);
+  S.drift = Math.round(Math.random() * 20) / 20;
+  S.wobble = Math.round(Math.random() * 20) / 20;
+  S.minSize = Math.round((0.05 + Math.random() * 0.25) * 100) / 100;
+  S.maxSize = Math.round((0.2 + Math.random() * 0.5) * 100) / 100;
+  if (S.maxSize < S.minSize + 0.05) S.maxSize = S.minSize + 0.1;
+  S.texture = Math.round(Math.random() * 20) / 20;
+  S.halftone = Math.random() < 0.5 ? 0 : Math.round(Math.random() * 20) / 20;
+  S.dotSize = 3 + Math.floor(Math.random() * 22);
+  S.htMode = Math.floor(Math.random() * 4);
+  S.vignette = Math.random() < 0.4 ? 0 : Math.round(Math.random() * 20) / 20;
+  const pals = Object.keys(PALETTES);
+  S.palette = pals[Math.floor(Math.random() * pals.length)];
+  const bgs = Object.keys(BGS);
+  S.bg = bgs[Math.floor(Math.random() * bgs.length)];
+  syncUI();
+  generateComposition();
+}
+
+function checkHideUI() {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const qs = new URLSearchParams(location.search);
+  if (hash.get('ui') === '0' || qs.get('ui') === '0') {
+    document.getElementById('settings-btn').style.display = 'none';
+    document.getElementById('info').style.display = 'none';
+    document.getElementById('nav-hint').style.display = 'none';
+  }
+}
+
+// --- Init ---
+resize();
+window.addEventListener('resize', () => { resize(); generatePaperNoise(); generateComposition(); });
+
+syncUI();
+bindUIEvents();
+loadFromURL();
+syncUI();
+generateComposition();
+checkHideUI();
+animate();
+
+// --- Events ---
+canvas.addEventListener('click', () => generateComposition());
+document.getElementById('settings-btn').addEventListener('click', togglePanel);
+document.getElementById('new-btn').addEventListener('click', () => generateComposition());
+document.getElementById('dice-btn').addEventListener('click', randomizeCfg);
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 's' || e.key === 'S') { e.preventDefault(); togglePanel(); }
+  if (e.key === 'Escape' && panelOpen) togglePanel();
+  if (e.key === ' ') { e.preventDefault(); generateComposition(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); navHistory(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); navHistory(1); }
+  if (e.key === 'h' || e.key === 'H') {
+    e.preventDefault();
+    const els = ['settings-btn','info','nav-hint'];
+    const hidden = document.getElementById('settings-btn').style.display === 'none';
+    els.forEach(id => document.getElementById(id).style.display = hidden ? '' : 'none');
+    if (!hidden && panelOpen) togglePanel();
+  }
+});
+
+document.getElementById('share-btn').addEventListener('click', () => {
+  const url = encodeURL();
+  const btn = document.getElementById('share-btn');
+  const reset = () => { btn.innerHTML = '&#8679; share settings'; };
+  const copied = () => { btn.textContent = '\u2713 copied!'; setTimeout(reset, 1800); };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(copied).catch(() => { prompt('Copy this link:', url); });
+  } else {
+    const ta = Object.assign(document.createElement('textarea'),
+      { value: url, style: 'position:fixed;opacity:0' });
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); copied();
+  }
+});
+</script>
+</body>
+</html>
