@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Business Model</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #888899;
+    --accent: #6c8cff;
+    --accent2: #8b5cf6;
+    --green: #4ade80;
+    --red: #f87171;
+    --orange: #fb923c;
+    --yellow: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    max-width: 1400px;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .panel h2 {
+    font-size: 0.85rem;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .panel h3 {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin: 14px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .panel h3:first-of-type { border-top: none; padding-top: 0; margin-top: 6px; }
+  .input-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.78rem;
+  }
+  .input-row label {
+    color: var(--text-dim);
+    flex: 1;
+    min-width: 0;
+  }
+  .input-row .input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .input-row input[type="number"] {
+    width: 80px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    text-align: right;
+  }
+  .input-row input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+  .input-row .unit {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    min-width: 30px;
+  }
+  .range-val {
+    color: var(--accent);
+    font-size: 0.78rem;
+    min-width: 50px;
+    text-align: right;
+  }
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .kpi .label {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .kpi .value {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+  .kpi .sub {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .positive { color: var(--green); }
+  .negative { color: var(--red); }
+  .neutral { color: var(--accent); }
+  .warn { color: var(--orange); }
+
+  /* Chart area */
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 320px;
+  }
+  canvas { width: 100% !important; height: 100% !important; }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background: var(--surface2);
+    color: var(--text-dim);
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.65rem;
+  }
+  th:first-child { text-align: left; }
+  td {
+    text-align: right;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td:first-child {
+    text-align: left;
+    color: var(--text-dim);
+  }
+  tr:hover td { background: rgba(108,140,255,0.05); }
+  .yr-divider td { border-top: 2px solid var(--accent2); }
+
+  /* Valuation */
+  .val-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .val-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+  .val-card .mult {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+  .val-card .ev {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--yellow);
+  }
+  .val-card .basis {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 12px;
+  }
+  .tab {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-family: inherit;
+  }
+  .tab.active {
+    background: var(--surface);
+    color: var(--accent);
+    border-bottom-color: var(--surface);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.78rem;
+  }
+  .toggle-row label { color: var(--text-dim); flex: 1; }
+  .toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: 0.2s;
+  }
+  .toggle .slider::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    left: 2px;
+    top: 2px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .slider::before { transform: translateX(16px); background: white; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Agent-as-a-Service Business Model</h1>
+<p class="subtitle">36-month revenue, cost, and valuation projections &nbsp;·&nbsp; <a href="#" id="resetBtn" style="color:var(--text-dim);font-size:0.75rem;text-decoration:underline;cursor:pointer;">Reset to Jason's defaults</a> &nbsp;·&nbsp; <a href="#" id="flintBtn" style="color:var(--accent);font-size:0.75rem;text-decoration:underline;cursor:pointer;">Use Flint's numbers</a></p>
+
+<div class="grid">
+  <!-- LEFT: Inputs -->
+  <div>
+    <div class="panel" style="margin-bottom:16px;">
+      <h2>Revenue Parameters</h2>
+      <h3>Pricing</h3>
+      <div class="input-row">
+        <label>Setup Fee (one-time)</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="setupFee" value="1000" step="500" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Monthly Recurring / Agent</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="monthlyFee" value="1000" step="100" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Annual Price Increase</label>
+        <div class="input-wrap">
+          <input type="range" id="priceIncrease" min="0" max="15" value="5" step="1">
+          <span class="range-val" id="priceIncreaseVal">5%</span>
+        </div>
+      </div>
+
+      <h3>Growth</h3>
+      <div class="input-row">
+        <label>Starting Agents (Month 1)</label>
+        <div class="input-wrap">
+          <input type="number" id="startingAgents" value="10" step="1" min="1">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>New Agents / Month</label>
+        <div class="input-wrap">
+          <input type="number" id="newAgentsPerMonth" value="4" step="1" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Monthly Growth Rate</label>
+        <div class="input-wrap">
+          <input type="range" id="growthRate" min="0" max="30" value="20" step="1">
+          <span class="range-val" id="growthRateVal">20%</span>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <label>Compound new-agent growth</label>
+        <div class="toggle">
+          <input type="checkbox" id="compoundGrowth" checked>
+          <span class="slider"></span>
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Monthly Churn Rate</label>
+        <div class="input-wrap">
+          <input type="range" id="churnRate" min="0" max="10" value="5" step="0.5">
+          <span class="range-val" id="churnRateVal">5%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <h2>Costs per Agent</h2>
+      <h3>Infrastructure</h3>
+      <div class="input-row">
+        <label>Hosting / Agent / Mo</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="hostingCost" value="50" step="10" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>API (Claude, etc.) / Mo</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="apiCost" value="100" step="25" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Tools & Services / Mo</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="toolsCost" value="50" step="10" min="0">
+        </div>
+      </div>
+
+      <h3>Onboarding & Consulting</h3>
+      <div class="input-row">
+        <label>Onboarding Period (months)</label>
+        <div class="input-wrap">
+          <input type="number" id="onboardMonths" value="2" step="0.5" min="0.5" max="6">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>New Agents / Consultant</label>
+        <div class="input-wrap">
+          <input type="number" id="onboardCapacity" value="8" step="1" min="1">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Ongoing Agents / Consultant</label>
+        <div class="input-wrap">
+          <input type="number" id="ongoingCapacity" value="50" step="5" min="1">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Consultant Monthly Rate</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="consultantRate" value="8000" step="500" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Other Setup Cost / Agent</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="otherSetupCost" value="0" step="100" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px;">
+      <h2>Team & Overhead</h2>
+      <div class="input-row">
+        <label>Founders (no salary initially)</label>
+        <div class="input-wrap">
+          <input type="number" id="founders" value="2" step="1" min="1">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Founder Salary (starts Mo)</label>
+        <div class="input-wrap">
+          <input type="number" id="founderSalaryMonth" value="12" step="1" min="1" max="36">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Founder Monthly Salary</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="founderSalary" value="12000" step="500" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>FT Engineers (hire at Mo)</label>
+        <div class="input-wrap">
+          <input type="number" id="engHireMonth" value="2" step="1" min="1" max="36">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Engineer Monthly Salary</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="engSalary" value="12000" step="500" min="0">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Agents per Engineer Needed</label>
+        <div class="input-wrap">
+          <input type="number" id="agentsPerEng" value="200" step="1" min="1">
+        </div>
+      </div>
+      <div class="input-row">
+        <label>Monthly Overhead (office, legal, etc.)</label>
+        <div class="input-wrap">
+          <span class="unit">$</span>
+          <input type="number" id="overhead" value="5000" step="250" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Valuation Multiples</h2>
+      <div class="input-row">
+        <label>Revenue Multiple</label>
+        <div class="input-wrap">
+          <input type="range" id="revMultiple" min="1" max="20" value="8" step="0.5">
+          <span class="range-val" id="revMultipleVal">8x</span>
+        </div>
+      </div>
+      <div class="input-row">
+        <label>ARR Multiple</label>
+        <div class="input-wrap">
+          <input type="range" id="arrMultiple" min="1" max="30" value="12" step="0.5">
+          <span class="range-val" id="arrMultipleVal">12x</span>
+        </div>
+      </div>
+      <div class="input-row">
+        <label>EBITDA Multiple</label>
+        <div class="input-wrap">
+          <input type="range" id="ebitdaMultiple" min="5" max="40" value="15" step="1">
+          <span class="range-val" id="ebitdaMultipleVal">15x</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Output -->
+  <div class="right-col">
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <div class="panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="chart">Chart</button>
+        <button class="tab" data-tab="table">Monthly Detail</button>
+        <button class="tab" data-tab="team">Team Scaling</button>
+      </div>
+      <div id="chartTab" class="tab-content">
+        <div class="chart-container">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </div>
+      <div id="tableTab" class="tab-content" style="display:none;">
+        <div class="table-wrap" id="tableWrap"></div>
+      </div>
+      <div id="teamTab" class="tab-content" style="display:none;">
+        <div class="table-wrap" id="teamWrap"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Enterprise Valuation (Month 36)</h2>
+      <div class="val-grid" id="valGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+// --- Presets ---
+// Jason's assumptions: high-volume, lean ops, scale play
+const DEFAULTS = {
+  setupFee: 1000, monthlyFee: 1000, priceIncrease: 5,
+  startingAgents: 10, newAgentsPerMonth: 4, growthRate: 20, compoundGrowth: true, churnRate: 5,
+  hostingCost: 50, apiCost: 100, toolsCost: 50,
+  onboardMonths: 2, onboardCapacity: 8, ongoingCapacity: 50, consultantRate: 8000, otherSetupCost: 0,
+  founders: 2, founderSalaryMonth: 12, founderSalary: 12000,
+  engHireMonth: 2, engSalary: 12000, agentsPerEng: 200, overhead: 5000,
+  revMultiple: 8, arrMultiple: 12, ebitdaMultiple: 15,
+};
+
+// Flint's assumptions: boutique, higher-touch, margin play
+const FLINT_PRESET = {
+  setupFee: 5000, monthlyFee: 3000, priceIncrease: 8,
+  startingAgents: 3, newAgentsPerMonth: 2, growthRate: 10, compoundGrowth: true, churnRate: 2,
+  hostingCost: 150, apiCost: 400, toolsCost: 75,
+  onboardMonths: 2, onboardCapacity: 3, ongoingCapacity: 25, consultantRate: 12000, otherSetupCost: 1000,
+  founders: 2, founderSalaryMonth: 6, founderSalary: 10000,
+  engHireMonth: 4, engSalary: 14000, agentsPerEng: 30, overhead: 3000,
+  revMultiple: 10, arrMultiple: 15, ebitdaMultiple: 18,
+};
+const STORAGE_KEY = 'agent-biz-model-settings';
+
+const inputIds = Object.keys(DEFAULTS);
+
+function saveToStorage() {
+  const state = {};
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    state[id] = el.type === 'checkbox' ? el.checked : +el.value;
+  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  let state;
+  try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+  applyState(state || DEFAULTS);
+}
+
+function applyState(state) {
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (!el || state[id] === undefined) return;
+    if (el.type === 'checkbox') {
+      el.checked = state[id];
+    } else {
+      el.value = state[id];
+    }
+  });
+  // Update slider displays
+  sliderDefs.forEach(([id, valId, suffix]) => {
+    if ($(valId)) $(valId).textContent = $(id).value + suffix;
+  });
+}
+
+function resetDefaults(e) {
+  if (e) e.preventDefault();
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  applyState(DEFAULTS);
+  render();
+}
+
+function useFlintPreset(e) {
+  if (e) e.preventDefault();
+  applyState(FLINT_PRESET);
+  saveToStorage();
+  render();
+}
+
+// --- Helpers ---
+const $ = id => document.getElementById(id);
+const fmt = n => {
+  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+  return '$' + Math.round(n).toLocaleString();
+};
+const pct = n => (n * 100).toFixed(1) + '%';
+
+// --- Model ---
+function runModel() {
+  const p = {
+    setupFee: +$('setupFee').value,
+    monthlyFee: +$('monthlyFee').value,
+    priceIncrease: +$('priceIncrease').value / 100,
+    startingAgents: +$('startingAgents').value,
+    newAgentsBase: +$('newAgentsPerMonth').value,
+    growthRate: +$('growthRate').value / 100,
+    compoundGrowth: $('compoundGrowth').checked,
+    churnRate: +$('churnRate').value / 100,
+    hostingCost: +$('hostingCost').value,
+    apiCost: +$('apiCost').value,
+    toolsCost: +$('toolsCost').value,
+    onboardMonths: +$('onboardMonths').value,
+    onboardCapacity: +$('onboardCapacity').value,
+    ongoingCapacity: +$('ongoingCapacity').value,
+    consultantRate: +$('consultantRate').value,
+    otherSetupCost: +$('otherSetupCost').value,
+    founders: +$('founders').value,
+    founderSalaryMonth: +$('founderSalaryMonth').value,
+    founderSalary: +$('founderSalary').value,
+    engHireMonth: +$('engHireMonth').value,
+    engSalary: +$('engSalary').value,
+    agentsPerEng: +$('agentsPerEng').value,
+    overhead: +$('overhead').value,
+    revMultiple: +$('revMultiple').value,
+    arrMultiple: +$('arrMultiple').value,
+    ebitdaMultiple: +$('ebitdaMultiple').value,
+  };
+
+  const months = [];
+  let totalAgents = 0;
+  let cumulativeRevenue = 0;
+  let cumulativeProfit = 0;
+  // Track agents still in onboarding (each entry = months remaining)
+  let onboardQueue = [];
+
+  for (let m = 1; m <= 36; m++) {
+    const yearsElapsed = Math.floor((m - 1) / 12);
+    const effectiveMonthlyFee = p.monthlyFee * Math.pow(1 + p.priceIncrease, yearsElapsed);
+
+    // New agents this month
+    let newAgents;
+    if (m === 1) {
+      newAgents = p.startingAgents;
+    } else {
+      if (p.compoundGrowth) {
+        newAgents = p.newAgentsBase * Math.pow(1 + p.growthRate, m - 1);
+      } else {
+        newAgents = p.newAgentsBase * (1 + p.growthRate * (m - 1));
+      }
+    }
+    newAgents = Math.round(newAgents);
+
+    // Churn
+    const churned = Math.round(totalAgents * p.churnRate);
+    totalAgents = totalAgents + newAgents - churned;
+    if (totalAgents < 0) totalAgents = 0;
+
+    // Add new agents to onboarding queue
+    for (let i = 0; i < newAgents; i++) {
+      onboardQueue.push(p.onboardMonths);
+    }
+
+    // Count agents currently onboarding vs post-onboard
+    const agentsOnboarding = onboardQueue.length;
+    const agentsOngoing = Math.max(0, totalAgents - agentsOnboarding);
+
+    // Consultants needed: some handle new onboards, some handle ongoing
+    const consultantsForOnboarding = Math.ceil(agentsOnboarding / p.onboardCapacity);
+    const consultantsForOngoing = Math.ceil(agentsOngoing / p.ongoingCapacity);
+    const activeConsultants = consultantsForOnboarding + consultantsForOngoing;
+
+    // Tick down onboard queue
+    onboardQueue = onboardQueue.map(c => c - 1).filter(c => c > 0);
+
+    // Revenue
+    const setupRevenue = newAgents * p.setupFee;
+    const recurringRevenue = totalAgents * effectiveMonthlyFee;
+    const totalRevenue = setupRevenue + recurringRevenue;
+
+    // Costs
+    const infraCost = totalAgents * (p.hostingCost + p.apiCost + p.toolsCost);
+    const consultantCost = activeConsultants * p.consultantRate;
+    const setupCosts = newAgents * p.otherSetupCost;
+
+    // Team costs
+    const founderCost = m >= p.founderSalaryMonth ? p.founders * p.founderSalary : 0;
+    const engineersNeeded = m >= p.engHireMonth ? Math.max(1, Math.ceil(totalAgents / p.agentsPerEng)) : 0;
+    const engCost = engineersNeeded * p.engSalary;
+    const teamCost = founderCost + engCost;
+
+    const totalCost = infraCost + consultantCost + setupCosts + teamCost + p.overhead;
+    const profit = totalRevenue - totalCost;
+    const margin = totalRevenue > 0 ? profit / totalRevenue : 0;
+
+    cumulativeRevenue += totalRevenue;
+    cumulativeProfit += profit;
+
+    months.push({
+      month: m,
+      newAgents,
+      churned,
+      totalAgents,
+      agentsOnboarding,
+      agentsOngoing,
+      setupRevenue,
+      recurringRevenue,
+      totalRevenue,
+      infraCost,
+      consultantCost,
+      setupCosts,
+      founderCost,
+      engCost,
+      engineersNeeded,
+      activeConsultants,
+      consultantsForOnboarding,
+      consultantsForOngoing,
+      teamCost,
+      overhead: p.overhead,
+      totalCost,
+      profit,
+      margin,
+      cumulativeRevenue,
+      cumulativeProfit,
+    });
+  }
+
+  return { months, params: p };
+}
+
+// --- Render ---
+let chart = null;
+
+function render() {
+  const { months, params } = runModel();
+  const last = months[months.length - 1];
+  const mo12 = months[11];
+  const mo24 = months[23];
+
+  // ARR = last month recurring * 12
+  const arr = last.recurringRevenue * 12;
+  const arr12 = mo12.recurringRevenue * 12;
+
+  // Trailing 12mo EBITDA (months 25-36)
+  const trailing12 = months.slice(24);
+  const ebitda12 = trailing12.reduce((s, m) => s + m.profit, 0);
+
+  // Break even month
+  let breakEvenMonth = null;
+  let runningProfit = 0;
+  for (const m of months) {
+    runningProfit += m.profit;
+    if (runningProfit > 0 && !breakEvenMonth) breakEvenMonth = m.month;
+  }
+
+  // KPIs
+  const kpiHTML = `
+    <div class="kpi"><div class="label">Total Agents (Mo 36)</div><div class="value neutral">${last.totalAgents}</div><div class="sub">Mo 12: ${mo12.totalAgents} · Mo 24: ${mo24.totalAgents}</div></div>
+    <div class="kpi"><div class="label">ARR (Mo 36)</div><div class="value positive">${fmt(arr)}</div><div class="sub">Mo 12: ${fmt(arr12)}</div></div>
+    <div class="kpi"><div class="label">Monthly Revenue</div><div class="value positive">${fmt(last.totalRevenue)}</div><div class="sub">Recurring: ${fmt(last.recurringRevenue)}</div></div>
+    <div class="kpi"><div class="label">Monthly Profit</div><div class="value ${last.profit >= 0 ? 'positive' : 'negative'}">${fmt(last.profit)}</div><div class="sub">Margin: ${pct(last.margin)}</div></div>
+    <div class="kpi"><div class="label">Cumulative Revenue</div><div class="value neutral">${fmt(last.cumulativeRevenue)}</div></div>
+    <div class="kpi"><div class="label">Break-Even Month</div><div class="value ${breakEvenMonth ? 'positive' : 'warn'}">${breakEvenMonth ? 'Mo ' + breakEvenMonth : 'N/A'}</div><div class="sub">${breakEvenMonth ? (breakEvenMonth <= 6 ? 'Early!' : breakEvenMonth <= 12 ? 'Year 1' : breakEvenMonth <= 24 ? 'Year 2' : 'Year 3') : 'Not in 36mo'}</div></div>
+    <div class="kpi"><div class="label">Team Size (Mo 36)</div><div class="value neutral">${params.founders + last.engineersNeeded + last.activeConsultants}</div><div class="sub">${params.founders}F + ${last.engineersNeeded}E + ${last.activeConsultants}C (${last.consultantsForOnboarding}ob/${last.consultantsForOngoing}og)</div></div>
+    <div class="kpi"><div class="label">Trailing EBITDA</div><div class="value ${ebitda12 >= 0 ? 'positive' : 'negative'}">${fmt(ebitda12)}</div><div class="sub">Months 25-36</div></div>
+  `;
+  $('kpiRow').innerHTML = kpiHTML;
+
+  // Chart
+  const labels = months.map(m => 'M' + m.month);
+  const datasets = [
+    { label: 'Revenue', data: months.map(m => m.totalRevenue), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', fill: true, tension: 0.3 },
+    { label: 'Cost', data: months.map(m => m.totalCost), borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,0.1)', fill: true, tension: 0.3 },
+    { label: 'Profit', data: months.map(m => m.profit), borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)', fill: true, tension: 0.3, borderDash: [4,3] },
+  ];
+
+  if (chart) chart.destroy();
+  const ctx = $('mainChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#888899', font: { family: 'monospace', size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#888899', font: { size: 10 } }, grid: { color: '#1a1a25' } },
+        y: {
+          ticks: { color: '#888899', font: { size: 10 }, callback: v => fmt(v) },
+          grid: { color: '#1a1a25' }
+        }
+      }
+    }
+  });
+
+  // Monthly detail table
+  let tableHTML = '<table><thead><tr><th>Mo</th><th>Agents</th><th>New</th><th>Churn</th><th>Setup Rev</th><th>Recurring</th><th>Total Rev</th><th>Infra</th><th>Consult</th><th>Team</th><th>Total Cost</th><th>Profit</th><th>Margin</th></tr></thead><tbody>';
+  for (const m of months) {
+    const cls = (m.month === 13 || m.month === 25) ? ' class="yr-divider"' : '';
+    tableHTML += `<tr${cls}>
+      <td>${m.month}</td><td>${m.totalAgents}</td><td>+${m.newAgents}</td><td>-${m.churned}</td>
+      <td>${fmt(m.setupRevenue)}</td><td>${fmt(m.recurringRevenue)}</td><td>${fmt(m.totalRevenue)}</td>
+      <td>${fmt(m.infraCost)}</td><td>${fmt(m.consultantCost)}</td><td>${fmt(m.teamCost)}</td>
+      <td>${fmt(m.totalCost)}</td>
+      <td class="${m.profit >= 0 ? 'positive' : 'negative'}">${fmt(m.profit)}</td>
+      <td class="${m.margin >= 0.2 ? 'positive' : m.margin >= 0 ? 'warn' : 'negative'}">${pct(m.margin)}</td>
+    </tr>`;
+  }
+  tableHTML += '</tbody></table>';
+  $('tableWrap').innerHTML = tableHTML;
+
+  // Team table
+  let teamHTML = '<table><thead><tr><th>Mo</th><th>Agents</th><th>Onboarding</th><th>Ongoing</th><th>Founders</th><th>Eng</th><th>Consult (OB)</th><th>Consult (OG)</th><th>Total Team</th><th>Founder $</th><th>Eng $</th><th>Consult $</th><th>Total $</th></tr></thead><tbody>';
+  for (const m of months) {
+    const cls = (m.month === 13 || m.month === 25) ? ' class="yr-divider"' : '';
+    const total = params.founders + m.engineersNeeded + m.activeConsultants;
+    teamHTML += `<tr${cls}>
+      <td>${m.month}</td><td>${m.totalAgents}</td>
+      <td>${m.agentsOnboarding}</td><td>${m.agentsOngoing}</td>
+      <td>${params.founders}</td><td>${m.engineersNeeded}</td>
+      <td>${m.consultantsForOnboarding}</td><td>${m.consultantsForOngoing}</td><td>${total}</td>
+      <td>${fmt(m.founderCost)}</td><td>${fmt(m.engCost)}</td><td>${fmt(m.consultantCost)}</td>
+      <td>${fmt(m.teamCost + m.consultantCost)}</td>
+    </tr>`;
+  }
+  teamHTML += '</tbody></table>';
+  $('teamWrap').innerHTML = teamHTML;
+
+  // Valuation
+  const revEV = last.totalRevenue * 12 * params.revMultiple;
+  const arrEV = arr * params.arrMultiple;
+  const ebitdaEV = ebitda12 > 0 ? ebitda12 * params.ebitdaMultiple : 0;
+
+  $('valGrid').innerHTML = `
+    <div class="val-card">
+      <div class="mult">${params.revMultiple}x Revenue</div>
+      <div class="ev">${fmt(revEV)}</div>
+      <div class="basis">Based on Mo 36 annualized revenue</div>
+    </div>
+    <div class="val-card">
+      <div class="mult">${params.arrMultiple}x ARR</div>
+      <div class="ev">${fmt(arrEV)}</div>
+      <div class="basis">Based on Mo 36 recurring ARR</div>
+    </div>
+    <div class="val-card">
+      <div class="mult">${params.ebitdaMultiple}x EBITDA</div>
+      <div class="ev">${ebitdaEV > 0 ? fmt(ebitdaEV) : 'N/A'}</div>
+      <div class="basis">${ebitdaEV > 0 ? 'Based on trailing 12mo profit' : 'Negative trailing EBITDA'}</div>
+    </div>
+  `;
+}
+
+// --- Wiring ---
+const sliderDefs = [
+  ['priceIncrease', 'priceIncreaseVal', '%'],
+  ['growthRate', 'growthRateVal', '%'],
+  ['churnRate', 'churnRateVal', '%'],
+  ['revMultiple', 'revMultipleVal', 'x'],
+  ['arrMultiple', 'arrMultipleVal', 'x'],
+  ['ebitdaMultiple', 'ebitdaMultipleVal', 'x'],
+];
+sliderDefs.forEach(([id, valId, suffix]) => {
+  $(id).addEventListener('input', () => {
+    $(valId).textContent = $(id).value + suffix;
+    saveToStorage();
+    render();
+  });
+});
+
+document.querySelectorAll('input[type="number"], input[type="checkbox"]').forEach(el => {
+  el.addEventListener('input', () => { saveToStorage(); render(); });
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
+    tab.classList.add('active');
+    $(tab.dataset.tab + 'Tab').style.display = '';
+  });
+});
+
+// Preset buttons
+$('resetBtn').addEventListener('click', resetDefaults);
+$('flintBtn').addEventListener('click', useFlintPreset);
+
+// Init — load saved state, then render
+loadFromStorage();
+render();
+</script>
+</body>
+</html>
