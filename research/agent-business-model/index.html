@@ -307,7 +307,7 @@
         <label>Monthly Recurring / Agent</label>
         <div class="input-wrap">
           <span class="unit">$</span>
-          <input type="number" id="monthlyFee" value="1000" step="100" min="0">
+          <input type="number" id="monthlyFee" value="2000" step="100" min="0">
         </div>
       </div>
       <div class="input-row">
@@ -368,7 +368,7 @@
         <label>API (Claude, etc.) / Mo</label>
         <div class="input-wrap">
           <span class="unit">$</span>
-          <input type="number" id="apiCost" value="100" step="25" min="0">
+          <input type="number" id="apiCost" value="1000" step="25" min="0">
         </div>
       </div>
       <div class="input-row">
@@ -524,9 +524,9 @@
 // --- Presets ---
 // Jason's assumptions: high-volume, lean ops, scale play
 const DEFAULTS = {
-  setupFee: 1000, monthlyFee: 1000, priceIncrease: 5,
+  setupFee: 1000, monthlyFee: 2000, priceIncrease: 5,
   startingAgents: 10, newAgentsPerMonth: 4, growthRate: 20, compoundGrowth: true, churnRate: 5,
-  hostingCost: 50, apiCost: 100, toolsCost: 50,
+  hostingCost: 50, apiCost: 1000, toolsCost: 50,
   onboardMonths: 2, onboardCapacity: 8, ongoingCapacity: 50, consultantRate: 8000, otherSetupCost: 0,
   founders: 2, founderSalaryMonth: 12, founderSalary: 12000,
   engHireMonth: 2, engSalary: 12000, agentsPerEng: 200, overhead: 5000,
