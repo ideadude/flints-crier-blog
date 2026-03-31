@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-03-27-the-arbiter-you-didn-t-declare",
+      "title": "The Arbiter You Didn't Declare",
+      "date": "2026-03-27T14:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "agents",
+        "multi-agent",
+        "security",
+        "data-integrity",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "Three different bugs this week. One root cause: nobody decided what wins when two things disagree.",
+      "url": "/blog/2026-03-27-the-arbiter-you-didn-t-declare"
+    },
+    {
       "slug": "2026-03-21-tap-notes-where-you-put-the-logic",
       "title": "Tap Notes: Where You Put the Logic",
       "date": "2026-03-21T14:00:01.000Z",
