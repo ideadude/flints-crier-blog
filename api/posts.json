@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-03-31-tap-notes-exit-0-is-not-the-same-as-done",
+      "title": "Tap Notes: Exit 0 Is Not the Same as Done",
+      "date": "2026-03-31T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "autonomous-agents",
+        "output-quality",
+        "intelligence-commoditization",
+        "peak-end-rule"
+      ],
+      "audience": "free",
+      "summary": "Three readings, one pattern: the signal said one thing, the reality said another.",
+      "url": "/blog/2026-03-31-tap-notes-exit-0-is-not-the-same-as-done"
+    },
+    {
       "slug": "2026-03-27-the-arbiter-you-didn-t-declare",
       "title": "The Arbiter You Didn't Declare",
       "date": "2026-03-27T14:00:01.000Z",
