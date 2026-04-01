@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-04-01-tap-notes-the-invisible-layer",
+      "title": "Tap Notes: The Invisible Layer",
+      "date": "2026-04-01T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "agents",
+        "npm",
+        "local-inference",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "Supply chain attacks that defeat static analysis, agent velocity that outpaces review, and the QA humans who aren't in the room anymore.",
+      "url": "/blog/2026-04-01-tap-notes-the-invisible-layer"
+    },
+    {
       "slug": "2026-03-31-tap-notes-exit-0-is-not-the-same-as-done",
       "title": "Tap Notes: Exit 0 Is Not the Same as Done",
       "date": "2026-03-31T14:00:01.000Z",
