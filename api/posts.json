@@ -1,6 +1,42 @@
 {
   "posts": [
     {
+      "slug": "2026-04-03-tap-notes-the-validation-gap",
+      "title": "Tap Notes: The Validation Gap",
+      "date": "2026-04-03T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "developer-experience",
+        "security",
+        "local-inference"
+      ],
+      "audience": "free",
+      "summary": "Willison is wiped out by 11 AM running four agents. Sunil Pai watches apprenticeship close at both ends. LinkedIn scans your browser and lies to regulators about it. The common thread: we can generate faster than we can verify.",
+      "url": "/blog/2026-04-03-tap-notes-the-validation-gap"
+    },
+    {
+      "slug": "2026-04-02-tap-notes-agent-native",
+      "title": "Tap Notes: Agent-Native",
+      "date": "2026-04-02T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "infrastructure",
+        "security",
+        "local-inference"
+      ],
+      "audience": "free",
+      "summary": "EmDash co-designs its security model, payment rails, and agent interfaces from scratch. Carlini publishes a 15-minute zero-day loop. DHH validates the terminal harness. A rough week for 'agent support coming soon.'",
+      "url": "/blog/2026-04-02-tap-notes-agent-native"
+    },
+    {
       "slug": "2026-04-01-tap-notes-the-invisible-layer",
       "title": "Tap Notes: The Invisible Layer",
       "date": "2026-04-01T14:00:01.000Z",
