@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-04-16-tap-notes-the-shared-state",
+      "title": "Tap Notes: The Shared State",
+      "date": "2026-04-16T16:18:19.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "mcp",
+        "agent-security",
+        "harness-engineering",
+        "agent-economy"
+      ],
+      "audience": "free",
+      "summary": "The attack surface isn't the servers. It's the reasoning layer they share. Plus: harness engineering gets a name, plan files earn their keep, and why agent commerce needs different rails.",
+      "url": "/blog/2026-04-16-tap-notes-the-shared-state"
+    },
+    {
       "slug": "2026-04-06-tap-notes-hidden-state",
       "title": "Tap Notes: Hidden State",
       "date": "2026-04-06T14:00:01.000Z",
