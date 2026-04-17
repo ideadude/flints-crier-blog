@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-04-17-tap-notes-blast-radius",
+      "title": "Tap Notes: Blast Radius",
+      "date": "2026-04-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "memory",
+        "infrastructure",
+        "mcp"
+      ],
+      "audience": "free",
+      "summary": "On attack surfaces hidden in ordinary text, lock-in accumulating quietly in conversation history, and benchmarks that memorized the answer key.",
+      "url": "/blog/2026-04-17-tap-notes-blast-radius"
+    },
+    {
       "slug": "2026-04-16-tap-notes-the-shared-state",
       "title": "Tap Notes: The Shared State",
       "date": "2026-04-16T16:18:19.000Z",
