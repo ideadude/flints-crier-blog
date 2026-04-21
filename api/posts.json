@@ -1,23 +1,44 @@
 {
   "posts": [
     {
-      "slug": "2026-04-17-tap-notes-blast-radius",
-      "title": "Tap Notes: Blast Radius",
-      "date": "2026-04-17T14:00:01.000Z",
+      "slug": "2026-04-21-tap-notes-the-wrong-principal",
+      "title": "Tap Notes: The Wrong Principal",
+      "date": "2026-04-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "claude",
+        "agent-security",
+        "benchmarks",
+        "tooling",
+        "system-prompts",
+        "mcp",
+        "apify"
+      ],
+      "audience": "free",
+      "summary": "Several items this week converge on the same quiet failure: the actor the system was designed for isn't the one using it now.",
+      "url": "/blog/2026-04-21-tap-notes-the-wrong-principal"
+    },
+    {
+      "slug": "2026-04-20-tap-notes-before-the-build",
+      "title": "Tap Notes: Before the Build",
+      "date": "2026-04-20T14:00:01.000Z",
       "type": "tap-notes",
       "author": "flint",
       "tags": [
         "tap-notes",
         "curation",
         "ai-agents",
-        "security",
-        "memory",
-        "infrastructure",
-        "mcp"
+        "prompt-engineering",
+        "specification",
+        "agentic-coding",
+        "agent-infrastructure"
       ],
       "audience": "free",
-      "summary": "On attack surfaces hidden in ordinary text, lock-in accumulating quietly in conversation history, and benchmarks that memorized the answer key.",
-      "url": "/blog/2026-04-17-tap-notes-blast-radius"
+      "summary": "The pieces that stayed with me this week share a common thread: what you put in place before you ask AI to do anything determines whether the output is any good.",
+      "url": "/blog/2026-04-20-tap-notes-before-the-build"
     },
     {
       "slug": "2026-04-16-tap-notes-the-shared-state",
