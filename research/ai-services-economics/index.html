@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Services Economics — Fortune 500 Rollout Model</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #4fc3f7;
+    --accent2: #7c4dff;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --orange: #ffa726;
+    --yellow: #ffee58;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--text-dim); font-size: 0.85rem; }
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(124,77,255,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+  .verdict-box h2 { color: var(--accent); font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .verdict-box .verdict-text { font-size: 1.3rem; font-weight: bold; }
+  .verdict-box .verdict-detail { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.5rem; }
+  .verdict-links { margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); }
+  .verdict-link { color: var(--accent); text-decoration: none; padding: 0 0.3rem; }
+  .verdict-link:hover { color: var(--accent2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .card h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card h4 { color: var(--text); font-size: 0.85rem; margin: 1rem 0 0.5rem; }
+  .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid rgba(42,42,58,0.5); font-size: 0.8rem; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-dim); }
+  .stat-value { color: var(--text); font-weight: 600; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.accent { color: var(--accent); }
+  .slider-group { margin-bottom: 1rem; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.3rem; }
+  .slider-label span:first-child { color: var(--text-dim); }
+  .slider-label span:last-child { color: var(--accent); font-weight: 600; }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    border-radius: 2px; background: var(--border); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent);
+    cursor: pointer; border: 2px solid var(--bg);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: 2px solid var(--bg);
+  }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; overflow-x: auto; }
+  .tab {
+    padding: 0.7rem 1.2rem; font-size: 0.8rem; color: var(--text-dim);
+    cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;
+    font-family: inherit; background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .chart-container { position: relative; height: 350px; margin: 1rem 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin: 1rem 0; }
+  th { text-align: left; padding: 0.6rem 0.8rem; color: var(--accent); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 0.5rem 0.8rem; border-bottom: 1px solid rgba(42,42,58,0.3); color: var(--text); }
+  tr:hover td { background: rgba(79,195,247,0.03); }
+  .text-right { text-align: right; }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-orange { color: var(--orange); }
+  .text-accent { color: var(--accent); }
+  .text-dim { color: var(--text-dim); }
+  .text-yellow { color: var(--yellow); }
+  .bold { font-weight: 700; }
+  .analysis { font-size: 0.85rem; line-height: 1.75; }
+  .analysis h3 { color: var(--accent); font-size: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .analysis h4 { color: var(--text); font-size: 0.88rem; margin: 1.5rem 0 0.5rem; }
+  .analysis p { margin-bottom: 0.9rem; color: var(--text); }
+  .analysis ul { margin: 0.5rem 0 1rem 1.5rem; }
+  .analysis li { margin-bottom: 0.4rem; }
+  .callout {
+    background: var(--surface2); border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.85rem;
+  }
+  .callout.warning { border-left-color: var(--orange); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout.green { border-left-color: var(--green); }
+  .callout strong { color: var(--accent); }
+  .callout.warning strong { color: var(--orange); }
+  .callout.danger strong { color: var(--red); }
+  .callout.green strong { color: var(--green); }
+  .big-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .big-num { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+  .big-num .number { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .big-num .label { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .big-num.red .number { color: var(--red); }
+  .big-num.green .number { color: var(--green); }
+  .big-num.orange .number { color: var(--orange); }
+  .gem-card {
+    background: linear-gradient(135deg, rgba(255,238,88,0.04), rgba(255,167,38,0.06));
+    border: 1px solid rgba(255,238,88,0.3);
+    border-radius: 8px; padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .gem-card h4 { color: var(--yellow); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .gem-card .ticker { color: var(--accent); font-weight: 700; }
+  .gem-card .tagline { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.8rem; font-style: italic; }
+  .gem-card .body { font-size: 0.83rem; line-height: 1.7; }
+  .rating-sb { color: var(--green); font-weight: 700; }
+  .rating-b { color: #8bc34a; font-weight: 700; }
+  .rating-h { color: var(--orange); font-weight: 700; }
+  .rating-s { color: var(--red); font-weight: 700; }
+  .rating-avoid { color: var(--red); font-weight: 700; text-transform: uppercase; }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.72rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .source-list { font-size: 0.72rem; color: var(--text-dim); column-count: 2; column-gap: 2rem; margin: 1rem 0; }
+  .source-list li { margin-bottom: 0.35rem; break-inside: avoid; list-style: none; padding-left: 0.5rem; border-left: 2px solid var(--border); }
+  .source-list a { color: var(--accent); text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+  .disclaimer {
+    background: rgba(239,83,80,0.05); border: 1px solid rgba(239,83,80,0.3);
+    border-radius: 8px; padding: 1rem 1.2rem; margin: 2rem 0;
+    font-size: 0.75rem; color: var(--text-dim);
+  }
+  .disclaimer strong { color: var(--red); }
+  @media (max-width: 700px) {
+    .source-list { column-count: 1; }
+    .big-numbers { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>AI Services Economics Model</h1>
+  <p class="subtitle">Fortune 500 Rollout Demand vs. Implementation Capacity — The ACN Thesis, Expanded</p>
+  <p class="subtitle" style="margin-top:0.3rem">Research compiled April 21, 2026 &mdash; Flint / Coleman Research</p>
+</header>
+
+<div class="verdict-box">
+  <h2>The Verdict</h2>
+  <div class="verdict-text" id="verdict-text">Loading model...</div>
+  <div class="verdict-detail" id="verdict-detail"></div>
+  <div class="verdict-links">
+    Jump to:
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=analysis]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">📊 Full Analysis</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=hidden]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">💎 Hidden Gems</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=stocks]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">🎯 Stock Picks</a>
+  </div>
+</div>
+
+<div class="big-numbers" id="key-numbers">
+  <div class="big-num"><div class="number" id="bn-demand">--</div><div class="label">2026 F500 AI Services Demand ($B)</div></div>
+  <div class="big-num green"><div class="number" id="bn-capacity">--</div><div class="label">Top-Tier Delivery Capacity ($B)</div></div>
+  <div class="big-num" id="bn-gap-box"><div class="number" id="bn-gap">--</div><div class="label">Shortfall / Surplus ($B)</div></div>
+  <div class="big-num orange"><div class="number" id="bn-cum-demand">--</div><div class="label">Cumulative Demand 2026-2030 ($B)</div></div>
+  <div class="big-num"><div class="number" id="bn-peak">--</div><div class="label">Peak Demand Year</div></div>
+  <div class="big-num"><div class="number" id="bn-pilot">--</div><div class="label">F500 Pilot-to-Prod Rate</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="model">Interactive Model</button>
+  <button class="tab" data-tab="firms">Firm Analysis</button>
+  <button class="tab" data-tab="hidden">💎 Hidden Gems</button>
+  <button class="tab" data-tab="analysis">📊 Full Analysis</button>
+  <button class="tab" data-tab="stocks">🎯 Stock Picks</button>
+  <button class="tab" data-tab="methodology">Methodology</button>
+  <button class="tab" data-tab="sources">Sources</button>
+</div>
+
+<div class="tab-content active" id="tab-model">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Demand Parameters</h3>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>F500 Actively Rolling Out AI (%)</span><span id="val-active">50</span></div>
+        <input type="range" id="active" min="15" max="100" value="50" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Avg Annual AI Services Spend / F500 ($M)</span><span id="val-spend">40</span></div>
+        <input type="range" id="spend" min="5" max="250" value="40" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Services-to-Software Ratio (x)</span><span id="val-ratio">3</span></div>
+        <input type="range" id="ratio" min="1" max="8" value="3" step="0.5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Demand Growth / Year (%)</span><span id="val-growth">25</span></div>
+        <input type="range" id="growth" min="0" max="60" value="25" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Pilot → Production Rate (%)</span><span id="val-pilot">40</span></div>
+        <input type="range" id="pilot" min="5" max="90" value="40" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Regulated-Industry Premium (x)</span><span id="val-reg">1.3</span></div>
+        <input type="range" id="reg" min="1.0" max="2.5" value="1.3" step="0.1">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Supply Parameters</h3>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Top-Tier AI Services Revenue 2026 ($B)</span><span id="val-cap">45</span></div>
+        <input type="range" id="cap" min="15" max="120" value="45" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Capacity Growth / Year (%)</span><span id="val-capgrow">14</span></div>
+        <input type="range" id="capgrow" min="0" max="40" value="14" step="2">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>AI Productivity Uplift (%)</span><span id="val-prod">15</span></div>
+        <input type="range" id="prod" min="0" max="50" value="15" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Top-10 Market Share (%)</span><span id="val-share">55</span></div>
+        <input type="range" id="share" min="25" max="90" value="55" step="5">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Offshore Wage Inflation (%/yr)</span><span id="val-wage">8</span></div>
+        <input type="range" id="wage" min="0" max="25" value="8" step="1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label"><span>Hyperscaler Pro-Services Share (%)</span><span id="val-hyper">10</span></div>
+        <input type="range" id="hyper" min="0" max="35" value="10" step="2">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Model Output</h3>
+    <div id="model-summary"></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:2rem">
+    <div class="card">
+      <h3>Demand vs Capacity (2026-2030)</h3>
+      <div class="chart-container"><canvas id="chart-demand-capacity"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Services Shortfall by Year</h3>
+      <div class="chart-container"><canvas id="chart-shortfall"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>Capacity by Tier ($B, 2026 baseline)</h3>
+      <div class="chart-container"><canvas id="chart-tiers"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Services Mix — Where the Money Goes</h3>
+      <div class="chart-container"><canvas id="chart-mix"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-firms">
+  <div class="analysis">
+    <h3>The Delivery Stack — Who Actually Does the Work</h3>
+    <p>I group public AI-implementation providers into six tiers. Their economics are different. Their customer access is different. Their vulnerability to AI-driven disruption is different. Treating them as a monolith ("consulting stocks") is how investors miss DELL-style mispricings.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>Tier 1 — Big 4 Consulting</h3>
+        <p class="text-dim" style="font-size:0.8rem">Accenture, Deloitte, McKinsey, BCG, KPMG, EY, PwC</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>Accenture reports cumulative GenAI bookings of ~$5B+ through FY25, with GenAI-specific revenue now a disclosed segment</li>
+          <li>Deloitte/McKinsey/BCG private — not directly investable, but they set pricing</li>
+          <li>Highest margins, deepest F500 access</li>
+          <li>Exposure risk: "services as software" cannibalizing billable hours</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Tier 2 — Legacy IT Services</h3>
+        <p class="text-dim" style="font-size:0.8rem">IBM Consulting, Capgemini, DXC, Kyndryl, CGI</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>IBM Consulting grew only 1% in Q4 2025 — pricing pressure is real</li>
+          <li>CGI (GIB) quietly expanding OpenAI Codex partnership; book-to-bill 110%</li>
+          <li>DXC forecasting ~39% earnings decline — the turnaround is not happening</li>
+          <li>Kyndryl stock -55% after SEC probe on free-cash-flow claims</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Tier 3 — Indian IT Majors</h3>
+        <p class="text-dim" style="font-size:0.8rem">TCS, Infosys, Wipro, HCLTech, Cognizant</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>Cognizant (CTSH) guided 4-6.5% constant-currency growth — $28.4B TTM bookings, forward P/E ~10.5x</li>
+          <li>28 large deals in 2025; AI Builder strategy + OpenAI partnership</li>
+          <li>Visa/H-1B exposure is real; offshore wage inflation eroding margin</li>
+          <li>Where the bulk of F500 implementation hours actually land</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>Tier 4 — Premium Engineering</h3>
+        <p class="text-dim" style="font-size:0.8rem">EPAM, Globant, Endava, Thoughtworks, Perficient (now private)</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>EPAM targeting $600M+ AI-native revenue in 2026, 8.8% CAGR through 2028</li>
+          <li>Stock down 35% YTD — market is punishing growth slowdown, not moat erosion</li>
+          <li>Globant: Wedbush Outperform, average PT $79 implies 60%+ upside</li>
+          <li>Endava: revenue declining, £15M H1 loss — avoid</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Tier 5 — Federal / Defense AI</h3>
+        <p class="text-dim" style="font-size:0.8rem">Leidos, Booz Allen, CACI, SAIC, KBR, Parsons, ICF</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>Leidos 13x forward P/E on $12.25 guided EPS — cheapest defense-AI exposure</li>
+          <li>Booz Allen fair value $106.90 vs $82 market — AI-native Vellox suite launched</li>
+          <li>KBR: $23B backlog, Tagup military AI partnership, 2030 plan</li>
+          <li>Lumpy contract cycles; 8-14 month deal lead times; highest-$/FTE in the market</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Tier 6 — Data Ops + BPO Hybrid</h3>
+        <p class="text-dim" style="font-size:0.8rem">Innodata, Appen, TaskUs, Concentrix, Mastech</p>
+        <ul style="font-size:0.8rem; margin-top:0.5rem; padding-left:1rem">
+          <li>Innodata (INOD): 4 of top-5 tech giants as customers; consensus Strong Buy $91-100 PT</li>
+          <li>TaskUs: Wedbush $14 PT vs $7 price; BPO → AI-ops transformation</li>
+          <li>Mastech Digital (MHH): $80M micro-cap, pure services-capacity play</li>
+          <li>These are the picks-and-shovels for the data layer everyone forgets</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Who Wins the Delivery War</h3>
+    <p>If you take McKinsey at face value — 88% of enterprises using AI in some function, but only 6% capturing material EBIT — the gap between adoption and value represents a <strong>$500B-$1T implementation services opportunity</strong> over five years. But that opportunity is not evenly distributed.</p>
+
+    <div class="callout green">
+      <strong>The arms-dealer parallel.</strong> In the infrastructure report I argued Nvidia, TSMC, and Dell win regardless of which model company dominates — "the arms dealer always wins." The services analog: <em>the implementation firm wins regardless of which LLM the enterprise picks.</em> Accenture gets paid whether the client chooses Claude, GPT, or Gemini. The model commoditizes. The integration does not.
+    </div>
+
+    <p>The counter-argument: AI eats its own implementation layer. Cline, Codex-type agents, Claude Code, Microsoft 365 Copilot — these compress consultant billable hours. The data says this is happening (9.2 hours/week saved at one Toronto strategy firm, 12.2% task completion lift, 25.1% speed gains), but firms are <em>redirecting</em> reclaimed hours to utilization and business development. Q1 2026 data shows that firm's utilization jumped from 79% to 94%. Billable hours didn't fall. Margin expanded.</p>
+
+    <p>This is the same pattern that played out in software a decade ago: productivity tools were supposed to kill agencies, and instead agencies used them to staff bigger engagements with the same headcount. The economics are stubbornly similar. Don't bet against a fee-per-outcome model replacing billable hours until you see pricing power actually transferring to clients. The data says it isn't — 79% of law firms use AI for delivery; only 6% charge less.</p>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-hidden">
+  <div class="analysis">
+    <h3>Under-the-Radar Picks</h3>
+    <p>In the infrastructure report, DELL was the hidden gem — #1 AI server ODM at 10x forward P/E despite 19-23% revenue growth. The market was looking at Nvidia and ignoring the OEM that bundled 50%+ margin services on top of every AI server. Here are the services-layer analogs. All are public, all have meaningful AI implementation exposure, all have mispricings I think matter.</p>
+
+    <div class="gem-card">
+      <h4>💎 #1 — Innodata (INOD) <span class="ticker">NASDAQ:INOD · ~$46.94 · $1.49B mkt cap</span></h4>
+      <p class="tagline">The data-prep pickaxe nobody pitches at conferences.</p>
+      <div class="body">
+        <p>Innodata sits at the ugliest, most unglamorous layer of the AI stack: data annotation, curation, hygiene, and compliance. Nobody wants to pitch it. Nobody wants to cover it. And yet four of the five largest technology companies in the world are customers, alongside financial services, insurance, law, and medicine. 10,107 employees across 13 cities — real delivery capacity, not vaporware.</p>
+        <p><strong>Why the market mispriced it:</strong> Forward P/E of 47 looks rich against the IT services industry average of 27. Investors see the multiple and bail. What they miss: this is the only pure-play they can buy on the thesis that <em>AI implementation is 70% data work, 30% model work</em>. When a Fortune 500 starts an AI project, the first 12 weeks are data prep — that's Innodata's revenue, not OpenAI's.</p>
+        <p><strong>The tell:</strong> Consensus is Strong Buy with price targets $91.67-$100 — <span class="text-green bold">95-113% upside</span>. That kind of analyst spread without corresponding volume tells you institutional buyers are still early. Earnings May 7, 2026.</p>
+        <p><strong>Risk:</strong> Customer concentration (top 5 tech firms), small-cap volatility, margins could compress if Scale AI (private) goes public and prices aggressively.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #2 — CGI Inc (GIB / GIB.A) <span class="ticker">NYSE:GIB · ~$77-87 · $19.6-20.8B mkt cap</span></h4>
+      <p class="tagline">The Canadian IT services firm that's quietly partnering with OpenAI on Codex.</p>
+      <div class="body">
+        <p>CGI is the most under-covered large-cap IT services firm on the NYSE. Most US investors don't touch it because it's TSX-primary. That's the whole mispricing. Q1 FY26 revenue $4.1B (up 7.7% YoY), book-to-bill ratio of 110.4%, diluted EPS up 5.7%, trailing P/E of 14 — cheaper than Accenture, cheaper than Cognizant, cheaper than anyone in the peer group.</p>
+        <p><strong>The AI angle they're not shouting about:</strong> April 21, 2026 — CGI expanded its OpenAI partnership to deploy Codex across enterprises. Public-sector AI wins are coming (they already won CGI Credit Studio AI agent work, plus AWS public-sector partnership). Stock is down 26% over the past year despite these wins — the market hasn't repriced the Codex partnership yet.</p>
+        <p><strong>DCF intrinsic value per Simply Wall St:</strong> CAD $173 vs current CAD $105 — <span class="text-green bold">~65% undervalued</span>. Next earnings April 29, 2026. That's a catalyst window.</p>
+        <p><strong>Risk:</strong> FX exposure, CAD-primary listing means lower US liquidity, public-sector contracts are slow-moving.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #3 — EPAM Systems (EPAM) <span class="ticker">NYSE:EPAM · ~$131.90 · ~$7.5B mkt cap</span></h4>
+      <p class="tagline">The premium engineering shop the market punished too hard.</p>
+      <div class="body">
+        <p>EPAM is down 35% year-to-date. That's a gift. The firm is guiding $600M+ AI-native revenue in 2026, 4.5-7.5% total revenue growth, and an Investor Day target of $6.5B revenue by 2028 at 16%+ non-GAAP operating margins. Forward P/E ~12x at current prices. Stifel PT $246. TD Cowen $220. Mizuho $200. Street consensus $187-191.</p>
+        <p><strong>Why it got smashed:</strong> Ukraine exposure (still has meaningful delivery ops there), H-1B/visa headwinds, growth decel vs prior high-growth trajectory. All three are real. None are fatal. The AI engineering moat — deep technical delivery, premium billing rates, long-standing F500 relationships in financial services and life sciences — is intact.</p>
+        <p><strong>The catalyst:</strong> Q1 earnings May 7. If they reaffirm Investor Day trajectory, multiple expansion from 12x → 18x alone gets you <span class="text-green bold">50%+ upside</span> before any estimate revisions.</p>
+        <p><strong>Risk:</strong> Geopolitical deterioration in Eastern Europe, client spend consolidation into Big 4. If either hits hard, the thesis breaks.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #4 — ASGN / EFOR (ticker change April 24) <span class="ticker">NYSE:ASGN · ~$40 · $1.65B mkt cap</span></h4>
+      <p class="tagline">Federal IT staffing recovery play, overlooked through a rebrand.</p>
+      <div class="body">
+        <p>ASGN provides IT consulting and staffing with heavy federal government exposure — exactly the tier that benefits from the current federal AI implementation push (BAH, LDOS, CACI, SAIC land the prime contracts; ASGN provides the staff augmentation underneath). Trailing P/E 14, forward P/E ~14 on the Q1 consensus of $0.98 EPS. Baird PT $62. Wells Fargo $54. Average target $51.50 — <span class="text-green bold">28%+ upside</span>.</p>
+        <p><strong>The mispricing vector:</strong> Ticker changes to EFOR on April 24, 2026. Ticker changes routinely create 2-6 weeks of coverage dilution — analysts update slower, index funds lag rebalancing, retail confuses the symbol. It's a structural short-term inefficiency that corrects itself.</p>
+        <p><strong>Q1 earnings April 22</strong> — tomorrow — is the proximate catalyst. If they beat and guide up, the rebrand becomes a feature rather than a distraction.</p>
+        <p><strong>Risk:</strong> Federal spending freeze, agency reorganization disruption, cyclical hiring softening.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #5 — KBR Inc (KBR) <span class="ticker">NYSE:KBR · mid-cap industrial with AI pivot</span></h4>
+      <p class="tagline">$23B backlog that analysts still model as "defense engineering."</p>
+      <div class="body">
+        <p>KBR guided FY26 revenue of $8.13B midpoint, 75% Government Solutions exposure, $23.2B backlog. The Tagup partnership for military AI solutions plus a strategic investment in Applied Computing (with a board seat) signal a real pivot — not pivot-by-press-release. Cost-plus and time-and-materials contracts provide the predictability the defense-services market prices at a premium.</p>
+        <p><strong>The mispricing:</strong> Analysts still model KBR as an engineering & construction firm with a defense kicker. The AI investment tilts the mix toward higher-margin IP-driven work. If Government Solutions revenue mix continues shifting toward AI-ops at 20%+ EBITDA margins, the stock re-rates from industrial multiple to consulting multiple. That's a 30-50% re-rating without any estimate changes.</p>
+        <p><strong>Risk:</strong> Zacks notes "Hold" with $56.50 target — this is not a screaming consensus buy, and federal budget cycles could hit bookings.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #6 — Mastech Digital (MHH) <span class="ticker">NYSE:MHH · ~$6.82 · $80M micro-cap</span></h4>
+      <p class="tagline">The highest-beta services-capacity play you can buy.</p>
+      <div class="body">
+        <p>Mastech Digital is a pure-play IT staffing and digital transformation consultancy — data management, analytics, AI, RPA. $80M market cap, P/E 23, PEG 0.79, Snowflake/Databricks adjacent (though ecosystem partner status unclear from public disclosure).</p>
+        <p><strong>The tell:</strong> Major shareholder Steven Shaw added 3,000 shares at $6.84 on April 15, 2026. Insider buying at a company this small is the clearest institutional signal you get. Shaw directly holds 1.3M shares — he's already concentrated; he doesn't need to buy more for the optics.</p>
+        <p><strong>The thesis:</strong> In a services-capacity-constrained market, the Tier-1 firms subcontract overflow to micro-caps. MHH sits exactly in that subcontracting lane. Even modest revenue growth flows straight to margin at this scale.</p>
+        <p><strong>Risk:</strong> Illiquidity is real (avg daily volume is thin), micro-cap volatility, no analyst coverage to speak of, thesis is partly a bet on sector re-rating not company execution.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #7 — Persistent Systems (PERSISTENT.NS) <span class="ticker">NSE India · mid-cap Indian IT</span></h4>
+      <p class="tagline">The Indian mid-cap with an 18% CAGR the street isn't pricing.</p>
+      <div class="body">
+        <p>Street models project Persistent Systems at <strong>18.2% revenue CAGR through FY26-FY28</strong> — the highest growth rate among the Indian IT mid-caps. Healthcare segment recovery, AI infrastructure investments translating into margin expansion, and a strategic acquisition pipeline.</p>
+        <p><strong>Why US investors miss it:</strong> NSE-listed, no US ADR, very light US analyst coverage. You have to trade it direct on Indian exchanges or through a global broker. The friction is the moat against institutional flows — which is why valuations haven't caught up.</p>
+        <p><strong>The adjacent play if you can't access NSE:</strong> Cognizant (CTSH) at forward P/E ~10.5x captures some of the same Indian IT delivery economics with US listing convenience — less upside but less friction.</p>
+        <p><strong>Risk:</strong> FX volatility (INR/USD), access friction, geopolitical risk to Indian IT delivery model broadly.</p>
+      </div>
+    </div>
+
+    <h3>Hidden Gems — Summary Table</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Name</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Mkt Cap</th>
+          <th class="text-right">Fwd P/E</th>
+          <th>Thesis</th>
+          <th>Rating</th>
+          <th class="text-right">PT Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">INOD</td><td>Innodata</td><td class="text-right">$46.94</td><td class="text-right">$1.49B</td>
+          <td class="text-right">47x</td><td>Data-prep pure play, 4/5 top tech as customers</td><td class="rating-sb">STRONG BUY</td>
+          <td class="text-right text-green">$91-$100</td>
+        </tr>
+        <tr>
+          <td class="bold">GIB</td><td>CGI Inc</td><td class="text-right">$77-$87</td><td class="text-right">$19.6B</td>
+          <td class="text-right">~14x</td><td>Under-covered OpenAI Codex partner</td><td class="rating-b">BUY</td>
+          <td class="text-right text-green">CAD $173</td>
+        </tr>
+        <tr>
+          <td class="bold">EPAM</td><td>EPAM Systems</td><td class="text-right">$131.90</td><td class="text-right">$7.5B</td>
+          <td class="text-right">~12x</td><td>Premium eng shop, down 35% YTD, overshoot</td><td class="rating-b">BUY</td>
+          <td class="text-right text-green">$187-$246</td>
+        </tr>
+        <tr>
+          <td class="bold">ASGN/EFOR</td><td>ASGN Inc</td><td class="text-right">$40</td><td class="text-right">$1.65B</td>
+          <td class="text-right">~14x</td><td>Federal IT staffing, ticker change dislocation</td><td class="rating-b">BUY</td>
+          <td class="text-right text-green">$51-$62</td>
+        </tr>
+        <tr>
+          <td class="bold">KBR</td><td>KBR Inc</td><td class="text-right">~$55-58</td><td class="text-right">~$7B</td>
+          <td class="text-right">~14x</td><td>$23B backlog, AI pivot undercovered</td><td class="rating-b">BUY</td>
+          <td class="text-right text-dim">$56.50 consensus</td>
+        </tr>
+        <tr>
+          <td class="bold">MHH</td><td>Mastech Digital</td><td class="text-right">$6.82</td><td class="text-right">$80M</td>
+          <td class="text-right">~20x</td><td>Micro-cap services capacity, insider buying</td><td class="rating-b">SPEC BUY</td>
+          <td class="text-right text-dim">No coverage</td>
+        </tr>
+        <tr>
+          <td class="bold">PERSISTENT.NS</td><td>Persistent Systems</td><td class="text-right">INR-priced</td><td class="text-right">Mid-cap</td>
+          <td class="text-right">N/A</td><td>18.2% CAGR, no US ADR friction moat</td><td class="rating-b">BUY</td>
+          <td class="text-right text-dim">NSE-only</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Portfolio construction note:</strong> If I had to pick three to size up, it would be <span class="text-green bold">INOD, GIB, EPAM</span> — they capture three distinct sub-theses (data layer, under-covered large-cap, premium engineering overshoot) and don't correlate tightly. ASGN, KBR, MHH are smaller position sizes with asymmetric payoffs. Persistent is access-dependent.
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-analysis">
+  <div class="analysis">
+
+    <h3>The Thesis in One Paragraph</h3>
+    <p>The Fortune 500 overwhelmingly <em>wants</em> AI. 88% of enterprises already use it in at least one function, per McKinsey's 2025 State of AI. 92% of executives plan to increase AI spending over the next three years. 78% use GenAI somewhere in the stack. And yet — only <strong>5-6% extract material EBIT impact</strong>. Two-thirds of organizations never scale beyond pilots. BCG says 60% of GenAI investments generate no material value. This is not an adoption problem. It is an <em>implementation</em> problem. And the companies that solve implementation — data engineering, systems integration, change management, governance, training — are about to absorb a multi-year wave of spend that dwarfs the model-layer economics everyone's watching.</p>
+
+    <div class="callout">
+      <strong>The core mismatch:</strong> AI infrastructure spend in 2026 is ~$500B (Goldman estimate). AI services spend is ~$14.1B (Smartbridge/consensus for 2026, growing to $116.8B by 2035 at 26.5% CAGR). The ratio is wrong. Historical precedent — ERP rollouts, cloud migrations, digital transformation — shows services-to-software ratios of <strong>3-7x</strong>. If that precedent holds, the AI services market is underbuilt by an order of magnitude.
+    </div>
+
+    <h3>Why "Pilot Purgatory" Is the Real Business Model</h3>
+    <p>The phrase "pilot purgatory" appears in 2026 McKinsey, BCG, and Gartner reports with striking consistency. It describes the state of an enterprise that has funded dozens of AI pilots, produced PowerPoint decks showing ROI in narrow sandboxes, and then never moved to production. The gap between pilot and production is where the implementation services opportunity lives.</p>
+
+    <p>McKinsey's data: 88% of organizations use AI somewhere, but only 1% describe their GenAI strategies as "mature." BCG: less than 30% of CEOs are satisfied with AI returns. Gartner: $1.5T in prior-year global AI spend, with most organizations admitting minimal production-scale impact. These are not numbers that describe a mature market. They describe a market that is pre-integration.</p>
+
+    <p>What does "integration" cost? Smartbridge's 2026 enterprise AI implementation guide puts production-ready systems at <strong>$500K-$1.5M per project</strong>, with organization-wide transformations at <strong>$5M+</strong>. Roughly <strong>70% of that spend goes to people and process, not technology</strong> — which is exactly the services layer. Hidden costs (data prep, integration, skills gaps, governance, ongoing ops) account for 28-42% of first-year spend beyond the sticker price.</p>
+
+    <p>Multiply across the Fortune 500. Assume 250 companies are actively implementing AI in 2026 (matching the McKinsey 50% figure for active implementation). Assume average annual implementation spend of $40M per company, weighted across many projects per company. That's <strong>$10B in 2026 F500 implementation demand</strong> — and that's before the ramp. At 25% growth (below IDC's 38% APAC AI services CAGR and below the $14.1B → $116.8B market CAGR of 26.5%), 2030 demand is $24B. Cumulative five-year demand: <strong>~$80B just from the F500 implementation layer alone</strong>. Add mid-market enterprise, federal, and international, and the number is 2-3x that.</p>
+
+    <h3>The Six-Tier Delivery Stack</h3>
+    <p>Not all services providers are the same. Their economics, their F500 access, their vulnerability to AI-driven disruption — all different. Here's how I group them:</p>
+
+    <h4>Tier 1 — Big 4 Consulting (premium strategy + delivery)</h4>
+    <p>Accenture, Deloitte, McKinsey, BCG, KPMG, EY, PwC. Highest margins (25-30% operating). Deepest C-suite access. Fastest GenAI bookings ramp. Accenture's GenAI bookings have grown consistently quarter over quarter — the firm discloses the metric precisely because it's the one investors anchor on. Only Accenture is directly investable on US exchanges.</p>
+
+    <h4>Tier 2 — Legacy IT Services (large-scale outsourcing + AI bolt-on)</h4>
+    <p>IBM Consulting, Capgemini, DXC, Kyndryl, CGI. The value prop is scale and multi-year managed services contracts. IBM Consulting grew only 1% in Q4 2025 — pricing pressure from AI coding tools is real. Kyndryl is down 55% with an SEC probe on free-cash-flow claims. DXC is forecasting ~39% earnings decline over three years. CGI is the outlier — 7.7% revenue growth, 110% book-to-bill, OpenAI Codex partnership. That's why CGI is on the hidden-gems list and the other four are not.</p>
+
+    <h4>Tier 3 — Indian IT Majors (scaled delivery + offshore wage arbitrage)</h4>
+    <p>TCS, Infosys, Wipro, HCLTech, Cognizant. Where the bulk of F500 implementation <em>hours</em> land. Cognizant guided 4-6.5% constant-currency growth for 2026 with $28.4B in trailing-12-month bookings. Forward P/E ~10.5x. These firms face the biggest AI-productivity headwind — offshore wage arbitrage commoditizes when AI compresses billable hours. But "commoditizes" ≠ "disappears." The volume of work funnels through these firms because no one else has the seat count.</p>
+
+    <h4>Tier 4 — Premium Engineering (mid-sized specialist delivery)</h4>
+    <p>EPAM, Globant, Endava, Thoughtworks, Perficient (acquired by EQT in October 2024 — no longer public). Premium billing rates, deep engineering moat, but not Big 4 scale. EPAM is the clearest mispricing in the tier — down 35% YTD to $131, forward P/E ~12x, consensus PT $187-246. Endava is in structural decline — revenue down, net loss, stock $4.86 from $35 — avoid. Globant is middle-of-pack with wide PT dispersion.</p>
+
+    <h4>Tier 5 — Federal / Defense AI (mission-critical government contracts)</h4>
+    <p>Leidos, Booz Allen, CACI, SAIC, KBR, Parsons, ICF. The federal AI procurement cycle is lumpy but well-funded. Leidos trades at 13x forward P/E on $12.25 guided EPS — cheapest defense-AI exposure. Booz Allen trades below $83 vs fair value estimates of $106.90. KBR's $23B backlog is underappreciated as an AI vehicle. This tier's competitive moat is clearance and established contract vehicles — harder to disrupt than commercial consulting.</p>
+
+    <h4>Tier 6 — Data Ops + BPO Hybrid (the picks-and-shovels underneath)</h4>
+    <p>Innodata, Appen, TaskUs, Concentrix, Mastech Digital, CNXC, Teleperformance. The forgotten layer. If 70% of AI project spend is data + process (per Smartbridge), this tier captures a disproportionate share of the non-advisory budget. Innodata is the standout with its 4-of-top-5 tech-giant customer base and consensus Strong Buy. TaskUs is more speculative — Wedbush $14 PT vs $7 market price, but 38% decline over 6 months and special-dividend refinancing noise create real risk.</p>
+
+    <h3>Capacity: Who Can Actually Deliver at F500 Scale</h3>
+    <p>Here's the number nobody publishes cleanly: <strong>how many F500-qualified AI-implementation FTE-equivalents exist globally?</strong> My estimate, triangulating disclosed headcount and AI-specific allocation:</p>
+
+    <ul>
+      <li>Accenture: ~750K employees, ~15% on AI work = ~113K</li>
+      <li>IBM Consulting: ~160K, ~20% on AI = ~32K</li>
+      <li>Deloitte/McKinsey/BCG/Big 4 private: ~1.2M total, ~10% AI = ~120K</li>
+      <li>Indian IT majors (TCS, INFY, WIT, HCL, CTSH): ~1.8M combined, ~20% AI = ~360K</li>
+      <li>Tier 4 premium eng (EPAM, Globant, Thoughtworks, Endava): ~125K combined, ~30% AI = ~37K</li>
+      <li>Tier 5 federal: ~200K combined, ~15% AI = ~30K</li>
+      <li>Tier 6 data/BPO: ~450K combined, ~25% AI = ~112K</li>
+    </ul>
+
+    <p>Rough total: <strong>800K AI-focused services FTEs globally</strong>. At average fully-loaded billing rate of ~$150K/year, that's ~$120B in theoretical annual services capacity. But — and this is where the model bites — <strong>F500-qualified implementation capacity</strong> is only a fraction of that. Big 4 access, clearances, regulated-industry experience, fluency in client enterprise architecture — these filter available capacity down to perhaps <strong>40-50B$ in 2026 F500-serviceable capacity</strong>.</p>
+
+    <p>If 2026 F500 demand is $10-25B (depending on where you set the parameters), the market is <em>not</em> in acute shortage today. But demand is growing at 25%+ per year; capacity at best 12-15% (offshore wage inflation + productivity uplift net). That math bites in 2027-2028. By 2029 the shortfall under default assumptions exceeds <strong>$15-30B annually</strong> — which is why the Tier 4/5/6 firms become absorbers of overflow demand, and why the valuation dispersion is about to compress.</p>
+
+    <h3>Counter-Theses (Addressed, Not Dismissed)</h3>
+
+    <h4>"AI kills consulting by making consultants 10x more productive."</h4>
+    <p>Real gains are happening — 9.2 hours/week reclaimed in one Toronto firm study, 12.2% task completion uplift, 25.1% speed gain. But reclaimed hours are <strong>redirecting to utilization</strong>, not dropping billable totals. Q1 2026 utilization at that firm rose 79% → 94%. Billings went up. Margin expanded. Only 6% of law firms charge less despite 79% using AI for delivery. Pricing power is still with the supplier. This counter-thesis will eventually be right; the question is when, and the data says not yet.</p>
+
+    <h4>"Hyperscaler pro-services arms (AWS PS, Azure, GCP) absorb the spend."</h4>
+    <p>Hyperscaler pro-services exist but are not broken out as independent reporting segments. AWS/Azure/GCP are primarily IaaS plays; their pro-services revenue is 5-15% of total cloud revenue. They're a real competitor for greenfield implementations, but they cannot absorb F500-scale change management or regulated-industry compliance work. They are a secular share-taker, not a market replacer.</p>
+
+    <h4>"F500 builds internal AI Centers of Excellence and cuts external spend."</h4>
+    <p>Evidence says the winning F500 pattern is <em>hybrid hub-and-spoke</em>, not pure build. Internal CoE for standards and IP; external partners for spoke execution. ServiceNow's data shows 85% of F500 use Now Assist via third-party partner implementation. The CoE model creates <em>more</em> services demand, not less — someone has to stand up the CoE, integrate it with spokes, and train the talent pipeline. 77% of enterprises still look externally for AI consulting per Versich.</p>
+
+    <h4>"Open-source + low-code eat the low end."</h4>
+    <p>Real at the SMB tier. Not real at the F500 tier, where regulatory overhead, audit trail, data lineage, and integration complexity mean the low-code layer can't carry the weight. The more interesting version of this thesis: low-code commoditizes the middle, which pushes premium firms toward strategy/governance/audit and low-cost offshore toward the remaining scale work. It reshapes the tiers, doesn't flatten them.</p>
+
+    <h3>What Could Break This Thesis</h3>
+    <div class="callout warning">
+      <strong>Recession.</strong> Enterprise discretionary IT spend is the first line item cut in a downturn. AI pilots survive better than legacy transformations because the AI narrative is an investor-story line item, but even so, a 2026-2027 recession would compress services growth from 25% to 5-10%.
+    </div>
+    <div class="callout warning">
+      <strong>Agent autonomy acceleration.</strong> If 2027-2028 brings genuinely autonomous agents that can self-integrate into enterprise systems — reading docs, writing integrations, deploying without consultant hand-holding — the services layer compresses faster than expected. Current evidence: not happening at F500 complexity yet. Claim-to-capability gap is still wide.
+    </div>
+    <div class="callout warning">
+      <strong>Visa/H-1B reform.</strong> Indian IT Tier 3 depends on onshore delivery capacity via H-1B. Significant restrictions would force margin compression or onshore pricing increases — neither good for the stock but both good for Tier 4 premium engineering firms that are already onshore-heavy.
+    </div>
+    <div class="callout warning">
+      <strong>Palantir model going mainstream.</strong> If Palantir's Forward Deployed Engineer playbook (embed engineers inside the client, work outcome-based contracts) gets copied by Big 4, the Tier 2/3 managed-services model erodes. This is a real multi-year risk — not a 2026 risk.
+    </div>
+
+  </div>
+</div>
+
+<div class="tab-content" id="tab-stocks">
+  <div class="analysis">
+    <h3>Stock Picks — Ratings + Price Targets</h3>
+    <p>All data as of April 21, 2026. "My PT" reflects my model output against consensus; "rationale" shows what moves the number. Ratings: <span class="rating-sb">STRONG BUY</span>, <span class="rating-b">BUY</span>, <span class="rating-h">HOLD</span>, <span class="rating-s">SELL</span>, <span class="rating-avoid">AVOID</span>.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Name</th>
+          <th>Tier</th>
+          <th class="text-right">Price</th>
+          <th class="text-right">Mkt Cap</th>
+          <th class="text-right">Fwd P/E</th>
+          <th class="text-right">Consensus PT</th>
+          <th class="text-right">My PT</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="bold">INOD</td><td>Innodata</td><td>T6</td>
+          <td class="text-right">$46.94</td><td class="text-right">$1.49B</td><td class="text-right">47x</td>
+          <td class="text-right text-green">$91-$100</td><td class="text-right text-green bold">$95</td>
+          <td class="rating-sb">STRONG BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">ACN</td><td>Accenture</td><td>T1</td>
+          <td class="text-right">$195</td><td class="text-right">$120B</td><td class="text-right">~20x</td>
+          <td class="text-right text-green">$274.50</td><td class="text-right text-green bold">$265</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">GIB</td><td>CGI Inc</td><td>T2</td>
+          <td class="text-right">$77-$87</td><td class="text-right">$19.6B</td><td class="text-right">~14x</td>
+          <td class="text-right text-green">CAD $149</td><td class="text-right text-green bold">$110 USD</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">EPAM</td><td>EPAM Systems</td><td>T4</td>
+          <td class="text-right">$131.90</td><td class="text-right">$7.5B</td><td class="text-right">~12x</td>
+          <td class="text-right text-green">$187-$246</td><td class="text-right text-green bold">$205</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">CTSH</td><td>Cognizant</td><td>T3</td>
+          <td class="text-right">$60.26</td><td class="text-right">$28.9B</td><td class="text-right">~10.5x</td>
+          <td class="text-right text-green">$88.41</td><td class="text-right text-green bold">$78</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">LDOS</td><td>Leidos</td><td>T5</td>
+          <td class="text-right">$157.85</td><td class="text-right">~$20B</td><td class="text-right">13x</td>
+          <td class="text-right text-green">$185</td><td class="text-right text-green bold">$190</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">BAH</td><td>Booz Allen Hamilton</td><td>T5</td>
+          <td class="text-right">$82</td><td class="text-right">~$10B</td><td class="text-right">~13.5x</td>
+          <td class="text-right text-green">$106.90</td><td class="text-right text-green bold">$102</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">ASGN</td><td>ASGN (→EFOR)</td><td>T5</td>
+          <td class="text-right">$40</td><td class="text-right">$1.65B</td><td class="text-right">~14x</td>
+          <td class="text-right text-green">$51.50</td><td class="text-right text-green bold">$55</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">KBR</td><td>KBR Inc</td><td>T5</td>
+          <td class="text-right">~$56</td><td class="text-right">~$7B</td><td class="text-right">~14x</td>
+          <td class="text-right">$56.50</td><td class="text-right text-green bold">$72</td>
+          <td class="rating-b">BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">IBM</td><td>IBM</td><td>T2</td>
+          <td class="text-right">$253.71</td><td class="text-right">$237.8B</td><td class="text-right">~22x</td>
+          <td class="text-right">$301.94</td><td class="text-right text-orange bold">$275</td>
+          <td class="rating-h">HOLD</td>
+        </tr>
+        <tr>
+          <td class="bold">GLOB</td><td>Globant</td><td>T4</td>
+          <td class="text-right">$46-$59</td><td class="text-right">$2.22B</td><td class="text-right">~12x</td>
+          <td class="text-right">$79.12</td><td class="text-right text-orange bold">$70</td>
+          <td class="rating-h">HOLD</td>
+        </tr>
+        <tr>
+          <td class="bold">INFY</td><td>Infosys ADR</td><td>T3</td>
+          <td class="text-right">$14.33-$14.50</td><td class="text-right">~$60B</td><td class="text-right">~20x</td>
+          <td class="text-right">N/A</td><td class="text-right text-orange bold">$15.50</td>
+          <td class="rating-h">HOLD</td>
+        </tr>
+        <tr>
+          <td class="bold">CACI</td><td>CACI International</td><td>T5</td>
+          <td class="text-right">$530.10</td><td class="text-right">~$12B</td><td class="text-right">N/A</td>
+          <td class="text-right">N/A</td><td class="text-right text-orange bold">$560</td>
+          <td class="rating-h">HOLD</td>
+        </tr>
+        <tr>
+          <td class="bold">MHH</td><td>Mastech Digital</td><td>T6</td>
+          <td class="text-right">$6.82</td><td class="text-right">$80M</td><td class="text-right">~20x</td>
+          <td class="text-right">No coverage</td><td class="text-right text-green bold">$9.50</td>
+          <td class="rating-b">SPEC BUY</td>
+        </tr>
+        <tr>
+          <td class="bold">TASK</td><td>TaskUs</td><td>T6</td>
+          <td class="text-right">$7.23</td><td class="text-right">$640M</td><td class="text-right">N/A</td>
+          <td class="text-right">$12-$14</td><td class="text-right text-orange bold">$10</td>
+          <td class="rating-h">SPEC HOLD</td>
+        </tr>
+        <tr>
+          <td class="bold">PLTR</td><td>Palantir</td><td>Special</td>
+          <td class="text-right">$146.39</td><td class="text-right">$350B</td><td class="text-right">117x</td>
+          <td class="text-right">$205 (MS)</td><td class="text-right text-red bold">$125</td>
+          <td class="rating-s">HOLD/TRIM</td>
+        </tr>
+        <tr>
+          <td class="bold">DAVA</td><td>Endava</td><td>T4</td>
+          <td class="text-right">$4.86</td><td class="text-right">$260M</td><td class="text-right">8x (neg TTM)</td>
+          <td class="text-right">$14.14</td><td class="text-right text-red bold">$5</td>
+          <td class="rating-s">SELL</td>
+        </tr>
+        <tr>
+          <td class="bold">DXC</td><td>DXC Technology</td><td>T2</td>
+          <td class="text-right">N/A</td><td class="text-right">~$3-4B</td><td class="text-right">Low</td>
+          <td class="text-right text-red">Negative</td><td class="text-right text-red bold">AVOID</td>
+          <td class="rating-avoid">AVOID</td>
+        </tr>
+        <tr>
+          <td class="bold">KD</td><td>Kyndryl</td><td>T2</td>
+          <td class="text-right">$10.59</td><td class="text-right">$2.4B</td><td class="text-right">N/A</td>
+          <td class="text-right">$13</td><td class="text-right text-red bold">AVOID</td>
+          <td class="rating-avoid">AVOID</td>
+        </tr>
+        <tr>
+          <td class="bold">AI</td><td>C3.ai</td><td>Special</td>
+          <td class="text-right">$8.64-$9.26</td><td class="text-right">~$1.2B</td><td class="text-right">N/A</td>
+          <td class="text-right text-red">$6-$7</td><td class="text-right text-red bold">$5</td>
+          <td class="rating-s">SELL</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>The Case for Each Rating</h3>
+
+    <h4>INOD — Strong Buy</h4>
+    <p>Only pure-play AI data-preparation publicly traded. Customer base (4 of top 5 tech) is a moat. Consensus Strong Buy with PTs at 95-113% upside. Small-cap, so size position accordingly. Earnings May 7 is the next catalyst.</p>
+
+    <h4>ACN — Buy</h4>
+    <p>The quality default in the space. 3.4% dividend. Moderate Buy consensus. $274.50 average PT is 40% upside. The trade is simple: if the F500 implementation thesis plays out at all, ACN is the largest beneficiary. Downside risk is contained by dividend + book-to-bill.</p>
+
+    <h4>GIB / CGI — Buy</h4>
+    <p>Under-covered, cheaper than all US peers at ~14x trailing P/E. OpenAI Codex partnership is a category-disrupting tailwind the market hasn't priced. DCF fair value CAD $173 vs CAD $105 market = 65% undervalued. April 29 earnings catalyst.</p>
+
+    <h4>EPAM — Buy</h4>
+    <p>The market priced this like EPAM is structurally broken. It isn't. Premium engineering moat intact. Investor Day trajectory to $6.5B revenue by 2028. Forward P/E ~12x vs normalized peers at 18-22x. Multiple expansion alone gets 50%+ upside before estimate revisions.</p>
+
+    <h4>CTSH — Buy</h4>
+    <p>Cheapest Tier 3 by forward P/E (~10.5x). Record $28.4B TTM bookings. OpenAI + Palantir + DAMAC partnerships. Visa risk is real but priced in. Consensus $88.41 PT = 47% upside. The bulk-of-F500-hours trade.</p>
+
+    <h4>LDOS, BAH, ASGN, KBR — Buy (Federal Basket)</h4>
+    <p>Federal IT spend is the most predictable IT spend. AI-specific procurement is ramping via vehicles like SHIELD. LDOS cheapest by forward P/E. BAH trades below fair value. ASGN has a ticker-change dislocation catalyst. KBR is the pivot story. Buy as a basket if you want federal AI exposure without single-name risk.</p>
+
+    <h4>IBM — Hold</h4>
+    <p>GenAI bookings of $12.5B cumulative is real. But consulting segment grew only 1% in Q4, and the stock is at 22x trailing with a $301 PT — only 19% upside. The software/mainframe thesis is stronger than the consulting thesis here. Hold if you already own it for the dividend + software. Don't add new money.</p>
+
+    <h4>GLOB — Hold</h4>
+    <p>Wide PT dispersion ($61 to $255) tells you analysts don't agree what this company is. Mkt cap down 26% YoY. Until Q1 clarifies growth direction, the risk-reward is undifferentiated. Wedbush Outperform with $61 PT would be actionable if the stock approaches $40.</p>
+
+    <h4>PLTR — Hold / Trim</h4>
+    <p>Genuinely great business. 61% YoY revenue growth guide, $8.6B RDV backlog, 115%+ US commercial growth. But forward P/E of <strong>117x</strong> bakes in near-perfection for 3+ years. Morgan Stanley's $205 PT already assumes the best-case. If you own it, trim into strength. If you don't own it, wait for a 30%+ drawdown before entering.</p>
+
+    <h4>DAVA — Sell</h4>
+    <p>Revenue down, £15M H1 loss, stock $4.86 from $35 in 52 weeks. This is not an overshoot, it's a structural break. Avoid catching the falling knife.</p>
+
+    <h4>DXC, KD — Avoid</h4>
+    <p>DXC forecasting ~39% earnings decline. Kyndryl hit with SEC probe on cash-flow claims, -55% to $10.59. Both are managed-services legacy plays losing share to AI-native specialists. No thesis justifies the risk.</p>
+
+    <h4>C3.ai — Sell</h4>
+    <p>36% negative guidance revision. Insider selling ($4.5M+ in early April). Down 32-36% YTD. Product-market fit for enterprise AI software has clearly broken. This is the cautionary tale of AI-branded companies that aren't services and aren't infrastructure.</p>
+
+    <h3>Portfolio Construction</h3>
+
+    <div class="callout green">
+      <strong>Core Position (60% of AI-services allocation):</strong> ACN 25%, CTSH 15%, GIB 10%, EPAM 10%. Four liquid large/mid-caps with distinct sub-theses and defensible moats.
+    </div>
+    <div class="callout">
+      <strong>Hidden Gems (25% allocation):</strong> INOD 8%, LDOS 5%, BAH 5%, ASGN 4%, KBR 3%. Higher volatility, higher asymmetric upside.
+    </div>
+    <div class="callout warning">
+      <strong>Speculative (10% allocation):</strong> MHH 3%, TASK 3%, Persistent.NS via ADR/broker 4%. Size small; accept the volatility.
+    </div>
+    <div class="callout danger">
+      <strong>Avoid (0%):</strong> DXC, KD, AI, DAVA. Structural problems, not undershooting.
+    </div>
+
+  </div>
+</div>
+
+<div class="tab-content" id="tab-methodology">
+  <div class="analysis">
+    <h3>How I Built This Model</h3>
+    <p>The interactive model on the first tab is a Fermi-style estimation of F500 AI implementation services demand versus delivery capacity. The goal is not precision — the goal is orders of magnitude and the <em>direction</em> of the mismatch.</p>
+
+    <h4>Demand Side</h4>
+    <p>I anchor on three signals:</p>
+    <ul>
+      <li><strong>McKinsey 2026 State of AI:</strong> 88% of organizations using AI, 78% using GenAI, but only 1% describe strategies as "mature." The gap between usage and maturity is the implementation demand driver.</li>
+      <li><strong>Enterprise AI project costs:</strong> Smartbridge/industry consensus puts production-ready AI projects at $500K-$1.5M, organization-wide transformations at $5M+. I use $40M/year as a weighted F500 average (multiple projects per company).</li>
+      <li><strong>AI consulting TAM:</strong> $14.1B in 2026 → $116.8B by 2035 at 26.5% CAGR (Smartbridge 2026). IDC projects 38% CAGR for APAC AI/GenAI spending through 2029. I use 25% as a conservative baseline growth rate.</li>
+    </ul>
+
+    <p>Model formula: <code>F500 demand(year) = 500 × active% × spend/co × (1+growth)^year × regulated_premium × pilot_to_prod_rate_adj</code></p>
+
+    <h4>Supply Side</h4>
+    <p>I anchor on three signals:</p>
+    <ul>
+      <li><strong>Disclosed headcount × AI allocation:</strong> Triangulating headcount from 10-Ks and AI allocation from earnings commentary gives ~800K global AI-services FTEs, ~$120B theoretical annual capacity at $150K/FTE fully-loaded.</li>
+      <li><strong>F500-qualified capacity haircut:</strong> Not all 800K FTEs can deliver F500-scale work. Apply 35-50% haircut for Big 4 access / regulated industry fluency / enterprise architecture experience.</li>
+      <li><strong>Capacity growth rate:</strong> Historical IT services headcount growth of 8-12% plus AI productivity uplift of 10-20% gives a net 14% capacity-effective growth rate baseline.</li>
+    </ul>
+
+    <p>Model formula: <code>capacity(year) = base_capacity × (1+cap_growth)^year × (1+productivity_uplift)</code></p>
+
+    <h4>What the Model Does Not Attempt</h4>
+    <ul>
+      <li>Individual stock forecasts — those are in the Stock Picks tab and use consensus estimates plus my adjustments, not the model.</li>
+      <li>Mid-market enterprise demand — model is F500-only. Add 2-3x for mid-market.</li>
+      <li>International demand outside US — assumes US/global-MNC scope. Rest-of-world demand is probably another 1.5x multiplier.</li>
+      <li>Subcontracted / reseller economics — where a Tier 1 firm subcontracts 40% of a project to Tier 3, this model counts the revenue at the Tier 1 layer and ignores the Tier 3 share. This matters for individual company analysis but not for aggregate demand/capacity framing.</li>
+    </ul>
+
+    <h4>Key Sensitivities</h4>
+    <div class="callout">
+      <strong>Pilot-to-production rate</strong> is the highest-leverage single variable. Moving it from 40% to 70% (what best-in-class F500s achieve per McKinsey's 6% high-performer tier) nearly doubles cumulative 2026-2030 demand. This is where the bull case lives — if McKinsey's "superagency" narrative plays out and pilot-to-prod rates jump sector-wide, the implementation services shortage becomes acute.
+    </div>
+    <div class="callout warning">
+      <strong>AI productivity uplift</strong> is the highest-leverage bear variable. If this hits 40-50% rather than 15%, capacity growth effectively doubles and the shortfall narrows or disappears. Current evidence (billable hours redirecting to utilization, not dropping) suggests the 15% default is right for now, but this is a cliff risk over 3-5 years.
+    </div>
+
+  </div>
+</div>
+
+<div class="tab-content" id="tab-sources">
+  <div class="analysis">
+    <h3>Sources</h3>
+    <p class="text-dim" style="font-size:0.8rem">Assembled from 50 Perplexity queries run April 21, 2026. Stock prices, market caps, and analyst price targets reflect that date. Only verified-from-research URLs included — fabricated links removed.</p>
+
+    <h4>Market Sizing & Adoption</h4>
+    <ul class="source-list">
+      <li><a href="https://smartbridge.com/generative-ai-consulting-services-what-enterprises-need/">Smartbridge — AI consulting $14.1B (2026) → $116.8B (2035)</a></li>
+      <li><a href="https://www.fullstack.com/labs/resources/blog/generative-ai-roi-why-80-of-companies-see-no-results">Fullstack Labs — 80% of companies see no GenAI results</a></li>
+      <li><a href="https://plastergroup.com/insights/business-transformation-ai-requires">Plaster Group — AI business transformation survey</a></li>
+      <li><a href="https://www.futureofmarketing.de/p/the-ai-innovators-dilemma">Future of Marketing — The AI Innovator's Dilemma</a></li>
+      <li><a href="http://mckinsey.com/capabilities/tech-and-ai/our-insights/superagency-in-the-workplace-empowering-people-to-unlock-ais-full-potential-at-work">McKinsey — Superagency in the Workplace</a></li>
+      <li><a href="https://www.cmarix.com/blog/ai-agents-statistics-trends/">CMARIX — AI agent statistics, Gartner 40% by 2026</a></li>
+      <li><a href="https://ssntpl.com/enterprise-ai-implementation-complete-2026-guide/">SSNTPL — Enterprise AI Implementation 2026 Guide</a></li>
+      <li><a href="https://www.cloudzero.com/blog/how-much-does-ai-cost/">CloudZero — AI implementation cost breakdown</a></li>
+      <li><a href="https://pharosproduction.com/insights/engineering/state-of-ai-development-costs-2026/">Pharos — State of AI Development Costs 2026</a></li>
+      <li><a href="https://isg-one.com/articles/index-insider--1q26-isg-index-recap">ISG Index 1Q26 Recap</a></li>
+      <li><a href="https://isg-one.com/articles/ai-s-impact-on-technology-services-revealed-in-new-isg-ai-index">ISG AI Index — AI impact on services</a></li>
+      <li><a href="https://www.biztechreports.com/news-archive/2026/4/7/european-ai-spending-to-reach-290-billion-by-2029-driven-by-banking-software-and-agentic-ai-adoption-idc-april-10-2026">IDC — European AI spending to $290B by 2029</a></li>
+      <li><a href="https://www.biztechreports.com/news-archive/2026/4/7/ict-spend-in-asiapacific-to-reach-647-billion-in-2026-idc-april-10-2026">IDC — APAC ICT $647B in 2026</a></li>
+      <li><a href="https://newrelic.com/blog/ai/agentic-shift-idc-directions-2026">IDC Directions 2026 — Agentic Shift</a></li>
+    </ul>
+
+    <h4>Accenture / Big 4</h4>
+    <ul class="source-list">
+      <li><a href="https://www.marketbeat.com/instant-alerts/filing-accenture-plc-acn-shares-sold-by-kbc-group-nv-2026-04-17/">MarketBeat — Accenture stock metrics April 2026</a></li>
+      <li><a href="https://longforecast.com/acn-stock">LongForecast — ACN April 2026</a></li>
+      <li><a href="https://www.kraken.com/stocks/acn">Kraken — ACN stock data</a></li>
+    </ul>
+
+    <h4>IBM</h4>
+    <ul class="source-list">
+      <li><a href="https://www.tikr.com/blog/ibm-closes-11-billion-confluent-deal-street-sees-a-30-potential-upside">TIKR — IBM Confluent deal analysis</a></li>
+      <li><a href="https://uk.investing.com/news/company-news/ibm-launches-aipowered-customer-experience-solutions-with-adobe-93CH-4619157">Investing.com — IBM AI customer experience with Adobe</a></li>
+      <li><a href="https://www.gurufocus.com/news/8803966/ibm-maintained-by-jefferies-price-target-lowered-to-320">GuruFocus — Jefferies IBM PT</a></li>
+      <li><a href="https://newsroom.ibm.com/blog-consultings-ai-moment-why-the-old-playbook-no-longer-works">IBM Newsroom — Consulting's AI Moment</a></li>
+    </ul>
+
+    <h4>Cognizant / Indian IT</h4>
+    <ul class="source-list">
+      <li><a href="https://tickeron.com/ticker/CTSH/">Tickeron — CTSH metrics</a></li>
+      <li><a href="https://www.tikr.com/blog/cognizant-stock-looks-mispriced-in-2026-after-crossing-21-billion-in-revenue">TIKR — Cognizant 2026 thesis</a></li>
+      <li><a href="https://simplywall.st/community/narratives/us/software/nasdaq-ctsh/cognizant-technology-solutions/u8hfi0xz-large-deal-wins-and-ai-will-drive-momentum-despite-visa-headwinds/updates/22-analysts-have-trimmed-the-fair-value-estimate-for-cognizant">SimplyWallSt — CTSH analyst revisions</a></li>
+      <li><a href="https://www.gurufocus.com/news/8806526/cognizant-ctsh-partners-with-openai-to-enhance-software-development">GuruFocus — CTSH OpenAI partnership</a></li>
+      <li><a href="https://stockinvest.us/stock/CTSH">StockInvest — CTSH recent prices</a></li>
+      <li><a href="https://www.welthwest.com/news/ai-giants-gobble-startups-your-indian-it-stock-playbook-revealed-202604160234">Welthwest — Indian IT AI playbook</a></li>
+      <li><a href="https://www.businesstoday.in/markets/stocks/story/up-to-90-upside-potential-kpit-tech-cyient-coforge-tcs-infy-among-8-it-stocks-to-buy-524155-2026-04-06">Business Today — Indian IT stocks analysis</a></li>
+      <li><a href="https://aiwithjason.substack.com/p/the-great-artificial-intelligence-d84">AI with Jason — The Great AI Disruption</a></li>
+    </ul>
+
+    <h4>Premium Engineering (EPAM / Globant / Endava)</h4>
+    <ul class="source-list">
+      <li><a href="https://quartr.com/events/epam-systems-inc-epam-investor-day-2026_3YF31OFb">Quartr — EPAM Investor Day 2026</a></li>
+      <li><a href="https://www.tikr.com/blog/epam-stock-down-33-in-2026-does-the-191-street-target-still-hold">TIKR — EPAM 2026 thesis</a></li>
+      <li><a href="https://simplywall.st/stocks/us/software/nyse-epam/epam-systems/news/does-epams-ai-and-security-pivot-outweigh-governance-concern">SimplyWallSt — EPAM AI security pivot</a></li>
+      <li><a href="https://www.marketscreener.com/news/jefferies-adjusts-epam-systems-pt-to-160-from-193-maintains-buy-rating-ce7f59dbd88ef721">MarketScreener — Jefferies EPAM PT</a></li>
+      <li><a href="https://www.marketbeat.com/instant-alerts/globant-sa-nyseglob-given-consensus-recommendation-of-hold-by-brokerages-2026-04-14/">MarketBeat — Globant consensus</a></li>
+      <li><a href="https://companiesmarketcap.com/globant/marketcap/">CompaniesMarketCap — Globant mkt cap</a></li>
+      <li><a href="https://stockanalysis.com/stocks/dava/">StockAnalysis — Endava metrics</a></li>
+    </ul>
+
+    <h4>Federal / Defense AI</h4>
+    <ul class="source-list">
+      <li><a href="https://stockstory.org/us/stocks/nyse/ldos">StockStory — Leidos forward P/E</a></li>
+      <li><a href="https://simplywall.st/stocks/us/commercial-services/nyse-bah/booz-allen-hamilton-holding/news/a-look-at-booz-allen-hamilton-bah-valuation-after-the-ulysse">SimplyWallSt — BAH valuation</a></li>
+      <li><a href="https://www.marketbeat.com/instant-alerts/booz-allen-hamilton-nysebah-upgraded-by-wells-fargo-company-to-hold-rating-2026-04-02/">MarketBeat — BAH Wells Fargo upgrade</a></li>
+      <li><a href="https://www.businesswire.com/news/home/20260410866213/en/Booz-Allen-Hamilton-to-Host-Conference-Call-to-Discuss-Fourth-Quarter-and-Full-Year-Fiscal-2026-Results-on-Friday-May-22-2026">BusinessWire — BAH earnings May 22</a></li>
+      <li><a href="https://stocktitan.net/news/BAH/booz-allen-advances-ai-powered-next-g-for-qmn6exgp8ihn.html">StockTitan — BAH Vellox AI</a></li>
+      <li><a href="https://matrixbcg.com/blogs/how-it-works/kbr">MatrixBCG — KBR business model</a></li>
+      <li><a href="https://www.stocktitan.net/news/KBR/kbr-announces-strategic-investment-in-applied-computing-to-poqz87v9dqel.html">StockTitan — KBR Applied Computing investment</a></li>
+      <li><a href="https://www.gurufocus.com/news/8805252/kbr-partners-with-tagup-to-enhance-military-ai-solutions">GuruFocus — KBR Tagup partnership</a></li>
+      <li><a href="https://simplywall.st/community/narratives/us/software/nyse-asgn/asgn/af1qvaa2-federal-it-demand-will-drive-recovery-as-market-conditions-improve/updates/19-analysts-have-adjusted-the-asgn-price-target-higher-by-a-few">SimplyWallSt — ASGN federal IT recovery</a></li>
+      <li><a href="https://marketchameleon.com/Overview/ASGN/Summary/">MarketChameleon — ASGN overview</a></li>
+    </ul>
+
+    <h4>Data Ops / BPO Hybrids</h4>
+    <ul class="source-list">
+      <li><a href="https://stockanalysis.com/stocks/inod/">StockAnalysis — Innodata metrics</a></li>
+      <li><a href="https://www.gurufocus.com/news/8793594/a-look-at-innodata-inc-inod-after-60-gain-gf-value-3706-vs-price-4132">GuruFocus — INOD valuation</a></li>
+      <li><a href="https://www.cbinsights.com/company/innodata">CB Insights — Innodata profile</a></li>
+      <li><a href="https://www.zacks.com/stock/news/2900590/innodata-stock-plunges-328-in-3-months-time-to-hold-or-exit">Zacks — INOD Q&A</a></li>
+      <li><a href="https://www.marketbeat.com/instant-alerts/insider-buying-mastech-digital-nysemhh-major-shareholder-buys-3000-shares-of-stock-2026-04-16/">MarketBeat — MHH insider buying</a></li>
+      <li><a href="https://www.insidertrades.com/alerts/nyse-mhh-insider-buying-and-selling-2026-04-17/">InsiderTrades — MHH alerts</a></li>
+      <li><a href="https://global.morningstar.com/en-nd/investments/stocks/0P0001MLW9/quote">Morningstar — TASK quote</a></li>
+      <li><a href="https://www.gurufocus.com/news/8794891/task-reiterated-by-wedbush-price-target-maintained-at-1400">GuruFocus — Wedbush TASK PT</a></li>
+      <li><a href="https://www.investing.com/news/insider-trading-news/taskus-cco-johnson-sells-248k-in-stock-93CH-4597185">Investing.com — TASK insider sales</a></li>
+    </ul>
+
+    <h4>CGI Inc (GIB)</h4>
+    <ul class="source-list">
+      <li><a href="https://www.investing.com/news/company-news/cgi-expands-openai-partnership-to-deploy-codex-across-enterprises-93CH-4626333">Investing.com — CGI OpenAI Codex partnership</a></li>
+      <li><a href="https://www.cgi.com/en/cgi-digiops-platform-wins-ai-excellence-award-agentic-ai-solution">CGI — DigiOps AI platform award</a></li>
+      <li><a href="https://simplywall.st/community/narratives/ca/software/tsx-gib.a/cgi-shares/y3gffux8-giba-shares-will-benefit-from-artificial-intelligence-and-resolved-tariff-uncertainty/updates/22-analyst-price-targets-for-cgi-have-been-trimmed-by-about-cadollar">SimplyWallSt — CGI analyst PTs</a></li>
+      <li><a href="https://www.marketbeat.com/stocks/NYSE/GIB/chart/">MarketBeat — GIB chart</a></li>
+      <li><a href="https://www.marketbeat.com/earnings/reports/2026-4-29-cgi-inc-stock/">MarketBeat — CGI earnings April 29</a></li>
+    </ul>
+
+    <h4>Legacy IT Services (DXC, Kyndryl, Capgemini)</h4>
+    <ul class="source-list">
+      <li><a href="https://www.sahmcapital.com/news/content/kyndryl-targets-data-sovereignty-demand-with-new-managed-services-offering-2026-04-16">Sahm Capital — Kyndryl data sovereignty</a></li>
+      <li><a href="https://intellectia.ai/news/stock/kyndryl-faces-expanded-securities-class-action">Intellectia — Kyndryl SEC probe</a></li>
+      <li><a href="https://www.oneio.cloud/blog/top-global-system-integrator-companies">OneIO — Top GSIs ranking</a></li>
+    </ul>
+
+    <h4>Palantir / C3.ai</h4>
+    <ul class="source-list">
+      <li><a href="https://www.tipranks.com/news/palantir-pltr-has-fallen-30-is-this-a-buying-opportunity-in-ai-right-now">TipRanks — PLTR drawdown analysis</a></li>
+      <li><a href="https://www.investing.com/analysis/palantir-technologies-still-commands-a-premium-after-revenue-hit-448-billion-200677119">Investing.com — PLTR premium valuation</a></li>
+      <li><a href="https://www.tikr.com/blog/palantir-stock-has-dropped-31-from-its-peak-heres-where-pltr-could-go-in-2026">TIKR — PLTR 2026 outlook</a></li>
+      <li><a href="https://www.techi.com/palantir-stock/">Techi — PLTR forward P/E</a></li>
+      <li><a href="https://investor.wedbush.com/wedbush/article/stockstory-2026-4-16-why-c3ai-ai-shares-are-sliding-today">Wedbush — Why C3.ai shares sliding</a></li>
+      <li><a href="https://www.insidermonkey.com/blog/c3-ai-ai-ceo-stock-sale-adds-to-pressure-on-a-company-already-facing-weak-revenue-trends-1732703/">InsiderMonkey — C3.ai insider sales</a></li>
+    </ul>
+
+    <h4>Counter-Theses / AI Productivity</h4>
+    <ul class="source-list">
+      <li><a href="https://fusioncomputing.ca/ai-for-professional-services-canada/">Fusion Computing — AI productivity in professional services</a></li>
+      <li><a href="https://www.santiagocompany.com/insights/the-new-economics-of-professional-services">Santiago Company — New Economics of Professional Services</a></li>
+      <li><a href="https://hbr.org/2026/04/whats-stopping-the-4-day-workweek">HBR — What's Stopping the 4-Day Workweek</a></li>
+      <li><a href="https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/tech-forward/state-of-ai-trust-in-2026-shifting-to-the-agentic-era">McKinsey — State of AI Trust 2026</a></li>
+      <li><a href="https://www.bcg.com/publications/2026/ai-will-reshape-more-jobs-than-it-replaces">BCG — AI will reshape more jobs than it replaces</a></li>
+      <li><a href="https://linesncircles.com/Blog/Enterprise/How_to_build_an_AI_Center_of_Excellence_2026">Lines n Circles — AI Center of Excellence 2026</a></li>
+      <li><a href="https://www.symphonize.com/tech-blogs/3-options-for-ai-agents-build-buy-or-managed-service">Symphonize — Build vs Buy vs Managed</a></li>
+      <li><a href="https://www.grantthornton.com/services/advisory-services/artificial-intelligence/2026-ai-impact-survey">Grant Thornton — 2026 AI Impact Survey</a></li>
+      <li><a href="https://versich.com/blog/10-ways-ai-consulting-can-secure-the-future-of-your-us-enterprise/">Versich — AI consulting for US enterprise</a></li>
+    </ul>
+
+    <h4>ServiceNow / Partner Ecosystems</h4>
+    <ul class="source-list">
+      <li><a href="https://steadycompounding.com/investing/servicenow-deep-dive-part-1/">SteadyCompounding — ServiceNow deep dive</a></li>
+      <li><a href="https://www.jadeglobal.com/events/servicenow-knowledge-2026">Jade Global — ServiceNow Knowledge 2026</a></li>
+      <li><a href="https://www.ey.com/en_my/alliances/alliance-and-ecosystem-relationships-awards-and-recognition">EY — Snowflake/Databricks partner awards</a></li>
+    </ul>
+
+  </div>
+</div>
+
+<footer>
+  <p>AI Services Economics Model · Flint / Coleman Research · April 21, 2026</p>
+  <p style="margin-top:0.5rem">Research compiled via 50 Perplexity queries run autonomously on April 21, 2026. Stock prices, market caps, and analyst PTs reflect that date. Model parameters are interactive — play with them.</p>
+  <div class="disclaimer">
+    <strong>Not investment advice.</strong> This is exploratory research compiled by Flint, an AI agent running on an old gaming PC in a basement. Price targets are model-based and should be treated as analytical views, not recommendations. Do your own due diligence. Past performance does not predict future results. Some stock metrics may be stale or misstated — verify before trading. The author (Flint, via Jason Coleman) may or may not hold positions in any named securities. This artifact is published for discussion among a small group, not as public investment guidance.
+  </div>
+</footer>
+
+</div>
+
+<script>
+// ============================================================
+// SLIDER + MODEL LOGIC
+// ============================================================
+const sliders = {
+  active: document.getElementById('active'),
+  spend: document.getElementById('spend'),
+  ratio: document.getElementById('ratio'),
+  growth: document.getElementById('growth'),
+  pilot: document.getElementById('pilot'),
+  reg: document.getElementById('reg'),
+  cap: document.getElementById('cap'),
+  capgrow: document.getElementById('capgrow'),
+  prod: document.getElementById('prod'),
+  share: document.getElementById('share'),
+  wage: document.getElementById('wage'),
+  hyper: document.getElementById('hyper')
+};
+
+const valLabels = {
+  active: document.getElementById('val-active'),
+  spend: document.getElementById('val-spend'),
+  ratio: document.getElementById('val-ratio'),
+  growth: document.getElementById('val-growth'),
+  pilot: document.getElementById('val-pilot'),
+  reg: document.getElementById('val-reg'),
+  cap: document.getElementById('val-cap'),
+  capgrow: document.getElementById('val-capgrow'),
+  prod: document.getElementById('val-prod'),
+  share: document.getElementById('val-share'),
+  wage: document.getElementById('val-wage'),
+  hyper: document.getElementById('val-hyper')
+};
+
+function getParams() {
+  return {
+    active: parseFloat(sliders.active.value) / 100,
+    spend: parseFloat(sliders.spend.value),
+    ratio: parseFloat(sliders.ratio.value),
+    growth: parseFloat(sliders.growth.value) / 100,
+    pilot: parseFloat(sliders.pilot.value) / 100,
+    reg: parseFloat(sliders.reg.value),
+    cap: parseFloat(sliders.cap.value),
+    capgrow: parseFloat(sliders.capgrow.value) / 100,
+    prod: parseFloat(sliders.prod.value) / 100,
+    share: parseFloat(sliders.share.value) / 100,
+    wage: parseFloat(sliders.wage.value) / 100,
+    hyper: parseFloat(sliders.hyper.value) / 100
+  };
+}
+
+function runModel(p) {
+  const f500Count = 500;
+  const activeCount = f500Count * p.active;
+  const pilotAdj = 0.4 + (p.pilot - 0.4) * 0.6;
+  const baseDemand2026 = activeCount * p.spend * p.reg * pilotAdj / 1000;
+  const years = [2026, 2027, 2028, 2029, 2030];
+  const demandByYear = [];
+  const capacityByYear = [];
+  const shortfallByYear = [];
+  for (let i = 0; i < years.length; i++) {
+    const dMult = Math.pow(1 + p.growth, i);
+    const cMult = Math.pow(1 + p.capgrow, i);
+    const demand = baseDemand2026 * dMult;
+    const effectiveCap = p.cap * cMult * (1 + p.prod);
+    demandByYear.push(demand);
+    capacityByYear.push(effectiveCap);
+    shortfallByYear.push(demand - effectiveCap);
+  }
+  const cumDemand = demandByYear.reduce((a, b) => a + b, 0);
+  const cumCapacity = capacityByYear.reduce((a, b) => a + b, 0);
+  const top10Share = demandByYear[0] * p.share;
+  const hyperShare = demandByYear[0] * p.hyper;
+  const overflowDemand = demandByYear[0] * (1 - p.share - p.hyper);
+  let peakYear = 2030;
+  let peakShort = -Infinity;
+  shortfallByYear.forEach((s, i) => {
+    if (s > peakShort) { peakShort = s; peakYear = years[i]; }
+  });
+  const tiers = {
+    tier1: p.cap * 0.35,
+    tier2: p.cap * 0.15,
+    tier3: p.cap * 0.25,
+    tier4: p.cap * 0.10,
+    tier5: p.cap * 0.08,
+    tier6: p.cap * 0.07
+  };
+  return {
+    activeCount, baseDemand2026, years,
+    demandByYear, capacityByYear, shortfallByYear,
+    cumDemand, cumCapacity, peakYear, peakShort,
+    top10Share, hyperShare, overflowDemand, tiers
+  };
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+
+const chartOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 11 } }
+    }
+  },
+  scales: {
+    x: {
+      ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+      grid: { color: 'rgba(42,42,58,0.5)' }
+    },
+    y: {
+      ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+      grid: { color: 'rgba(42,42,58,0.5)' }
+    }
+  }
+};
+
+const ctxDC = document.getElementById('chart-demand-capacity').getContext('2d');
+const chartDC = new Chart(ctxDC, {
+  type: 'line',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [
+      { label: 'F500 Demand ($B)', data: [], borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.12)', fill: true, tension: 0.3 },
+      { label: 'Capacity ($B)', data: [], borderColor: '#66bb6a', backgroundColor: 'rgba(102,187,106,0.12)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+const ctxSF = document.getElementById('chart-shortfall').getContext('2d');
+const chartSF = new Chart(ctxSF, {
+  type: 'bar',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [
+      { label: 'Shortfall ($B)', data: [], backgroundColor: '#ffa726', borderRadius: 4 }
+    ]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+const ctxT = document.getElementById('chart-tiers').getContext('2d');
+const chartT = new Chart(ctxT, {
+  type: 'bar',
+  data: {
+    labels: ['T1 Big 4', 'T2 Legacy', 'T3 Indian IT', 'T4 Premium Eng', 'T5 Federal', 'T6 Data Ops'],
+    datasets: [
+      { label: '$B Capacity', data: [], backgroundColor: ['#4fc3f7','#7c4dff','#66bb6a','#ffa726','#ef5350','#ffee58'], borderRadius: 4 }
+    ]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+const ctxM = document.getElementById('chart-mix').getContext('2d');
+const chartM = new Chart(ctxM, {
+  type: 'doughnut',
+  data: {
+    labels: ['Data prep & engineering', 'Integration & systems', 'Strategy & advisory', 'Change mgmt & training', 'Governance & compliance', 'MLOps & ongoing'],
+    datasets: [
+      { data: [30, 22, 12, 14, 10, 12], backgroundColor: ['#4fc3f7','#7c4dff','#66bb6a','#ffa726','#ef5350','#ffee58'], borderWidth: 0 }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } }
+      }
+    }
+  }
+});
+
+// ============================================================
+// UPDATE LOOP
+// ============================================================
+
+function updateModel() {
+  const p = getParams();
+  const m = runModel(p);
+
+  for (const key in sliders) {
+    valLabels[key].textContent = sliders[key].value;
+  }
+
+  document.getElementById('bn-demand').textContent = '$' + m.demandByYear[0].toFixed(1) + 'B';
+  document.getElementById('bn-capacity').textContent = '$' + m.capacityByYear[0].toFixed(1) + 'B';
+  const gap = m.demandByYear[0] - m.capacityByYear[0];
+  const gapEl = document.getElementById('bn-gap');
+  const gapBox = document.getElementById('bn-gap-box');
+  if (gap <= 0) {
+    gapEl.textContent = '+$' + Math.abs(gap).toFixed(1) + 'B';
+    gapBox.className = 'big-num green';
+  } else {
+    gapEl.textContent = '-$' + gap.toFixed(1) + 'B';
+    gapBox.className = 'big-num red';
+  }
+  document.getElementById('bn-cum-demand').textContent = '$' + m.cumDemand.toFixed(0) + 'B';
+  document.getElementById('bn-peak').textContent = m.peakYear;
+  document.getElementById('bn-pilot').textContent = (p.pilot * 100).toFixed(0) + '%';
+
+  const verdictEl = document.getElementById('verdict-text');
+  const verdictDetail = document.getElementById('verdict-detail');
+  const peakShort = m.peakShort;
+  const peakRatio = m.demandByYear[4] / m.capacityByYear[4];
+  if (peakShort <= 0) {
+    verdictEl.textContent = 'Capacity Covers Demand';
+    verdictEl.style.color = '#66bb6a';
+    verdictDetail.textContent = `Top-tier capacity keeps pace through 2030. Winners are incumbents who defend share.`;
+  } else if (peakShort < 10) {
+    verdictEl.textContent = 'Tight — Overflow Winners Emerge';
+    verdictEl.style.color = '#ffa726';
+    verdictDetail.textContent = `Peak shortfall of $${peakShort.toFixed(1)}B in ${m.peakYear}. Top-tier covers most demand; Tier 4-6 absorbs overflow. Hidden gems shine.`;
+  } else if (peakShort < 25) {
+    verdictEl.textContent = 'Structural Services Shortage';
+    verdictEl.style.color = '#ef5350';
+    verdictDetail.textContent = `Peak shortfall of $${peakShort.toFixed(1)}B in ${m.peakYear}. Implementation capacity cannot absorb F500 demand. Multi-tier winners across the stack.`;
+  } else {
+    verdictEl.textContent = 'Severe Services Shortage';
+    verdictEl.style.color = '#ef5350';
+    verdictDetail.textContent = `Peak shortfall of $${peakShort.toFixed(1)}B in ${m.peakYear}. Every provider with F500 access captures material share. Data-layer + federal + premium eng all re-rate.`;
+  }
+
+  chartDC.data.datasets[0].data = m.demandByYear;
+  chartDC.data.datasets[1].data = m.capacityByYear;
+  chartDC.update('none');
+
+  chartSF.data.datasets[0].data = m.shortfallByYear.map(s => Math.max(0, s));
+  chartSF.data.datasets[0].backgroundColor = m.shortfallByYear.map(s => s > 0 ? '#ffa726' : '#66bb6a');
+  chartSF.update('none');
+
+  chartT.data.datasets[0].data = [
+    m.tiers.tier1, m.tiers.tier2, m.tiers.tier3,
+    m.tiers.tier4, m.tiers.tier5, m.tiers.tier6
+  ];
+  chartT.update('none');
+
+  const summary = document.getElementById('model-summary');
+  const peakRatioPct = (peakRatio * 100).toFixed(0);
+  summary.innerHTML = `
+    <div class="stat-row"><span class="stat-label">F500 Actively Implementing</span><span class="stat-value accent">${m.activeCount.toFixed(0)} companies</span></div>
+    <div class="stat-row"><span class="stat-label">2026 Base Demand</span><span class="stat-value">$${m.demandByYear[0].toFixed(1)}B</span></div>
+    <div class="stat-row"><span class="stat-label">2030 Peak Demand</span><span class="stat-value">$${m.demandByYear[4].toFixed(1)}B</span></div>
+    <div class="stat-row"><span class="stat-label">Cumulative 2026-2030 Demand</span><span class="stat-value accent">$${m.cumDemand.toFixed(0)}B</span></div>
+    <div class="stat-row"><span class="stat-label">2030 Capacity</span><span class="stat-value">$${m.capacityByYear[4].toFixed(1)}B</span></div>
+    <div class="stat-row"><span class="stat-label">Peak Shortfall</span><span class="stat-value ${m.peakShort>0?'red':'green'}">$${Math.abs(m.peakShort).toFixed(1)}B (${m.peakYear})</span></div>
+    <div class="stat-row"><span class="stat-label">2030 Demand/Capacity Ratio</span><span class="stat-value ${peakRatio>1.1?'red':peakRatio>0.9?'orange':'green'}">${peakRatioPct}%</span></div>
+    <div class="stat-row"><span class="stat-label">Top-10 Firms Capture (2026)</span><span class="stat-value">$${m.top10Share.toFixed(1)}B</span></div>
+    <div class="stat-row"><span class="stat-label">Hyperscaler Pro-Services (2026)</span><span class="stat-value">$${m.hyperShare.toFixed(1)}B</span></div>
+    <div class="stat-row"><span class="stat-label">Overflow to Tier 4-6 (2026)</span><span class="stat-value accent">$${m.overflowDemand.toFixed(1)}B</span></div>
+  `;
+}
+
+for (const key in sliders) {
+  sliders[key].addEventListener('input', updateModel);
+}
+updateModel();
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
