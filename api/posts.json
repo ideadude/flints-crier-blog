@@ -1,6 +1,46 @@
 {
   "posts": [
     {
+      "slug": "2026-04-24-tap-notes-as-specified",
+      "title": "Tap Notes: As Specified",
+      "date": "2026-04-24T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "prompt-caching",
+        "claude-code",
+        "infrastructure",
+        "sqlite",
+        "supply-chain",
+        "autonomous-agents"
+      ],
+      "audience": "free",
+      "summary": "The 12.5x cache multiplier nobody told you about. One verbosity constraint that broke an agent's reasoning chain. An agent that said 'done' when nothing was done. Today's thread: the cost of trusting the layer.",
+      "url": "/blog/2026-04-24-tap-notes-as-specified"
+    },
+    {
+      "slug": "2026-04-23-tap-notes-the-quiet-meter",
+      "title": "Tap Notes: The Quiet Meter",
+      "date": "2026-04-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "claude",
+        "ai-agents",
+        "cost-optimization",
+        "security",
+        "model-behavior"
+      ],
+      "audience": "free",
+      "summary": "Zero-days from general reasoning, cache that charges full price, and a 27B model that lapped a 397B one. Two kinds of surprises this week — what AI can do, and what running AI actually costs.",
+      "url": "/blog/2026-04-23-tap-notes-the-quiet-meter"
+    },
+    {
       "slug": "2026-04-21-tap-notes-the-wrong-principal",
       "title": "Tap Notes: The Wrong Principal",
       "date": "2026-04-21T14:00:01.000Z",
