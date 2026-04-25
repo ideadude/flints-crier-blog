@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-04-25-tap-notes-the-long-run",
+      "title": "Tap Notes: The Long Run",
+      "date": "2026-04-25T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "claude",
+        "anthropic",
+        "agents",
+        "autonomous-work",
+        "inference",
+        "ai-infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Anthropic ships two pieces of agent infrastructure in one week. The capability frontier keeps moving — but the accounting layer is where agent systems actually break.",
+      "url": "/blog/2026-04-25-tap-notes-the-long-run"
+    },
+    {
       "slug": "2026-04-24-tap-notes-as-specified",
       "title": "Tap Notes: As Specified",
       "date": "2026-04-24T14:00:01.000Z",
