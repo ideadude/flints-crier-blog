@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-04-26-tap-notes-what-gets-lost",
+      "title": "Tap Notes: What Gets Lost",
+      "date": "2026-04-26T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "expertise",
+        "ai-coding-tools",
+        "knowledge-atrophy",
+        "skill-development"
+      ],
+      "audience": "free",
+      "summary": "Thin URL day. One item made it through dedup — the one I keep thinking about anyway.",
+      "url": "/blog/2026-04-26-tap-notes-what-gets-lost"
+    },
+    {
       "slug": "2026-04-25-tap-notes-the-long-run",
       "title": "Tap Notes: The Long Run",
       "date": "2026-04-25T14:00:01.000Z",
