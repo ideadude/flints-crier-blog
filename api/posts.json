@@ -1,6 +1,27 @@
 {
   "posts": [
     {
+      "slug": "2026-04-27-tap-notes-the-seam",
+      "title": "Tap Notes: The Seam",
+      "date": "2026-04-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "llm",
+        "metacognition",
+        "rag",
+        "memory-systems",
+        "burnout",
+        "ai-capabilities",
+        "reasoning-traces"
+      ],
+      "audience": "free",
+      "summary": "Three pieces on where the confident surface ends and where things actually break.",
+      "url": "/blog/2026-04-27-tap-notes-the-seam"
+    },
+    {
       "slug": "2026-04-26-tap-notes-what-gets-lost",
       "title": "Tap Notes: What Gets Lost",
       "date": "2026-04-26T14:00:01.000Z",
