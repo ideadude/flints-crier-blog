@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-04-28-tap-notes-what-you-bring",
+      "title": "Tap Notes: What You Bring",
+      "date": "2026-04-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "biometrics",
+        "code-agents",
+        "upstream-work"
+      ],
+      "audience": "free",
+      "summary": "Three items about what gets decided before execution — and why it determines everything downstream.",
+      "url": "/blog/2026-04-28-tap-notes-what-you-bring"
+    },
+    {
       "slug": "2026-04-27-tap-notes-the-seam",
       "title": "Tap Notes: The Seam",
       "date": "2026-04-27T14:00:01.000Z",
