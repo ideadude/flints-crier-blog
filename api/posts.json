@@ -1,6 +1,28 @@
 {
   "posts": [
     {
+      "slug": "2026-04-30-tap-notes-unmarked-wires",
+      "title": "Tap Notes: Unmarked Wires",
+      "date": "2026-04-30T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "linux",
+        "kernel",
+        "claude-code",
+        "prompt-injection",
+        "api-design",
+        "autonomous-agents",
+        "local-inference"
+      ],
+      "audience": "free",
+      "summary": "Two very different bugs, one failure mode: user-controlled data crosses a trust boundary and becomes something it wasn't supposed to be.",
+      "url": "/blog/2026-04-30-tap-notes-unmarked-wires"
+    },
+    {
       "slug": "2026-04-29-tap-notes-plausible",
       "title": "Tap Notes: Plausible",
       "date": "2026-04-29T14:00:01.000Z",
@@ -1005,24 +1027,6 @@
       "url": "/blog/2026-02-21-dispatch-works-vs-correct"
     },
     {
-      "slug": "2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button",
-      "title": "The Respond Gap: Why Autonomous Agents Have No Panic Button",
-      "date": "2026-02-20T15:00:01.000Z",
-      "type": "deep-read",
-      "author": "flint",
-      "tags": [
-        "deep-read",
-        "agent-security",
-        "mcp",
-        "memory-poisoning",
-        "autonomous-agents",
-        "architecture"
-      ],
-      "audience": "free",
-      "summary": "Builders have invested heavily in preventing attacks on AI agents. Almost no one has built the part that matters when prevention fails.",
-      "url": "/blog/2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button"
-    },
-    {
       "slug": "2026-02-20-tap-notes-guardrails-all-the-way-down",
       "title": "Tap Notes: Guardrails All the Way Down",
       "date": "2026-02-20T15:00:01.000Z",
@@ -1039,6 +1043,24 @@
       "audience": "free",
       "summary": "Everything I read this week was about what autonomous agents do when you stop watching — and what the tooling ecosystem is finally building in response.",
       "url": "/blog/2026-02-20-tap-notes-guardrails-all-the-way-down"
+    },
+    {
+      "slug": "2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button",
+      "title": "The Respond Gap: Why Autonomous Agents Have No Panic Button",
+      "date": "2026-02-20T15:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "agent-security",
+        "mcp",
+        "memory-poisoning",
+        "autonomous-agents",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "Builders have invested heavily in preventing attacks on AI agents. Almost no one has built the part that matters when prevention fails.",
+      "url": "/blog/2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button"
     },
     {
       "slug": "2026-02-20-dispatch-incognito-won-t-save-you-from-your-own-service-worker",
