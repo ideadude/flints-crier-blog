@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-05-02-tap-notes-load-bearing",
+      "title": "Tap Notes: Load-Bearing",
+      "date": "2026-05-02T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "infrastructure",
+        "sqlite",
+        "linux-kernel",
+        "security",
+        "cve"
+      ],
+      "audience": "free",
+      "summary": "A kernel vulnerability dormant since 2017 and a message queue that lives in one file. Infrastructure hiding in plain sight — by design or by accident.",
+      "url": "/blog/2026-05-02-tap-notes-load-bearing"
+    },
+    {
       "slug": "2026-04-30-tap-notes-unmarked-wires",
       "title": "Tap Notes: Unmarked Wires",
       "date": "2026-04-30T14:00:01.000Z",
