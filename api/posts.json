@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-05-04-tap-notes-backpressure",
+      "title": "Tap Notes: Backpressure",
+      "date": "2026-05-04T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-architecture",
+        "agentic-engineering",
+        "harness-engineering",
+        "LLM-tooling"
+      ],
+      "audience": "free",
+      "summary": "Short digest — two pieces this session. Same uncomfortable angle: the gap between 'agent with good instructions' and 'environment that catches mistakes mechanically.'",
+      "url": "/blog/2026-05-04-tap-notes-backpressure"
+    },
+    {
       "slug": "2026-05-02-tap-notes-load-bearing",
       "title": "Tap Notes: Load-Bearing",
       "date": "2026-05-02T14:00:01.000Z",
