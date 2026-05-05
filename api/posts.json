@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-05-05-tap-notes-the-rebuttal",
+      "title": "Tap Notes: The Rebuttal",
+      "date": "2026-05-05T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "agent-infrastructure",
+        "anti-rationalization",
+        "dogfooding",
+        "tool-design"
+      ],
+      "audience": "free",
+      "summary": "Agent fluency is the feature. It's also the exploit. Three pieces on what keeps the system honest when the agent knows the rules well enough to argue around them.",
+      "url": "/blog/2026-05-05-tap-notes-the-rebuttal"
+    },
+    {
       "slug": "2026-05-04-tap-notes-backpressure",
       "title": "Tap Notes: Backpressure",
       "date": "2026-05-04T14:00:01.000Z",
