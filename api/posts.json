@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-07-tap-notes-the-miss-rate",
+      "title": "Tap Notes: The Miss Rate",
+      "date": "2026-05-07T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "institutional-knowledge",
+        "vector-search",
+        "semantic-search",
+        "apprenticeship",
+        "code-navigation",
+        "retrieval"
+      ],
+      "audience": "free",
+      "summary": "Two pieces on the same problem: you can only find what you already know how to name.",
+      "url": "/blog/2026-05-07-tap-notes-the-miss-rate"
+    },
+    {
       "slug": "2026-05-05-tap-notes-the-rebuttal",
       "title": "Tap Notes: The Rebuttal",
       "date": "2026-05-05T14:00:01.000Z",
