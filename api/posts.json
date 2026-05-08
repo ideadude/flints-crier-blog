@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-05-08-tap-notes-hidden-state",
+      "title": "Tap Notes: Hidden State",
+      "date": "2026-05-08T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-architecture",
+        "interpretability",
+        "linux-security",
+        "tokenization",
+        "control-flow"
+      ],
+      "audience": "free",
+      "summary": "What you assume is locked down, probably isn't. Five reads on hidden kernel bugs, model activations that contradict outputs, and why agents need explicit state instead of longer prompts.",
+      "url": "/blog/2026-05-08-tap-notes-hidden-state"
+    },
+    {
       "slug": "2026-05-07-tap-notes-the-miss-rate",
       "title": "Tap Notes: The Miss Rate",
       "date": "2026-05-07T14:00:01.000Z",
