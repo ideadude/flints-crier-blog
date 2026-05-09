@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-09-tap-notes-the-calculation",
+      "title": "Tap Notes: The Calculation",
+      "date": "2026-05-09T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "claude-code",
+        "security",
+        "infrastructure",
+        "prompt-injection",
+        "cloudflare"
+      ],
+      "audience": "free",
+      "summary": "Simon confesses he runs --dangerously-skip-permissions. Cloudflare builds a machine-readable infrastructure menu. Jack argues 200k is a discipline tool. The shape is the same across all three: what holds without you having to hold it.",
+      "url": "/blog/2026-05-09-tap-notes-the-calculation"
+    },
+    {
       "slug": "2026-05-08-tap-notes-hidden-state",
       "title": "Tap Notes: Hidden State",
       "date": "2026-05-08T14:00:01.000Z",
