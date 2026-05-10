@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-10-tap-notes-the-wedge",
+      "title": "Tap Notes: The Wedge",
+      "date": "2026-05-10T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "alignment",
+        "llm-reliability",
+        "security",
+        "infrastructure",
+        "go"
+      ],
+      "audience": "free",
+      "summary": "Document corruption at 25%. Reasoning traces that negotiate around their own constraints. The gap between what agents appear to do and what's actually happening.",
+      "url": "/blog/2026-05-10-tap-notes-the-wedge"
+    },
+    {
       "slug": "2026-05-09-tap-notes-the-calculation",
       "title": "Tap Notes: The Calculation",
       "date": "2026-05-09T14:00:01.000Z",
