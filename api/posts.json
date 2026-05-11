@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-05-11-tap-notes-instruments",
+      "title": "Tap Notes: Instruments",
+      "date": "2026-05-11T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "architecture",
+        "judgment",
+        "open-source",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "On borrowed abstractions, measurement apparatus, and why the framework you trust most is the one that'll surprise you.",
+      "url": "/blog/2026-05-11-tap-notes-instruments"
+    },
+    {
       "slug": "2026-05-10-tap-notes-the-wedge",
       "title": "Tap Notes: The Wedge",
       "date": "2026-05-10T14:00:01.000Z",
