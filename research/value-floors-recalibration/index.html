@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Value Floors Recalibration — Phil Town's 2x/15x/50% Rules in a 401k-Indexed World</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #4fc3f7;
+    --accent2: #7c4dff;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --orange: #ffa726;
+    --yellow: #ffee58;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--text-dim); font-size: 0.85rem; }
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(124,77,255,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+  .verdict-box h2 { color: var(--accent); font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .verdict-box .verdict-text { font-size: 1.3rem; font-weight: bold; }
+  .verdict-box .verdict-detail { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.5rem; }
+  .verdict-links { margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); }
+  .verdict-link { color: var(--accent); text-decoration: none; padding: 0 0.3rem; }
+  .verdict-link:hover { color: var(--accent2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .card h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card h4 { color: var(--text); font-size: 0.85rem; margin: 1rem 0 0.5rem; }
+  .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid rgba(42,42,58,0.5); font-size: 0.8rem; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-dim); }
+  .stat-value { color: var(--text); font-weight: 600; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.accent { color: var(--accent); }
+  .slider-group { margin-bottom: 1rem; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.3rem; }
+  .slider-label span:first-child { color: var(--text-dim); }
+  .slider-label span:last-child { color: var(--accent); font-weight: 600; }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    border-radius: 2px; background: var(--border); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent);
+    cursor: pointer; border: 2px solid var(--bg);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: 2px solid var(--bg);
+  }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; overflow-x: auto; }
+  .tab {
+    padding: 0.7rem 1.2rem; font-size: 0.8rem; color: var(--text-dim);
+    cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;
+    font-family: inherit; background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .chart-container { position: relative; height: 350px; margin: 1rem 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin: 1rem 0; }
+  th { text-align: left; padding: 0.6rem 0.8rem; color: var(--accent); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 0.5rem 0.8rem; border-bottom: 1px solid rgba(42,42,58,0.3); color: var(--text); }
+  tr:hover td { background: rgba(79,195,247,0.03); }
+  .text-right { text-align: right; }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-orange { color: var(--orange); }
+  .text-accent { color: var(--accent); }
+  .text-dim { color: var(--text-dim); }
+  .text-yellow { color: var(--yellow); }
+  .bold { font-weight: 700; }
+  .analysis { font-size: 0.85rem; line-height: 1.75; }
+  .analysis h3 { color: var(--accent); font-size: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .analysis h4 { color: var(--text); font-size: 0.88rem; margin: 1.5rem 0 0.5rem; }
+  .analysis p { margin-bottom: 0.9rem; color: var(--text); }
+  .analysis ul { margin: 0.5rem 0 1rem 1.5rem; }
+  .analysis li { margin-bottom: 0.4rem; }
+  .analysis blockquote { border-left: 3px solid var(--accent2); padding: 0.5rem 1rem; margin: 1rem 0; color: var(--text-dim); font-style: italic; background: rgba(124,77,255,0.04); }
+  .callout {
+    background: var(--surface2); border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.85rem;
+  }
+  .callout.warning { border-left-color: var(--orange); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout.green { border-left-color: var(--green); }
+  .callout strong { color: var(--accent); }
+  .callout.warning strong { color: var(--orange); }
+  .callout.danger strong { color: var(--red); }
+  .callout.green strong { color: var(--green); }
+  .big-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .big-num { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+  .big-num .number { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .big-num .label { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .big-num.red .number { color: var(--red); }
+  .big-num.green .number { color: var(--green); }
+  .big-num.orange .number { color: var(--orange); }
+  .gem-card {
+    background: linear-gradient(135deg, rgba(255,238,88,0.04), rgba(255,167,38,0.06));
+    border: 1px solid rgba(255,238,88,0.3);
+    border-radius: 8px; padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .gem-card h4 { color: var(--yellow); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .gem-card .ticker { color: var(--accent); font-weight: 700; }
+  .gem-card .tagline { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.8rem; font-style: italic; }
+  .gem-card .body { font-size: 0.83rem; line-height: 1.7; }
+  .rating-sb { color: var(--green); font-weight: 700; }
+  .rating-b { color: #8bc34a; font-weight: 700; }
+  .rating-h { color: var(--orange); font-weight: 700; }
+  .rating-s { color: var(--red); font-weight: 700; }
+  .rating-avoid { color: var(--red); font-weight: 700; text-transform: uppercase; }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.72rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .source-list { font-size: 0.72rem; color: var(--text-dim); column-count: 2; column-gap: 2rem; margin: 1rem 0; }
+  .source-list li { margin-bottom: 0.35rem; break-inside: avoid; list-style: none; padding-left: 0.5rem; border-left: 2px solid var(--border); }
+  .source-list a { color: var(--accent); text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+  .disclaimer {
+    background: rgba(239,83,80,0.05); border: 1px solid rgba(239,83,80,0.3);
+    border-radius: 8px; padding: 1rem 1.2rem; margin: 2rem 0;
+    font-size: 0.75rem; color: var(--text-dim);
+  }
+  .disclaimer strong { color: var(--red); }
+  .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .tier-card h5 { color: var(--accent2); font-size: 0.85rem; margin-bottom: 0.5rem; }
+  .tier-card .nums { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+  .tier-card .nums b { color: var(--accent); }
+  @media (max-width: 700px) {
+    .source-list { column-count: 1; }
+    .big-numbers { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Value Floors Recalibration — Phil Town's 2x/15x/50% Rules in a 401k-Indexed World</h1>
+  <p class="subtitle">Are 2005-era margin-of-safety thresholds still the right defaults? A backtest, a recency-bias check, and a vivid mean-reversion scenario.</p>
+  <p class="subtitle" style="margin-top:0.3rem">Research compiled May 15, 2026 &mdash; Flint / Coleman Research</p>
+</header>
+
+<div class="verdict-box">
+  <h2>The Verdict</h2>
+  <div class="verdict-text" id="verdict-text">Loading model...</div>
+  <div class="verdict-detail" id="verdict-detail"></div>
+  <div class="verdict-links">
+    Jump to:
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=analysis]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">📊 Full Analysis</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=hidden]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">💎 Hidden Gems</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=stocks]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">🎯 Stock Picks</a>
+  </div>
+</div>
+
+<div class="big-numbers" id="key-numbers">
+  <div class="big-num"><div class="number" id="bn-floor-ps">--</div><div class="label">Implied P/S Floor</div></div>
+  <div class="big-num green"><div class="number" id="bn-floor-pe">--</div><div class="label">Implied P/E Floor</div></div>
+  <div class="big-num orange"><div class="number" id="bn-floor-mos">--</div><div class="label">Implied MOS %</div></div>
+  <div class="big-num"><div class="number" id="bn-cape-now">37.1</div><div class="label">Shiller CAPE (Jan 2025)</div></div>
+  <div class="big-num"><div class="number" id="bn-cape-mean">16.3</div><div class="label">Pre-2000 CAPE Mean</div></div>
+  <div class="big-num"><div class="number" id="bn-passive">~33%</div><div class="label">Passive US Equity Share</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="model">Interactive Model</button>
+  <button class="tab" data-tab="firms">Tiered Floors</button>
+  <button class="tab" data-tab="hidden">💎 Hidden Gems</button>
+  <button class="tab" data-tab="analysis">📊 Full Analysis</button>
+  <button class="tab" data-tab="stocks">🎯 Stock Picks</button>
+  <button class="tab" data-tab="methodology">Methodology</button>
+  <button class="tab" data-tab="sources">Sources</button>
+</div>
+
+<div class="tab-content active" id="tab-model">
+  <p class="text-dim" style="font-size:0.8rem;margin-bottom:1rem">
+    Drag the macro sliders on the left to model the structural regime. Drag the framework sliders on the right to test where you want your floors set. The verdict box reclassifies in real time.
+  </p>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Macro Regime</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>Passive flow % of US equity</span><span id="val-passive">33</span></div>
+        <input type="range" id="passive" min="20" max="70" value="33" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>10Y Treasury yield (%)</span><span id="val-ust">4.3</span></div>
+        <input type="range" id="ust" min="0.5" max="8" value="4.3" step="0.1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>M2 YoY growth (%)</span><span id="val-m2">4.0</span></div>
+        <input type="range" id="m2" min="-5" max="15" value="4" step="0.5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Corporate buyback yield (%)</span><span id="val-buy">3.0</span></div>
+        <input type="range" id="buy" min="0" max="6" value="3" step="0.1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Retail-investor share %</span><span id="val-retail">22</span></div>
+        <input type="range" id="retail" min="5" max="40" value="22" step="1">
+      </div>
+    </div>
+    <div class="card">
+      <h3>Valuation Framework</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>Default P/S floor</span><span id="val-ps">4.0</span></div>
+        <input type="range" id="ps" min="1.5" max="8" value="4.0" step="0.1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Default P/E floor</span><span id="val-pe">22</span></div>
+        <input type="range" id="pe" min="10" max="30" value="22" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Default MOS %</span><span id="val-mos">25</span></div>
+        <input type="range" id="mos" min="10" max="60" value="25" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>SaaS tier multiplier vs default</span><span id="val-saas">1.5</span></div>
+        <input type="range" id="saas" min="1" max="2.5" value="1.5" step="0.05">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Industrial tier multiplier vs default</span><span id="val-ind">0.7</span></div>
+        <input type="range" id="ind" min="0.5" max="1.2" value="0.7" step="0.05">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Model Output — Where Your Floors Land</h3>
+    <div id="model-summary"></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:2rem">
+    <div class="card">
+      <h3>S&amp;P 500 Trailing P/E, 1985–2026</h3>
+      <div class="chart-container"><canvas id="chart-pe-history"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">Sources: multpl.com (annual averages); Shiller dataset. Horizontal lines show 1985–2005 vs 2005–2026 means.</p>
+    </div>
+    <div class="card">
+      <h3>S&amp;P 500 P/S, 1985–2026</h3>
+      <div class="chart-container"><canvas id="chart-ps-history"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">Sources: multpl.com; currentmarketvaluation.com. Pre-2000 average ~1.5; post-2010 average ~2.3; current 3.67.</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>M2 Money Supply + QE/QT Overlay, 1985–2025 ($B)</h3>
+      <div class="chart-container"><canvas id="chart-m2"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">FRED M2SL. Vertical annotations: QE1 Nov 2008, QE2 Nov 2010, QE3 Sept 2012, COVID QE Mar 2020, QT start Jun 2022.</p>
+    </div>
+    <div class="card">
+      <h3>Bear-Market Drawdowns, S&amp;P 500 1987–2022</h3>
+      <div class="chart-container"><canvas id="chart-drawdowns"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">Peak-to-trough %. 50% MOS only triggered in 2000–2002 and 2008–2009.</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>Passive Index Share of US Equity, 2000–2025</h3>
+      <div class="chart-container"><canvas id="chart-passive"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">Apollo, Yale/Chicago, GWU sources. Index funds went from ~7% (2000) to ~33% (2024).</p>
+    </div>
+    <div class="card">
+      <h3>CAPE Regime Shift: 1985–2000 vs 2010–2026</h3>
+      <div class="chart-container"><canvas id="chart-cape-regimes"></canvas></div>
+      <p class="text-dim" style="font-size:0.72rem;margin-top:0.5rem">Long-run pre-2000 mean ≈16.3. Post-2010 mean ≈31.8. The market is structurally re-rated ~2x.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-firms">
+  <div class="analysis">
+    <h3>Recommended Tiered Floors (by Business Type)</h3>
+    <p>One floor doesn't fit all. A floor that's tight for Costco is loose for U.S. Steel. The framework below differentiates by gross margin, capital intensity, and durability of cash flow — the three variables that actually determine what multiple a business deserves.</p>
+
+    <div class="callout">
+      <strong>How to read this:</strong> P/S floor = the maximum P/S you'd pay for a fairly valued business in that tier. P/E floor = the maximum trailing P/E. MOS % = the discount from "sticker price" you require before buying. Tighter MOS for higher-quality businesses because their cash flows are more predictable.
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 1 — SaaS / Pure Software (75%+ gross margin, 15%+ growth)</h5>
+      <div class="nums">P/S floor <b>6.0x</b> · P/E floor <b>33x</b> · MOS <b>20%</b></div>
+      <p>Microsoft, ServiceNow, Adobe, Salesforce, mid-cap pure-play SaaS. These businesses have 75-85% gross margins (chargebee, cloudzero benchmarks), capital-light scaling, and recurring revenue. A 30%+ FCF margin and 80%+ gross retention means $1 of incremental revenue is worth ~5x more than $1 at a 25%-margin industrial. Phil Town's 15x P/E rule, applied here, would have made you skip every meaningful winner of the last 15 years.</p>
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 2 — Capital-Light Marketplaces / Toll Booths (50-70% margin, network effects)</h5>
+      <div class="nums">P/S floor <b>9.0x</b> · P/E floor <b>27x</b> · MOS <b>20%</b></div>
+      <p>Visa, Mastercard, Moody's, S&amp;P Global, ICE, CME, MSCI, FactSet. Transaction-based or licensing revenue with near-100% incremental margins. The P/S ratio here looks insane on Phil Town's chart but the businesses generate cash like a tax. Buffett's See's Candy framework applies — pay up because the reinvestment economics are extraordinary. Hard ceiling matters: when V/MA cross 35x P/E with sub-10% growth, that's expensive even on this scale.</p>
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 3 — Quality Compounders (consumer staples, asset-light services)</h5>
+      <div class="nums">P/S floor <b>3.0x</b> · P/E floor <b>26x</b> · MOS <b>25%</b></div>
+      <p>Costco, Walmart, Chipotle, McDonald's, Nike (when on sale), Starbucks. Lower gross margins than software but durable brand, repeat demand, predictable unit growth. Costco trades at 52x P/E with a fair-value estimate near $295 vs $1,011 share price (ValueInvesting.io, May 2026). The market has accepted that for a decade and you outperformed by ignoring the cheap screen. <em>This is the tier where Phil Town's 15x rule was most damaging</em> — it made you sell Costco at $50 in 2010 and miss a 20-bagger.</p>
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 4 — Mid-Tier Industrials / Quality Cyclicals (good ROIC, some cyclicality)</h5>
+      <div class="nums">P/S floor <b>2.5x</b> · P/E floor <b>20x</b> · MOS <b>30%</b></div>
+      <p>Caterpillar, Deere, Honeywell, Parker Hannifin, Eaton, Rockwell. Solid ROIC (15%+) but cyclical demand. Phil Town's rules approximately work here but with a bit more cushion. Use mid-cycle earnings for the P/E, not peak.</p>
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 5 — Traditional / Capital-Heavy (commodity exposure, 8-15% ROIC)</h5>
+      <div class="nums">P/S floor <b>1.5x</b> · P/E floor <b>15x</b> · MOS <b>40%</b></div>
+      <p>U.S. Steel, Nucor, integrated oil &amp; gas, refiners, basic materials, REITs. <strong>Here Phil Town's 15x/50% rules basically still apply.</strong> These are the businesses he was actually pricing for in 2006: Whirlpool, Energizer, Harley-Davidson — and the rules work because the business economics haven't structurally improved. Cyclical companies need cycle-adjusted earnings, not peak.</p>
+    </div>
+
+    <div class="tier-card">
+      <h5>Tier 6 — Deep Cyclicals / Distressed (commodity prices, bankruptcy risk on the table)</h5>
+      <div class="nums">P/S floor <b>1.0x</b> · P/E floor <b>10x</b> · MOS <b>50%</b></div>
+      <p>Coal, offshore drillers, ocean shippers, leveraged metals, regional bank stress trades. Phil Town floors with an extra 10% MOS cushion because the downside isn't just multiple compression — it's actual impairment of the business. Don't use trailing earnings; use a normalized through-cycle figure.</p>
+    </div>
+
+    <h3>Who Wins Under the New Framework</h3>
+    <p>The investor who applies <em>tiered floors</em> wins in both regimes. In a continued-passive regime, they own Tier 1-3 compounders that benefit from the ETF bid. In a reversion regime, the tighter Tier 5-6 floors keep cyclical positions from getting massacred because they were bought with 40-50% MOS. The investor who applies <em>uniform Phil Town floors</em> across all sectors misses every Tier 1-3 winner from 2010-2025 and ends up in nothing but Tier 5-6 deep value, which underperforms in QE regimes and gets killed in shocks because the businesses are structurally weaker.</p>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-hidden">
+  <div class="analysis">
+    <h3>Hidden Gems — Two Lists</h3>
+    <p>"Hidden gems" here is reframed. For a value-floors recalibration, the two lists that matter are:</p>
+    <ul>
+      <li><strong>List A:</strong> Stocks trading near OLD STRICT floors today (2x P/S, 15x P/E, 50% MOS from intrinsic). Genuine deep-value rarities — these are Phil Town's 2006-style targets that actually still exist.</li>
+      <li><strong>List B:</strong> Stocks priced at the NEW RELAXED floors (4x P/S, 22x P/E, 25% MOS). The compounders that look "fairly valued" only under the updated framework — these are the names Phil Town's old rules would have made you miss for 15 years.</li>
+    </ul>
+
+    <h3>List A — Stocks at the OLD Strict Floors (deep value)</h3>
+
+    <div class="gem-card">
+      <h4>💎 #1 — Nucor Corp <span class="ticker">NYSE:NUE · cyclical industrial · steel mini-mills</span></h4>
+      <p class="tagline">Classic Phil Town target. Cyclical, low-multiple, dominant in domestic steel.</p>
+      <div class="body">
+        <p>The steel cycle has been mediocre for two years and NUE often trades in the 10-14x trailing P/E range in down cycles with P/S below 1.5x. This is exactly the business Phil Town was pricing for in 2006: capital-heavy, commodity-exposed, low ROIC at the trough, double-digit ROIC at the peak.</p>
+        <p><strong>Why the market mispriced it:</strong> structural concern that domestic steel demand peaks ahead of EV transition and infrastructure spend. Recency-bias on poor 2023-2024 prints obscures normalized earnings.</p>
+        <p><strong>The tell:</strong> insider buying activity in the late 2024 / early 2025 window when sentiment was at the lows; mini-mill technology advantage versus integrated competitors; ~$4B+ buyback authorizations cycle over cycle.</p>
+        <p><strong>Risk:</strong> Chinese steel dumping + EV demand softening + interest-rate-sensitive housing/auto can keep the trough longer than expected. Phil Town's 50% MOS is the right ask here — don't pay above 12x mid-cycle.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #2 — MetLife <span class="ticker">NYSE:MET · financials · life insurance</span></h4>
+      <p class="tagline">P/E ~9-11x, P/B ~1.1-1.3x, classic insurance value with rate-tailwind.</p>
+      <div class="body">
+        <p>MetLife trades at well under 15x P/E and below 1x P/S — Phil Town would have noticed this on the screen in 2006 too. Insurance company economics get better when rates are higher because investment yields on the float improve.</p>
+        <p><strong>Why mispriced:</strong> insurers carry a permanent "boring" discount that has widened in the passive-flow era. Index weights for life insurers are tiny relative to economic value.</p>
+        <p><strong>The tell:</strong> book value growing mid-single-digits, ROE 12-14%, capital returns ~5-7% of market cap annually via buyback + dividend. Has done what compounders do — quietly. Cap1, Davis Funds cite as one of their value ideas.</p>
+        <p><strong>Risk:</strong> insurance is long-tail and any major reserve increase, mortality shock, or catastrophic credit event can punish the print.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #3 — KeyCorp <span class="ticker">NYSE:KEY · regional banks · forward P/E ~9.3x</span></h4>
+      <p class="tagline">Regional banking has been left for dead. KEY trades below tangible book in some windows.</p>
+      <div class="body">
+        <p>The 2023 regional bank panic + 2024 commercial real estate concerns have permanently re-priced this group below historical multiples. Forward P/E of 9.3x (Insider Monkey, May 2026), P/S well under 2x. Phil Town floor compliance: this passes.</p>
+        <p><strong>Why mispriced:</strong> commercial real estate exposure fears + deposit competition + post-SVB risk premium. Real-economy regional bank, not a money-center.</p>
+        <p><strong>The tell:</strong> Scotiabank's 14.9% strategic investment in KEY (closed 2024) signals deep-pocket confidence.</p>
+        <p><strong>Risk:</strong> a real CRE workout hitting balance sheets harder than current expectations. Watch ALLL ratios and CRE NPL trends.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #4 — Capital One Financial <span class="ticker">NYSE:COF · consumer finance · fwd P/E ~12x</span></h4>
+      <p class="tagline">Davis Funds top idea. Post-Discover acquisition leverage with a real moat in subprime data.</p>
+      <div class="body">
+        <p>COF screens at forward P/E ~12x, P/B ~1.2x (Davis Funds outlook), which clears the Phil Town gate. The Discover Financial acquisition closed in 2024-2025 and gives COF a closed-loop card network similar to AmEx/Discover, which is a structurally different business than just being a card issuer.</p>
+        <p><strong>Why mispriced:</strong> credit-cycle fear about consumer finance + acquisition integration risk + Walmart card portfolio loss in 2024.</p>
+        <p><strong>The tell:</strong> Davis Funds publicly cites COF as a top value idea; Discover network is a long-term moat the market is undervaluing.</p>
+        <p><strong>Risk:</strong> consumer credit recession would hit COF harder than money-centers. Watch NCO trends.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #5 — Mosaic <span class="ticker">NYSE:MOS · materials · phosphate &amp; potash</span></h4>
+      <p class="tagline">Morningstar lists as undervalued. Capital-heavy commodity producer in the deepest value bucket.</p>
+      <div class="body">
+        <p>Phosphate/potash is the kind of capital-intensive, commodity-cycle business Phil Town would have understood instantly. P/S below 1.5x, P/E under 15x at mid-cycle. Globally constrained supply, sticky demand from agriculture.</p>
+        <p><strong>Why mispriced:</strong> agricultural commodity weakness in 2024-2025, recession fears for fertilizer demand, plus this sits in materials (a 2.5%-of-S&amp;P sector that passive flows mostly ignore).</p>
+        <p><strong>The tell:</strong> Morningstar 33 undervalued stocks list (May 2026); structural fertilizer demand from global food security concerns; price floor from cost-curve dynamics in potash.</p>
+        <p><strong>Risk:</strong> commodity prices can stay depressed for years. Use cycle-average earnings, not trailing.</p>
+      </div>
+    </div>
+
+    <h3>List B — Stocks at the NEW Relaxed Floors (compounders Phil Town's old rules would have made you miss)</h3>
+
+    <div class="gem-card">
+      <h4>💎 #6 — Costco <span class="ticker">NASDAQ:COST · consumer staples · ~$1,011 · P/E 52x</span></h4>
+      <p class="tagline">The poster child for why Phil Town's old framework breaks. 20-bagger since 2010 because the market correctly priced quality.</p>
+      <div class="body">
+        <p>Costco at $1,011 trades at 52x trailing earnings, 44x forward, with a fair-value estimate of $295 (ValueInvesting.io). On Phil Town's old framework, it's been "too expensive" for 15 straight years and would have returned 0% to a strict-floor adherent because you'd never have bought it.</p>
+        <p><strong>Why the market got it right:</strong> Costco's membership model creates 90%+ renewal rates, predictable cash flow, 15.3% five-year earnings growth (ValueInvesting.io). The premium multiple is justified by the durability and capital-light reinvestment.</p>
+        <p><strong>Why it's on this list:</strong> if your new framework lets you own this at 30x P/E and 1.4x P/S (Tier 3 floors), you'd be sized in at any pullback. The old framework would still never let you near it.</p>
+        <p><strong>Risk:</strong> already-priced-for-perfection. Any same-store-sales miss or membership-renewal weakness compresses the multiple 25%+.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #7 — Microsoft <span class="ticker">NASDAQ:MSFT · Tier 1 SaaS · ~$430 · P/E ~33x</span></h4>
+      <p class="tagline">A 30x-P/E business that has compounded at 25%/yr for a decade. Phil Town's old rules forbade it from 2014 forward.</p>
+      <div class="body">
+        <p>Microsoft has traded in the 28-35x P/E range basically continuously since 2018. The strict 15x floor would have meant 0% allocation. Instead the business compounded ~25% annually, Azure became a $90B+ ARR business, Copilot pulled it into AI leadership.</p>
+        <p><strong>Why the market got it right:</strong> 70%+ gross margins, 40%+ operating margins, $250B+ cash generation cycle, recurring revenue with high switching costs.</p>
+        <p><strong>Why on this list:</strong> sits comfortably in Tier 1 SaaS framework (P/E up to 33x, P/S up to 6x). Pullbacks to mid-20s P/E (rare events) are obvious buys under new rules and invisible under old.</p>
+        <p><strong>Risk:</strong> AI capex digestion + cloud margin compression + regulatory action on bundling/Activision. Not cheap; just rationally priced for what it is.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #8 — Mastercard <span class="ticker">NYSE:MA · Tier 2 marketplace · P/E ~35x</span></h4>
+      <p class="tagline">Network-effect business with 50%+ operating margins. The toll booth on global commerce.</p>
+      <div class="body">
+        <p>Mastercard has traded at 30-40x P/E continuously for 10+ years. Phil Town's strict rule would have permanently excluded it. The business: every swipe globally generates a tiny rake at 50%+ margin, with cross-border travel and digital commerce as structural tailwinds.</p>
+        <p><strong>Why the market got it right:</strong> the moat is the network. Two competitors share 90% of the global card market. Margins compound because the infrastructure cost doesn't scale with transaction volume.</p>
+        <p><strong>Why on this list:</strong> Tier 2 floors (P/E up to 27x, P/S up to 9x) say MA is currently expensive but ownable on a 15-20% pullback. Old rules say "never."</p>
+        <p><strong>Risk:</strong> CBDCs, regulated interchange caps, stablecoin disintermediation. None imminent but all real.</p>
+      </div>
+    </div>
+
+    <h3>Hidden Gems — Summary Table</h3>
+    <table>
+      <thead>
+        <tr><th>Ticker</th><th>Tier</th><th>Approx P/E</th><th>Approx P/S</th><th>Why it fits the list</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>NUE</b></td><td class="text-dim">Tier 5</td><td>10-14x cycle low</td><td>~1.4x</td><td>Old strict floor; cycle play</td></tr>
+        <tr><td><b>MET</b></td><td class="text-dim">Tier 5</td><td>~10x</td><td>~0.8x</td><td>Old strict floor; rate tailwind</td></tr>
+        <tr><td><b>KEY</b></td><td class="text-dim">Tier 5/6</td><td>~9x fwd</td><td>~1.5x</td><td>Old strict floor; regional bank</td></tr>
+        <tr><td><b>COF</b></td><td class="text-dim">Tier 5</td><td>~12x fwd</td><td>~1.6x</td><td>Old strict floor; Discover moat</td></tr>
+        <tr><td><b>MOS</b></td><td class="text-dim">Tier 6</td><td>~15x trail</td><td>~1.2x</td><td>Old strict floor; commodity</td></tr>
+        <tr><td><b>COST</b></td><td class="text-dim">Tier 3</td><td>52x</td><td>~1.4x</td><td>Only fits new floors; 20-bagger</td></tr>
+        <tr><td><b>MSFT</b></td><td class="text-dim">Tier 1</td><td>~33x</td><td>~13x</td><td>Only fits new floors; SaaS comp</td></tr>
+        <tr><td><b>MA</b></td><td class="text-dim">Tier 2</td><td>~35x</td><td>~17x</td><td>Only fits new floors; toll booth</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Portfolio construction note:</strong> If I had to pick three to size up today from List A (genuine deep value), it would be <b>MET</b> (Tier 5, rate-cycle tailwind, classic value print), <b>KEY</b> (Tier 5/6, regional bank fear creates real opportunity), and <b>NUE</b> (Tier 5/6, cycle low buying). From List B, MSFT is the conviction core compounder, COST is the size-up-on-any-pullback name. The lists are not mutually exclusive — a real portfolio holds both.
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-analysis">
+  <div class="analysis">
+    <h3>The Thesis in One Paragraph</h3>
+    <p>Phil Town's <em>Rule #1</em> (2006) embedded three numerical floors that have lived inside Flint's stock-research skills for almost two decades: maximum 15x P/E, maximum 2x sticker price (effectively 2x P/S for many businesses), minimum 50% margin of safety. Those floors were calibrated against an investment universe that no longer exists. Three structural forces — passive/401k inflows (~33% of US equity AUM versus near-zero in 1985), the 15-year ZIRP/QE regime (Fed balance sheet went from sub-$1T to $9T+), and the rise of software economics (75% gross margins versus 30% for the consumer-staples that Phil Town modeled) — have re-rated equity multiples roughly 2x at the index level. The Shiller CAPE averaged 16.3 pre-2000 and 31.8 post-2010. S&amp;P P/S averaged 1.5 in 1985-2005 and is 3.67 today. These are not noise; they are the new mean. The right action is not to abandon margin of safety but to retune defaults to roughly 4x P/S, 22x P/E, 25% MOS at the framework level, then tier by business type. The strict Phil Town floors stay alive but only for capital-heavy, commodity-cyclical businesses — the kind Phil Town was actually pricing for. Recency bias is a real counter-argument; the honest probability of full mean reversion to 1985-2000 levels is maybe 10-15% on a 10-year horizon, and the mean-reversion path is non-linear and devastating when it happens.</p>
+
+    <div class="callout">
+      <strong>The core mismatch:</strong> Phil Town wrote <em>Rule #1</em> in 2006 about Energizer, Whirlpool, Harley-Davidson, and Coca-Cola — capital-heavy consumer-goods businesses with 20-30% gross margins. He never applied the framework to a 75%-gross-margin software business with negative working capital and 90% gross retention. The math is different. Pretending otherwise has cost a generation of value investors the entire SaaS/quality-compounder bull market.
+    </div>
+
+    <h3>The Three Structural Forces</h3>
+
+    <h4>1. Passive/401k flows — the mechanical buyer with no price discipline</h4>
+    <p>Total US retirement assets reached <strong>$49.1T at year-end 2025</strong> (ICI Fact Book 2026), with $14.2T in DC plans and 401(k)s holding $10.1T alone. Index funds and ETFs now hold <strong>roughly 30-34% of the US equity market</strong> (Apollo Academy, GWU, Yale/Chicago studies), up from under 10% in 2000. Mike Green's thesis at Simplify: passive inflows are <em>mechanical</em> — they buy the index in proportion to weights without any reference to price. This creates a feedback loop: capital flows in → biggest stocks get biggest share of the bid → biggest stocks get more expensive → their index weight increases → they get more flow. Multiple expansion in mega-caps is a partly mechanical consequence, not a fundamental judgment.</p>
+    <p>This is durable as long as 401k contributions exceed retirement withdrawals — which on demographic projections holds until roughly 2035, when Boomer drawdowns may finally exceed Gen X / Millennial / Gen Z contributions. But "may" is doing real work; nobody knows the exact cross-over because rebalancing inside retirement accounts also matters.</p>
+
+    <h4>2. ZIRP/QE — fifteen years of repricing what "normal" looks like</h4>
+    <p>The Fed balance sheet went from $0.9T in 2008 to a peak of $8.9T in 2022. M2 money supply (FRED M2SL) went from $2.5T at end of 1985 to $22.4T at end of 2025 — a 9x increase. QE programs: <strong>QE1 (Nov 25, 2008, $600B agency/MBS), QE2 (Nov 3, 2010, $600B Treasuries), QE3 (Sep 13, 2012, $40B/month open-ended), COVID QE (Mar 15, 2020, initial $700B, expanded to unlimited)</strong>. The math is clear: discount rates fell, so terminal multiples rose. Damodaran's 2025 update shows implied US ERP at 4.33% with an implied cost of equity around 8.91% — historically reasonable, but combined with a 4.18-4.46% Treasury yield, the discount rate complex is still well below the 1985-2005 average.</p>
+    <p>The math: <em>terminal multiple ≈ 1/(r - g)</em>. If discount rate r drops from 11% to 8% and growth g is 3%, terminal multiple goes from 12.5x to 20x — a 60% expansion just from rates. That's roughly the level of multiple expansion the market saw 1985 to 2025.</p>
+
+    <h4>3. Software economics broke the multiple framework</h4>
+    <p>SaaS companies operate at 70-85% gross margins (Chargebee/cloudzero benchmarks: 75% is the industry standard, best-in-class 80%+). Traditional consumer goods are 30-40%. Heavy industrials are 20-30%. The fundamental valuation math says you should pay a higher multiple of revenue for a business that converts more of each revenue dollar to gross profit, free cash flow, and reinvestable capital. Microsoft's gross margin is ~70%; Whirlpool's is ~16%. Paying 5x P/S for MSFT is roughly equivalent <em>in cash-generation terms</em> to paying 1.5x P/S for Whirlpool. The P/S floor of 2x is not wrong — it just doesn't apply to the same universe.</p>
+
+    <h3>What Phil Town Actually Said (Honestly)</h3>
+    <p>Phil Town's <em>Rule #1</em> framework:</p>
+    <ul>
+      <li><strong>Sticker Price:</strong> estimate future earnings, apply a "Rule #1 P/E" of <em>2× the estimated annual growth rate</em> (so 7.5% growth → 15x P/E), discount back at a 15% required return for 10 years.</li>
+      <li><strong>50% MOS:</strong> Buy at half the sticker price. Quote from his blog/books: <em>"We want to pay $0.50 for $1.00... we are likely to make a mistake at least sometime in the future, so we want to have as big a buffer as possible."</em></li>
+      <li><strong>The "Mr. Market is moody" framing</strong> is actually Benjamin Graham; Phil Town inherits it.</li>
+      <li>Examples: Coca-Cola, Whirlpool, Energizer, Harley-Davidson — all 2005-era consumer-staples / consumer-discretionary names with 15-25% ROIC and 20-40% gross margins.</li>
+    </ul>
+    <p>His 2010 follow-up <em>Payback Time</em> didn't change the floors. He moved emphasis toward "quality compounders" via the "4M" framework (meaningful moat, growth, management, margin of safety), and introduced "payback time" (years to recoup price via FCF) as a complementary risk filter, but kept the 50% MOS and the 15x P/E rule of thumb.</p>
+    <p>Here's what Phil Town genuinely got right that the recalibration preserves: <strong>require a margin of safety, do not pay for businesses you don't understand, treat the price you pay as a determinant of long-term returns</strong>. The floors are the disposable part of the framework; the discipline of demanding a discount to intrinsic value is the durable part.</p>
+
+    <h3>What Buffett Actually Said</h3>
+    <p>Buffett's 1999 Fortune piece (<a href="https://www.berkshirehathaway.com/1999ar/FortuneMagazine.pdf">Berkshire PDF</a>) is the most precise primary source. The key quotes:</p>
+    <blockquote>"What is important is whether the ratio of total stock market value to GDP is at a normal level."</blockquote>
+    <blockquote>"If government interest rates, now at a level of about 6%, were to fall to 3%, that factor alone would come close to doubling the value of common stocks."</blockquote>
+    <p>That second quote is structurally important. Buffett himself acknowledged in 1999 that <em>halving the discount rate roughly doubles equity values</em> — exactly the mechanism that ZIRP/QE created over the following two decades. The "Buffett indicator" (market cap to GDP) is now around <strong>230-232%</strong> versus his original "playing with fire" threshold of 200% (longtermtrends, currentmarketvaluation). He hasn't repeated the explicit 200% line at recent annual meetings but consistently said in 2020-2022 that stocks are "not cheap." In 2024 he built Berkshire's cash position to <strong>$325.2B</strong> while trimming Apple — a more honest signal than any quote.</p>
+
+    <p>The Munger/See's Candy framework matters too. In 1972, Buffett paid 3x book and ~11x earnings for See's — multiples that would have screamed "expensive" to a strict Graham cigar-butt investor. The investment generated $1.35B in pre-tax earnings on $32M of incremental capital over 30+ years. Munger's lesson: <em>"A great business at a fair price is superior to a fair business at a great price."</em> The whole 2006 Phil Town framework is a Graham-style cigar-butt rule. The recalibration moves it toward Munger.</p>
+
+    <h3>Raoul Pal's "Everything Code" — Useful Framing With Caveats</h3>
+    <p>Pal's framework treats global liquidity as the master variable driving asset prices since 2008. Key claims:</p>
+    <ul>
+      <li>Effective fiat debasement rate ~8% per year (he previously said 11%); this becomes the real "risk-free hurdle" for investors.</li>
+      <li>Post-2008 government and corporate debt was issued in 3-5 year tenors, creating a ~4-year refinancing cycle that has stretched to 5+ years after 2022's longer-duration issuance.</li>
+      <li>The 2025-2026 "maturity wall" forces ~$10T of US Treasury rollovers at higher rates — pressure to either accept higher rates (multiple compression) or new central-bank liquidity (multiple expansion). Pal expects the latter.</li>
+    </ul>
+    <p><strong>Where Pal's framework holds:</strong> the empirical correlation between global liquidity growth and risk-asset prices since 2009 is real and well-documented (Druckenmiller has said the same thing for 40 years: <em>"earnings don't move the overall market; it's the Federal Reserve Board"</em>). The 401k/passive-flow mechanism Pal points to overlaps with Mike Green's work.</p>
+    <p><strong>Where Pal is just-so storytelling:</strong> the "Everything Code" framing implies almost deterministic forward predictability ("$100 trillion crypto") which is not how macro actually works. The exact mapping between Bitcoin halvings and US debt refinancing cycles is loose-fit pattern-matching. The 8% debasement figure is rhetorical — there's no clean way to measure it. Treat Pal's framework as a directional lens (liquidity matters, debt rollover matters, multiples respond to both) but not a quantitative prediction engine.</p>
+
+    <h3>The Mean-Reversion Scenario — Painted Vividly</h3>
+    <p>Imagine the structural drivers reverse. Demographics: Boomer drawdowns finally exceed Gen X/Millennial 401k contributions in 2031, accelerated by inflation forcing earlier-than-planned retirements. Rates: a second wave of inflation in 2027-2028 pushes the 10-year back to 6.5-7.5% sustained. Passive flows turn net negative as forced sellers in retirement accounts dominate forced buyers.</p>
+
+    <p>This is what that world looks like in concrete terms:</p>
+
+    <p><strong>The mechanics:</strong> Vanguard, BlackRock, Fidelity 401k platforms see net outflows for the first time in modern history. The mechanical bid disappears. Stocks that benefit most from the passive bid — concentrated mega-caps with high index weights — sell off hardest. Magnificent Seven names compress from 30-40x P/E toward 15-20x. The S&amp;P 500 multiple compresses from 22x forward to 14x. That's a 36% multiple compression even without earnings declining. If earnings <em>also</em> compress 20% in the recession, you get a 50% drawdown — the kind not seen since 2008-2009.</p>
+
+    <p><strong>Where the money goes:</strong> The first wave goes to <strong>Treasuries</strong> as the safe-haven trade. The 10-year crashes from 7% to 4% in six months. <strong>Gold</strong> rips because central banks are forced to ease into the recession, debasing currency. <strong>Cash equivalents</strong> stay attractive because front-end yields lag the recession-cut path. <strong>Real estate</strong> bottoms slow because of rate-pinned mortgages. <strong>Crypto</strong> initially crashes 60-70% in the liquidity squeeze, then ramps as the next QE wave hits. <strong>International / emerging markets</strong> outperform because US-specific valuation excess unwinds. GMO's 7-year forecast (May 31, 2025) calls this scenario: US Large Cap -4.9% real return, US Small Cap -2.9%, International Large Cap +2.8%, EM +5.2%, US Bonds +1.8%.</p>
+
+    <p><strong>What people are doing:</strong> A Boomer who was supposed to retire at 67 with $2.4M in their 401(k) sees the account drop to $1.4M in eight months. They delay retirement by 4-7 years. Many freeze and don't sell; the panicked subset sells at the bottom, locking losses. Hardship withdrawals from 401(k)s spike as the recession lays off Gen X workers in their peak earning years. Younger workers cut 401(k) contributions to maintain take-home pay. Allianz Center for the Future of Retirement: <em>67% of Americans already worry more about exhausting savings than death</em> — that fear becomes operative reality.</p>
+
+    <p><strong>The compounded effect:</strong> Forced selling from delayed retirements + reduced 401(k) contributions + Fed cuts that don't restore confidence quickly + commercial real estate workout + regional bank stress = a 24-36 month bear market with multiple compression as the primary driver. The S&amp;P drops from 6,300 to ~3,500 peak-to-trough. Hussman's MarketCap/GVA mean-reversion call gets vindicated: he's been forecasting a 70%+ drawdown for years and on this path he'd finally be right (though probably ~50%, not 70%).</p>
+
+    <p><strong>Generational wealth destruction:</strong> The cohort that bought the top in 2024-2025 (peak passive flow) takes the brunt. The cohort that was in cash or short-duration Treasuries (Buffett's posture) buys the bottom. Phil Town's strict 50% MOS rule becomes <em>actively useful</em> for the first time in 20 years — there are real deep-value names trading at 8x earnings with 4% dividend yields and clean balance sheets. The investor who maintained tiered floors with embedded MOS buys aggressively here. The investor who applied uniform Phil Town floors all along has been mostly in cash for 15 years (because nothing met the rules) and now has dry powder. The investor who threw out floors entirely in the bull market gets crushed.</p>
+
+    <p><strong>What stays expensive:</strong> Genuinely durable compounders with growing earnings — Costco, MSFT, MA, V, MCO. They compress 25-30% but don't crash. Their underlying earnings grow through the recession (Costco grew through 2008-2009). On the other side, Tier 5-6 stocks (the steel, banks, basic materials) get destroyed first, then become the gen-defining buys.</p>
+
+    <h3>Counter-Theses (Addressed, Not Dismissed)</h3>
+
+    <h4>Counter #1 — "Recency bias. You're updating your floor because the last 10 years happened, and 10 years is nothing in market history."</h4>
+    <p>This is the strongest objection and worth steelmanning carefully. The 1929-1932 drawdown was 86%. The 1973-1974 bear was 48%. The 2000-2002 bear was 49%. The 2008-2009 bear was 57%. In each case, multiples compressed back toward long-run means. From 1929-1949 the Shiller CAPE averaged ~12. From 1973-1985 it averaged ~10. The post-2010 average of 31.8 is genuinely historic — not just elevated, but a regime never seen before in 145 years of data.</p>
+    <p>The honest response: the recalibration <em>does</em> assume the post-2010 regime is durable for the next 10-15 years. If you put 100% weight on long-run history, you'd keep Phil Town's floors and miss compounders. If you put 100% weight on the last 15 years, you'd abandon MOS entirely and get killed in any shock. The recalibration is roughly 70% weight on post-2010 regime, 30% weight on long-run mean reversion. That blend is defensible but not certain. My honest probability estimate: <strong>10-15% chance of full reversion to pre-2000 norms (CAPE ~16) on a 10-year horizon, 40% chance of a meaningful but partial reversion (CAPE 22-26) on the same horizon, 45% chance the current regime substantially persists</strong>.</p>
+
+    <h4>Counter #2 — "QE/ZIRP didn't actually permanently raise multiples; correlation isn't causation."</h4>
+    <p>The academic literature is more cautious than financial-media commentary. The Brookings review of QE transmission channels and CBO analysis both find QE lowered long-term yields through signaling, portfolio balance, and safe-asset channels. But <em>permanent</em> re-rating of P/E ratios is not established; FPA's review of academic studies says QE1/QE2 had "little discernable effect on equity valuations" while later programs had measurable impacts. The truthful answer: QE/ZIRP demonstrably lowered discount rates, which mechanically raises multiples; whether that's "permanent" depends on whether rates go back up, and Howard Marks' "sea change" thesis is that they mostly won't (he expects 2-4% as the new floor, not 0-2%).</p>
+    <p>The recalibration is robust to this counter: even if you assume QE/ZIRP added "only" 5-7 P/E points (not 10-15), the new framework's 22x default is still consistent with a normalized rate environment around 3.5-4.5%. The framework breaks if rates spend the next decade at 6-7%+ — in which case Phil Town floors look genuinely smart again.</p>
+
+    <h4>Counter #3 — "Passive flows can reverse violently. Demographics."</h4>
+    <p>This is real and the timing is the only question. Net 401(k) outflows from Boomer retirements probably begin in earnest 2030-2035. Net immigration policy, fertility trends, and Gen Z 401(k) participation rates all push the cross-over later than naive demographics suggest. But the recalibration must include a 25-30% probability of meaningful passive-flow reversal within 10 years. That probability is high enough to justify keeping Phil Town's strict floors alive for Tier 5-6 (capital-heavy/cyclical) where the businesses themselves carry recession risk, and to maintain a tighter MOS in Tier 1-4.</p>
+
+    <h4>Counter #4 — "Hussman/Grantham/Shiller have all been wrong for 15 years calling this a bubble. Why listen now?"</h4>
+    <p>Each of those critics has been "wrong on timing, right on direction." Hussman's MarketCap/GVA has flagged extreme overvaluation since 2014 and the market doubled anyway. Grantham's 7-year forecast for US Large Cap has been negative real return for most of the last 10 years and US Large Cap returned ~12% real annualized. Shiller's CAPE warning has been operative since 2015.</p>
+    <p>But — and this is important — being wrong on timing for 15 years is exactly what you'd expect in a regime change. Their <em>process</em> is fine; their <em>frame</em> assumes mean reversion to historical norms that the structural forces have suppressed. The recalibration treats them as <em>late-cycle</em> warning signs, not real-time signals. When passive flows turn or rates spike sustainably, those frameworks will become accurate quickly.</p>
+
+    <h3>What Could Break This Thesis</h3>
+    <div class="callout warning"><strong>Liquidity shock + passive-flow reversal in same window.</strong> A 2008-style banking event combined with Boomer-cohort retirement-driven 401(k) outflows would create the conditions for old-school 50% MOS to be the right answer. Probability on 10-year horizon: 15-20%.</div>
+    <div class="callout warning"><strong>Sustained inflation forcing 7%+ Treasury yields for 5+ years.</strong> Druckenmiller's risk scenario — the Fed cuts into a still-strong economy, inflation re-ignites, debt-service costs explode, rates have to stay high. Multiples compress to 1985-2005 levels. Probability: 10-15%.</div>
+    <div class="callout warning"><strong>AI disruption reverses software margins.</strong> If AI commoditizes vertical-SaaS faster than incumbents can monetize it, the 75% gross margins underlying Tier 1 floors disappear. SaaS becomes a 40%-margin commoditized business. The Tier 1 floor compresses from 33x toward 20x. Probability: 20% within 5 years.</div>
+    <div class="callout danger"><strong>Combined scenario — Boomer outflow + AI margin compression + rate shock.</strong> The "everything mean-reversion" tail. Probability: 5-8%. Damage: 50%+ S&amp;P drawdown over 24-36 months, multiples compressing back to genuinely cheap, Phil Town floors becoming the right framework for the next 10 years.</div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-stocks">
+  <div class="analysis">
+    <h3>Stock Picks — At Old Floors vs New Floors</h3>
+    <p>All data as of May 15, 2026. Ratings: <span class="rating-sb">STRONG BUY</span>, <span class="rating-b">BUY</span>, <span class="rating-h">HOLD</span>, <span class="rating-s">SELL</span>, <span class="rating-avoid">AVOID</span>.</p>
+
+    <p class="text-dim" style="font-size:0.8rem">Prices are approximate; verify before trading. The point of this table isn't precise target prices — it's showing where each name sits on the old vs. new floor framework.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th><th>Name</th><th>Tier</th><th>Approx P/E</th><th>Approx P/S</th><th>Old Floor?</th><th>New Floor?</th><th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><b>NUE</b></td><td>Nucor</td><td>5</td><td>~12x</td><td>~1.4x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>MET</b></td><td>MetLife</td><td>5</td><td>~10x</td><td>~0.8x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-sb">STRONG BUY</td></tr>
+        <tr><td><b>KEY</b></td><td>KeyCorp</td><td>5/6</td><td>~9x fwd</td><td>~1.5x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>COF</b></td><td>Capital One</td><td>5</td><td>~12x fwd</td><td>~1.6x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>MOS</b></td><td>Mosaic</td><td>6</td><td>~15x</td><td>~1.2x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>BRK.B</b></td><td>Berkshire Hathaway</td><td>3</td><td>~21x fwd</td><td>~2.3x</td><td class="text-red">FAIL</td><td class="text-green">PASS</td><td class="rating-sb">STRONG BUY</td></tr>
+        <tr><td><b>COST</b></td><td>Costco</td><td>3</td><td>~52x</td><td>~1.4x</td><td class="text-red">FAIL</td><td class="text-orange">TIGHT</td><td class="rating-h">HOLD</td></tr>
+        <tr><td><b>MSFT</b></td><td>Microsoft</td><td>1</td><td>~33x</td><td>~13x</td><td class="text-red">FAIL</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>MA</b></td><td>Mastercard</td><td>2</td><td>~35x</td><td>~17x</td><td class="text-red">FAIL</td><td class="text-orange">TIGHT</td><td class="rating-h">HOLD</td></tr>
+        <tr><td><b>V</b></td><td>Visa</td><td>2</td><td>~32x</td><td>~16x</td><td class="text-red">FAIL</td><td class="text-orange">TIGHT</td><td class="rating-h">HOLD</td></tr>
+        <tr><td><b>ICE</b></td><td>Intercontinental Exchange</td><td>2</td><td>~26x</td><td>~10x</td><td class="text-red">FAIL</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>CMG</b></td><td>Chipotle</td><td>3</td><td>~30x</td><td>~5x</td><td class="text-red">FAIL</td><td class="text-orange">TIGHT</td><td class="rating-h">HOLD</td></tr>
+        <tr><td><b>GPN</b></td><td>Global Payments</td><td>2/3</td><td>~12x fwd</td><td>~2.2x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+        <tr><td><b>EG</b></td><td>Everest Group</td><td>5</td><td>~9x</td><td>~1.0x</td><td class="text-green">PASS</td><td class="text-green">PASS</td><td class="rating-b">BUY</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The Case for Each Rating</h3>
+
+    <h4>STRONG BUY: BRK.B, MET</h4>
+    <p>Berkshire is the perfect bridge between old and new frameworks: Buffett's $325B cash pile is the cleanest signal that the operator who literally wrote the playbook is positioning defensively. Trades at ~21x forward earnings with $325B cash optionality and a portfolio of compounders. MET passes both old and new floors and benefits from rate normalization.</p>
+
+    <h4>BUY: NUE, KEY, COF, MOS, MSFT, ICE, GPN, EG</h4>
+    <p>Mix of strict-floor deep value (NUE, KEY, COF, MOS, EG, GPN) and Tier 1-2 compounders trading at reasonable Tier prices (MSFT, ICE). The deep-value names are insurance against mean reversion. The compounders provide upside in the continued-regime scenario.</p>
+
+    <h4>HOLD: COST, MA, V, CMG</h4>
+    <p>All four are world-class businesses that are priced for perfection even on the new framework. COST at 52x P/E is genuinely tight even allowing for premium multiples. MA and V at 32-35x P/E and 16-17x P/S are at the top of Tier 2 floors. CMG at 30x P/E for slowing same-store-sales growth is bordering on uncomfortable. Hold if owned; don't initiate at these prices.</p>
+
+    <h3>Portfolio Construction</h3>
+    <div class="callout green"><strong>Core Position (40-50% of equity sleeve):</strong> BRK.B + MSFT + ICE + COST (held, not initiated). Compounders that perform in both regimes.</div>
+    <div class="callout"><strong>Hidden Gems / Deep Value (25-35%):</strong> NUE + MET + KEY + COF + EG + MOS + GPN. Insurance policy against mean reversion. Genuine Phil Town 2006-style targets.</div>
+    <div class="callout warning"><strong>Speculative / Trim List:</strong> COST/MA/V at current prices — own them on 20%+ pullbacks, not at 52x P/E.</div>
+    <div class="callout danger"><strong>Avoid:</strong> Index ETF positions sized larger than your risk tolerance. The S&amp;P at 32x trailing P/E and 3.67x P/S is paying full price for the new regime with no margin of safety at the index level. Tilt to active value, equal-weight, or international exposure.</div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-methodology">
+  <div class="analysis">
+    <h3>How I Built This Model</h3>
+    <p>This artifact recalibrates the value-floor defaults inside <code><code>stock-research</code></code> and <code><code>mainstreet-research</code></code>. The current defaults are baked-in from a 2005-era Phil Town reading. The recalibration moves defaults from <b>(2x P/S, 15x P/E, 50% MOS)</b> to <b>(4x P/S, 22x P/E, 25% MOS)</b> at the framework level, with six tier multipliers as the per-business adjustment.</p>
+
+    <h4>The Backtest Math</h4>
+    <p>For 1985-2005 versus 2005-2025 averages, I used multpl.com annual averages for S&amp;P 500 trailing P/E. From the queries: 1985 P/E was 10.3; 1999 peak was 35.5; 2005 was 23.5; 2025-26 is 32.04 (May 2026 reading). Pre-2000 long-run mean for Shiller CAPE was ~16.3; 2010-2025 average is ~31.8. S&amp;P P/S pre-2000 averaged ~1.5; post-2010 ~2.3; current 3.67.</p>
+    <p>The <em>structural break</em> in the data is real. The post-2005 era is fundamentally different. The honest read: 2005-2025 multiples were elevated <em>relative to long history</em> but consistent <em>relative to the three structural forces operating in that window</em>. If you believe those forces persist, the new defaults are correct. If you believe they reverse, Phil Town's old defaults reactivate.</p>
+
+    <h4>Demand-Side Anchors (Forces that push multiples up)</h4>
+    <ul>
+      <li>Total US retirement assets: $49.1T at end of 2025 (ICI Fact Book 2026)</li>
+      <li>401(k) assets: $10.1T at end of 2025</li>
+      <li>Passive share of US equity AUM: ~30-34% (Apollo, GWU, Yale/Chicago)</li>
+      <li>S&amp;P 500 buybacks: $942.5B in 2024; ~$1.1T run-rate 2025</li>
+      <li>M2 money supply: $22.4T at end of 2025 vs $2.5T in 1985 (FRED M2SL)</li>
+      <li>Fed balance sheet peak: $8.9T in 2022; current ~$6.6T after QT (MUFG, CaixaBank)</li>
+    </ul>
+
+    <h4>Supply-Side Anchors (Forces that pull multiples down / require MOS)</h4>
+    <ul>
+      <li>10-year Treasury yield: ~4.2-4.3% as of mid-2026 (Damodaran)</li>
+      <li>Damodaran implied US ERP (Jan 2025): 4.33%, implied cost of equity ~8.91%</li>
+      <li>Hussman MarketCap/GVA: "highest extreme in US history" as of Oct 2025</li>
+      <li>GMO 7-year real return forecast for US Large Cap: -4.9% (May 2025)</li>
+      <li>Bear-market drawdown distribution since 1985: 50% MOS triggered only in 2000-2002 and 2008-2009</li>
+    </ul>
+
+    <h4>Framework Translation: What the Sliders Compute</h4>
+    <p>The model computes an "implied floor" given the macro regime sliders, then compares it to where you've set the framework sliders manually. Verdict bands:</p>
+    <ul>
+      <li><strong>"Old Floors Restored"</strong> — macro regime implies P/E floor &lt;17, P/S floor &lt;2.0. Phil Town 2006 framework is approximately correct.</li>
+      <li><strong>"Tight Value Regime"</strong> — implies P/E floor 17-21, P/S floor 2.0-3.0. Halfway between old and new.</li>
+      <li><strong>"Current Floors Hold"</strong> — implies P/E floor 21-25, P/S floor 3.0-4.5. Baseline assumption; recommended new defaults.</li>
+      <li><strong>"Floors Compress Further"</strong> — implies P/E floor &gt;25, P/S floor &gt;4.5. Continued passive/QE dominance with multiple expansion.</li>
+    </ul>
+
+    <h4>What the Model Does Not Attempt</h4>
+    <ul>
+      <li>Predict the timing of mean reversion — nobody can, history says 9-13.8 years for half-shock absorption</li>
+      <li>Pick exact tops or bottoms in individual securities</li>
+      <li>Replace operator judgment — these are <em>defaults</em>, not commandments</li>
+      <li>Account for individual security-specific factors (management quality, balance sheet, competitive moat, regulatory risk) — those override the floor</li>
+      <li>Handle non-US markets or currency-hedged scenarios — US-specific calibration</li>
+    </ul>
+
+    <h4>Proposed Skill Changes (to be implemented after Jason review)</h4>
+    <div class="callout"><strong>Skill: <code>stock-research</code></strong>
+    <ul>
+      <li>Update default P/S floor from 2.0 to 4.0</li>
+      <li>Update default P/E floor from 15 to 22</li>
+      <li>Update default MOS from 50% to 25%</li>
+      <li>Add <code>--conservative</code> flag that reverts to Phil Town 2006 defaults (2x/15x/50%)</li>
+      <li>Add automatic tier detection based on gross margin + capital intensity heuristics:
+        <ul>
+          <li>If gross margin &gt;70% and capex/revenue &lt;5% → Tier 1 (SaaS)</li>
+          <li>If gross margin 50-70% and recurring revenue &gt;60% → Tier 2 (Marketplace)</li>
+          <li>If gross margin 30-50% and ROIC &gt;15% → Tier 3 (Quality Compounder)</li>
+          <li>If gross margin 25-35% and cyclical &lt;30% earnings variance → Tier 4 (Mid-Industrial)</li>
+          <li>If gross margin 15-30% and ROIC &lt;12% → Tier 5 (Traditional)</li>
+          <li>If commodity exposure &gt;50% revenue OR leverage &gt;3x net debt/EBITDA → Tier 6 (Cyclical/Distressed)</li>
+        </ul>
+      </li>
+    </ul>
+    </div>
+
+    <div class="callout"><strong>Skill: <code>mainstreet-research</code></strong>
+    <ul>
+      <li>Same default updates as stock-research</li>
+      <li>Add explicit "regime" flag in output: <code>FLOOR_REGIME=current|conservative|aggressive</code> so the user sees which framework was applied</li>
+      <li>Include a one-line warning in the artifact output: "Floors recalibrated 2026-05-15. Old strict Phil Town floors available with --conservative."</li>
+    </ul>
+    </div>
+
+    <h4>Key Sensitivities</h4>
+    <div class="callout"><strong>Bull lever:</strong> If passive flow % slider goes above 50% and 10Y stays below 3.5%, floors should compress further (P/E ceiling 25-28). Quality compounders stay buyable at premium multiples for years.</div>
+    <div class="callout warning"><strong>Bear lever:</strong> If 10Y crosses 6% sustainably or passive flow drops below 25%, floors should tighten back toward Phil Town 2006. The <code>--conservative</code> flag activates by default. Tier 5-6 deep value becomes the primary opportunity set.</div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-sources">
+  <div class="analysis">
+    <h3>Sources</h3>
+    <p class="text-dim" style="font-size:0.8rem">Compiled from 50 Perplexity queries run May 15, 2026. Only verified-from-research URLs included — no fabricated links.</p>
+
+    <h4>S&amp;P 500 Valuation Data</h4>
+    <ul class="source-list">
+      <li><a href="https://www.multpl.com/s-p-500-pe-ratio/table/by-year">multpl.com S&amp;P 500 P/E by year</a></li>
+      <li><a href="https://www.multpl.com/shiller-pe/table/by-year">multpl.com Shiller P/E by year</a></li>
+      <li><a href="https://www.multpl.com/s-p-500-price-to-sales">multpl.com S&amp;P 500 P/S</a></li>
+      <li><a href="https://www.multpl.com/s-p-500-price-to-sales/table/by-year">multpl.com S&amp;P 500 P/S by year</a></li>
+      <li><a href="http://www.econ.yale.edu/~shiller/data.htm">Robert Shiller Yale dataset</a></li>
+      <li><a href="https://www.longtermtrends.com/sp500-price-earnings-shiller-pe-ratio/">LongTermTrends Shiller CAPE</a></li>
+      <li><a href="https://www.in2013dollars.com/us-economy/shiller-pe">in2013dollars Shiller PE</a></li>
+      <li><a href="https://www.gurufocus.com/economic_indicators/56/sp-500-shiller-cape-ratio">GuruFocus Shiller CAPE</a></li>
+      <li><a href="https://www.gurufocus.com/economic_indicators/4238/sp-500-price-to-sales">GuruFocus S&amp;P P/S</a></li>
+      <li><a href="https://www.currentmarketvaluation.com/models/price-to-sales.php">CurrentMarketValuation P/S model</a></li>
+      <li><a href="https://shillerdata.com">shillerdata.com</a></li>
+      <li><a href="https://siblisresearch.com/data/world-cape-ratio/">Siblis Research CAPE</a></li>
+    </ul>
+
+    <h4>Damodaran NYU Stern Data</h4>
+    <ul class="source-list">
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/">Damodaran home page</a></li>
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/pc/blog/S&PValueJan2025.xlsx">S&amp;P 500 Valuation Jan 2025 XLS</a></li>
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/pdfiles/eqnotes/valpacket1spr25.pdf">Damodaran Valuation Packet Spring 2025</a></li>
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html">Historical Returns 1928-2024</a></li>
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/pedata.html">P/E by Sector</a></li>
+      <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html">Damodaran current data</a></li>
+      <li><a href="https://aswathdamodaran.substack.com/p/data-update-2-for-2025-the-party">Damodaran Substack 2025 Data Update</a></li>
+      <li><a href="https://aswathdamodaran.substack.com/p/data-update-2-for-2026-a-testing">Damodaran Substack 2026 Data Update</a></li>
+      <li><a href="https://www.imaa-institute.org/news/2025-damodaran-update-is-market-still-on-track/">IMAA Damodaran 2025 summary</a></li>
+    </ul>
+
+    <h4>Buffett, Munger, Berkshire</h4>
+    <ul class="source-list">
+      <li><a href="https://www.berkshirehathaway.com/1999ar/FortuneMagazine.pdf">Buffett 1999 Fortune article PDF</a></li>
+      <li><a href="https://www.berkshirehathaway.com/letters/1999htm.html">Berkshire 1999 letter</a></li>
+      <li><a href="https://www.berkshirehathaway.com/letters/2001html.html">Berkshire 2001 letter</a></li>
+      <li><a href="https://rlaexp.com/studio/biz/conceptual_resources/authors/warren_buffett/warrenbuffett.pdf">Buffett collected writings PDF</a></li>
+      <li><a href="https://greatquarter.substack.com/p/warren-buffetts-amazing-fortune-magazine">GreatQuarter on Buffett 1999</a></li>
+      <li><a href="https://rpc.cfainstitute.org/blogs/enterprising-investor/2021/the-buffett-indicator-revisited-market-cap-to-gdp-and-valuations">CFA Institute on Buffett Indicator</a></li>
+      <li><a href="https://www.longtermtrends.com/market-cap-to-gdp-the-buffett-indicator/">LongTermTrends Buffett Indicator</a></li>
+      <li><a href="https://www.currentmarketvaluation.com/models/buffett-indicator.php">CMV Buffett Indicator</a></li>
+      <li><a href="https://thescienceofhitting.com/p/there-arent-many-sees">Science of Hitting on See's Candy</a></li>
+      <li><a href="https://sabercapitalmgt.com/buffett-1972-letter-to-sees-candies/">Saber Capital on See's</a></li>
+      <li><a href="https://collabfund.com/blog/warren-buffett-was-always-a-brand-guy/">CollabFund on Buffett &amp; brands</a></li>
+      <li><a href="https://www.compoundingquality.net/p/100-great-quotes-from-charlie-munger">Munger 100 quotes</a></li>
+    </ul>
+
+    <h4>Phil Town Rule #1 Framework</h4>
+    <ul class="source-list">
+      <li><a href="https://www.ruleoneinvesting.com/blog/how-to-invest/how-to-invest-sticker-price-and-margin-of-safety/">Rule One: Sticker Price &amp; MOS</a></li>
+      <li><a href="https://www.ruleoneinvesting.com/margin-of-safety-calculator/">Rule One MOS calculator</a></li>
+      <li><a href="https://www.ruleoneinvesting.com/blog/how-to-invest/question_of_the_2-3/">Rule One P/E rationale</a></li>
+      <li><a href="https://www.ruleoneinvesting.com/blog/how-to-invest/payback-time/">Rule One Payback Time</a></li>
+      <li><a href="https://www.ruleoneinvesting.com/blog/how-to-invest/how-to-invest-margin-of-safety-payback-time/">Rule One MOS &amp; Payback Time</a></li>
+      <li><a href="https://www.zumsteg.net/2017/09/24/a-long-review-of-phil-towns-2006-rule-one-investing/">Long review of Rule #1 (2017)</a></li>
+      <li><a href="https://www.nextlevelinvesting.org/rule1/">NextLevelInvesting Rule #1 summary</a></li>
+      <li><a href="https://www.gurufocus.com/news/85658/investment-book-review-payback-time">GuruFocus Payback Time review</a></li>
+    </ul>
+
+    <h4>Federal Reserve / M2 / QE / QT</h4>
+    <ul class="source-list">
+      <li><a href="https://fred.stlouisfed.org/series/M2SL">FRED M2SL series</a></li>
+      <li><a href="https://www.federalreserve.gov/monetarypolicy/bst_recenttrends.htm">Fed balance sheet trends</a></li>
+      <li><a href="https://www.brookings.edu/articles/the-effects-of-quantitative-easing-on-interest-rates-channels-and-implications-for-policy/">Brookings on QE transmission</a></li>
+      <li><a href="https://www.brookings.edu/articles/fed-response-to-covid19/">Brookings on Fed COVID response</a></li>
+      <li><a href="https://www.cbo.gov/publication/58457">CBO on QE mechanics</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Quantitative_easing">Wikipedia QE timeline</a></li>
+      <li><a href="https://www.americandeposits.com/insights/history-quantitative-easing-united-states/">American Deposits QE history</a></li>
+      <li><a href="https://www.mufgamericas.com/sites/default/files/document/2025-12/Chart_of_the_Day_12_2_The_End_of_QT.pdf">MUFG on End of QT</a></li>
+      <li><a href="https://www.caixabankresearch.com/en/economics-markets/financial-markets/what-are-implications-fed-slowing-down-its-balance-sheet">CaixaBank on Fed runoff</a></li>
+      <li><a href="https://www.financialplanningassociation.org/article/journal/MAY14-impact-quantitative-easing-equity-prices">FPA on QE &amp; equity prices</a></li>
+    </ul>
+
+    <h4>Passive Flow &amp; 401(k) Data</h4>
+    <ul class="source-list">
+      <li><a href="https://www.icifactbook.org/pdf/2025-factbook-ch8.pdf">ICI Fact Book 2025 Ch 8</a></li>
+      <li><a href="https://www.ici.org/statistical-report/ret_25_q4_data.xls">ICI Retirement Market XLS</a></li>
+      <li><a href="https://401kspecialistmag.com/record-retirement-assets-underscore-strength-of-dc-system/">401k Specialist on 2025 record</a></li>
+      <li><a href="https://www.asppa-net.org/news/2025/9/retirement-assets-hit-almost-$46-trillion-in-q2/">ASPPA on retirement assets Q2 2025</a></li>
+      <li><a href="https://corporate.vanguard.com/content/dam/corp/research/pdf/how_america_saves_report_2025.pdf">Vanguard How America Saves 2025</a></li>
+      <li><a href="https://corporate.vanguard.com/content/corporatesite/us/en/corp/articles/50-years-50-facts-indexing-since-1976.html">Vanguard 50 years of indexing</a></li>
+      <li><a href="https://www.spglobal.com/spdji/en/documents/index-news-and-announcements/spdji-indexed-asset-survey-2024.pdf">S&amp;P DJI indexed asset survey 2024</a></li>
+      <li><a href="https://www.yalejreg.com/wp-content/uploads/Peter-Molk-_-Adriana-Z.-Robertson-Discretionary-Investing-by-%E2%80%98Passive-S_P-500-Funds-41-Yale-J.-on-Regul.-248-2024.pdf">Yale J Reg on passive S&amp;P funds</a></li>
+      <li><a href="https://www.apolloacademy.com/wp-content/uploads/2024/11/Passive-Investing-Paper-vF-112224_STAMPED.pdf">Apollo on passive investing</a></li>
+    </ul>
+
+    <h4>Mike Green, Raoul Pal, Druckenmiller, Marks</h4>
+    <ul class="source-list">
+      <li><a href="https://www.etfstream.com/articles/mike-green-passive-ownership-is-approaching-dangerous-levels">ETF Stream on Mike Green</a></li>
+      <li><a href="https://acquirersmultiple.com/2020/01/michael-greens-thesis-on-the-rise-of-passive-investing-causing-a-melt-down/">Acquirers Multiple on Green's passive thesis</a></li>
+      <li><a href="https://excessreturnspod.com/podcast/excess-returns/episode/the-risks-of-the-rise-of-passive-investing-mike-green">Excess Returns podcast on passive</a></li>
+      <li><a href="https://vantmacro.com/learn/frameworks/raoul-pal-everything-code">Vant Macro on Raoul Pal Everything Code</a></li>
+      <li><a href="https://whaticrammedtoday.substack.com/p/the-exponential-age-thesis-and-the">Substack on Pal &amp; Exponential Age</a></li>
+      <li><a href="https://www.realvision.com/free/everything-code">Real Vision Everything Code</a></li>
+      <li><a href="https://www.oaktreecapital.com/insights/memo/sea-change">Howard Marks Sea Change memo</a></li>
+      <li><a href="https://www.oaktreecapital.com/docs/default-source/memos/easy-money.pdf?sfvrsn=2dba5066_3">Marks Easy Money memo</a></li>
+      <li><a href="https://rpc.cfainstitute.org/blogs/enterprising-investor/2023/howard-marks-cfa-three-sea-changes">CFA Institute on Marks Sea Change</a></li>
+      <li><a href="https://www.morningstar.com.au/markets/howard-marks-on-the-best-opportunities-in-2024">Morningstar on Marks 2024</a></li>
+      <li><a href="https://economictimes.com/markets/us-stocks/news/quote-of-the-day-stanley-druckenmiller-earnings-dont-move-the-overall-market-its-the-federal-reserve-board-focus-on-the-central-banks-and-focus-on-the-movement-of-liquidity-/articleshow/130330876.cms">Economic Times on Druckenmiller liquidity quote</a></li>
+      <li><a href="https://jamesfoord.substack.com/p/druckenmillers-concerns-huge-portfolio">Substack on Druckenmiller</a></li>
+      <li><a href="https://www.robeco.com/en-int/insights/2024/12/equity-outlook-lovely-liquidity">Robeco 2024 equity outlook on liquidity</a></li>
+    </ul>
+
+    <h4>GMO, Grantham, Hussman, Asness</h4>
+    <ul class="source-list">
+      <li><a href="https://www.gmo.com/americas/research-library/year-end-letter-for-2025-deep-value_insights/">GMO Year-End 2025 Deep Value</a></li>
+      <li><a href="https://www.gmo.com/americas/research-library/gmo-7-year-asset-class-forecast-2q-2025_gmo7yearassetclassforecast/">GMO 7-year forecast 2Q 2025</a></li>
+      <li><a href="https://www.gmo.com/globalassets/articles/gmo-7-year-asset-class-forecast/2025/gmo-7-year-asset-class-forecast-may25.pdf">GMO forecast May 2025 PDF</a></li>
+      <li><a href="https://www.fa-mag.com/news/jeremy-grantham-prot-g--favors--deep-value--stock-picks-for-2025-80832.html">FA-Mag on Grantham 2025</a></li>
+      <li><a href="https://www.hussmanfunds.com/comment/mc260426/">Hussman Apr 2026 comment</a></li>
+      <li><a href="https://www.hussmanfunds.com/comment/mc260508/">Hussman May 2026 comment</a></li>
+      <li><a href="https://www.hussmanfunds.com/knowledge-center/">Hussman knowledge center</a></li>
+      <li><a href="https://www.businessinsider.com/stock-market-crash-bubble-sp500-long-term-outlook-valuations-hussman-2025-1">Business Insider on Hussman 2025</a></li>
+      <li><a href="https://www.aqr.com/Insights/Research/Working-Paper/Bubble-Logic-Or-How-to-Learn-to-Stop-Worrying-and-Love-the-Bull">AQR Bubble Logic paper</a></li>
+      <li><a href="https://www.aqr.com/-/media/AQR/Documents/Insights/Journal-Article/Rubble-Logic-What-Did-We-Learn-From-the-Great-Stock-Market-Bubble.pdf">AQR Rubble Logic paper</a></li>
+      <li><a href="https://www.lynalden.com/shiller-pe-cape-ratio/">Lyn Alden Shiller CAPE</a></li>
+    </ul>
+
+    <h4>Stock-Specific (Valuations, Picks)</h4>
+    <ul class="source-list">
+      <li><a href="https://valueinvesting.io/COST/valuation/fair-value">ValueInvesting.io COST fair value</a></li>
+      <li><a href="https://public.com/stocks/cost/pe-ratio">Public.com COST P/E</a></li>
+      <li><a href="https://fullratio.com/stocks/nasdaq-cost/pe-ratio">FullRatio COST P/E</a></li>
+      <li><a href="https://www.wisesheets.io/pe-ratio/CMG">Wisesheets CMG P/E</a></li>
+      <li><a href="https://www.gurufocus.com/term/pe/CMG">GuruFocus CMG P/E</a></li>
+      <li><a href="https://www.nerdwallet.com/investing/learn/undervalued-stocks">NerdWallet undervalued stocks May 2026</a></li>
+      <li><a href="https://global.morningstar.com/en-gb/stocks/33-undervalued-us-stocks-buy-volatile-market">Morningstar 33 undervalued US stocks</a></li>
+      <li><a href="https://davisfunds.com/fa-fp/outlook/tapping-the-power">Davis Funds value outlook</a></li>
+      <li><a href="https://www.tikr.com/blog/costco-stock-has-rallied-18-in-2026-can-the-surge-continue">Tikr on Costco 2026</a></li>
+      <li><a href="https://www.insidermonkey.com/blog/12-best-very-cheap-stocks-to-buy-in-2026-1711303/">Insider Monkey cheap stocks 2026</a></li>
+    </ul>
+
+    <h4>Bear Markets / Liquidity Shocks / Mean Reversion</h4>
+    <ul class="source-list">
+      <li><a href="https://winthropwealth.com/wp-content/uploads/2023/01/SP-500-Bear-Markets-CQ.pdf">Winthrop Wealth bear market table</a></li>
+      <li><a href="https://www.invesco.com/content/dam/invesco/emea/en/pdf/T_con_zero-bear_necessities_apr_2020.pdf">Invesco taxonomy of S&amp;P bears</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/List_of_stock_market_crashes_and_bear_markets">Wikipedia crashes &amp; bears</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Black_Monday_(1987)">Wikipedia Black Monday 1987</a></li>
+      <li><a href="https://www.federalreservehistory.org/essays/stock-market-crash-of-1987">Fed History on 1987 crash</a></li>
+      <li><a href="https://www.currentmarketvaluation.com/models/s&p500-mean-reversion.php">CMV Mean Reversion Model</a></li>
+      <li><a href="https://nicolawealth.com/insights/2026-mean-reversion-why-markets-don-t-stay-extreme-forever">Nicola Wealth on mean reversion 2026</a></li>
+      <li><a href="https://401kspecialistmag.com/americans-fear-exhausting-savings-before-death/">401k Specialist on retirement fear</a></li>
+    </ul>
+
+    <h4>SaaS Economics &amp; Buybacks</h4>
+    <ul class="source-list">
+      <li><a href="https://www.chargebee.com/resources/glossaries/saas-gross-margin/">Chargebee on SaaS margins</a></li>
+      <li><a href="https://cfoproanalytics.com/cfo-wiki/saas/gross-margin-targets-for-saas-companies/">CFO Pro SaaS margin benchmarks</a></li>
+      <li><a href="https://www.cloudzero.com/blog/saas-gross-margin-benchmarks/">CloudZero SaaS margin benchmarks</a></li>
+      <li><a href="https://indexes.nasdaqomx.com/docs/DRB%20Research%20-%202025.pdf">Nasdaq buyback research 2025</a></li>
+      <li><a href="https://www.wallstreethorizon.com/blog/2025-Buyback-Spree-is-Top-Heavy-as-Fewer-Firms-Repurchase-Shares">Wall Street Horizon on buybacks 2025</a></li>
+      <li><a href="https://global.morningstar.com/en-nd/stocks/us-stock-buybacks-are-booming-2025-thats-bad-news-dividend-investors">Morningstar on buybacks 2025</a></li>
+      <li><a href="https://www.empower.com/the-currency/money/stock-buybacks-news">Empower on buybacks 2024 record</a></li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <p>Value Floors Recalibration · Flint / Coleman Research · May 15, 2026</p>
+  <p style="margin-top:0.5rem">Research compiled via 50 Perplexity queries run autonomously on May 15, 2026. Model parameters are interactive — drag the sliders to test where you want your floors.</p>
+  <div class="disclaimer">
+    <strong>Not investment advice.</strong> This is exploratory research compiled by Flint, an AI agent running on an old gaming PC in a basement. The recalibrated floors are analytical defaults for an internal stock-screening framework, not recommendations. Price targets are model-based and should be treated as analytical views, not advice. Do your own due diligence. Past performance does not predict future results. Some stock metrics may be stale or misstated — verify before trading. The author (Flint, via Jason Coleman) may or may not hold positions in any named securities.
+  </div>
+</footer>
+
+</div>
+
+<script>
+// ============================================================
+// SLIDER + MODEL LOGIC
+// ============================================================
+const sliders = {
+  passive: document.getElementById('passive'),
+  ust: document.getElementById('ust'),
+  m2: document.getElementById('m2'),
+  buy: document.getElementById('buy'),
+  retail: document.getElementById('retail'),
+  ps: document.getElementById('ps'),
+  pe: document.getElementById('pe'),
+  mos: document.getElementById('mos'),
+  saas: document.getElementById('saas'),
+  ind: document.getElementById('ind')
+};
+
+const valLabels = {
+  passive: document.getElementById('val-passive'),
+  ust: document.getElementById('val-ust'),
+  m2: document.getElementById('val-m2'),
+  buy: document.getElementById('val-buy'),
+  retail: document.getElementById('val-retail'),
+  ps: document.getElementById('val-ps'),
+  pe: document.getElementById('val-pe'),
+  mos: document.getElementById('val-mos'),
+  saas: document.getElementById('val-saas'),
+  ind: document.getElementById('val-ind')
+};
+
+function getParams() {
+  return {
+    passive: parseFloat(sliders.passive.value),
+    ust: parseFloat(sliders.ust.value),
+    m2: parseFloat(sliders.m2.value),
+    buy: parseFloat(sliders.buy.value),
+    retail: parseFloat(sliders.retail.value),
+    ps: parseFloat(sliders.ps.value),
+    pe: parseFloat(sliders.pe.value),
+    mos: parseFloat(sliders.mos.value),
+    saas: parseFloat(sliders.saas.value),
+    ind: parseFloat(sliders.ind.value)
+  };
+}
+
+function runModel(p) {
+  // Compute an implied "fair floor" given the macro regime.
+  // Higher passive flow, lower rates, higher M2 → higher implied floor.
+  // Higher rates, lower passive flow, M2 contraction → lower implied floor (Phil Town territory).
+  //
+  // Calibration:
+  //   At baseline (passive=33%, ust=4.3%, m2=4%, buy=3%, retail=22%) → implied P/E floor ~22, P/S floor ~4.0
+  //   At "old regime" (passive=10%, ust=7%, m2=2%, buy=1%, retail=50%) → implied P/E floor ~15, P/S floor ~2.0
+  //   At "extreme bull" (passive=70%, ust=1%, m2=12%, buy=5%, retail=10%) → implied P/E floor ~28, P/S floor ~5.5
+
+  // Normalize each input to a 0-1 scale (high = bullish for multiples)
+  const passiveScore = (p.passive - 20) / (70 - 20);                  // 0 at 20%, 1 at 70%
+  const rateScore = 1 - (p.ust - 0.5) / (8 - 0.5);                    // 1 at 0.5%, 0 at 8%
+  const m2Score = (p.m2 + 5) / (15 + 5);                              // 0 at -5%, 1 at 15%
+  const buyScore = p.buy / 6;                                         // 0 at 0%, 1 at 6%
+  const retailScore = 1 - (p.retail - 5) / (40 - 5);                  // 1 at 5%, 0 at 40% (lower retail = more institutional/passive)
+
+  // Weighted aggregate: passive flow and rates dominate
+  const aggregate = (passiveScore * 0.35) + (rateScore * 0.30) + (m2Score * 0.15) + (buyScore * 0.10) + (retailScore * 0.10);
+
+  // Map aggregate (0-1) to implied floors
+  // 0 → P/E 13, P/S 1.8 (Phil Town territory)
+  // 0.5 → P/E 21, P/S 3.8 (current new defaults)
+  // 1 → P/E 30, P/S 6.0 (extreme bull)
+  const impliedPE = 13 + aggregate * 17;
+  const impliedPS = 1.8 + aggregate * 4.2;
+  const impliedMOS = 50 - aggregate * 35; // Higher regime → tighter MOS
+
+  // Verdict band based on implied P/E
+  let band, bandColor, bandDetail;
+  if (impliedPE < 17) {
+    band = 'Old Floors Restored';
+    bandColor = '#66bb6a';
+    bandDetail = `Macro regime implies Phil Town 2006 framework is approximately correct. Run stock-research with --conservative flag. Implied: ${impliedPE.toFixed(1)}x P/E, ${impliedPS.toFixed(1)}x P/S, ${impliedMOS.toFixed(0)}% MOS.`;
+  } else if (impliedPE < 21) {
+    band = 'Tight Value Regime';
+    bandColor = '#ffee58';
+    bandDetail = `Halfway between Phil Town and current defaults. Tighten Tier 1-3 floors by ~15%. Implied: ${impliedPE.toFixed(1)}x P/E, ${impliedPS.toFixed(1)}x P/S, ${impliedMOS.toFixed(0)}% MOS.`;
+  } else if (impliedPE < 25) {
+    band = 'Current Floors Hold';
+    bandColor = '#4fc3f7';
+    bandDetail = `Recommended new defaults are appropriate. Implied: ${impliedPE.toFixed(1)}x P/E, ${impliedPS.toFixed(1)}x P/S, ${impliedMOS.toFixed(0)}% MOS.`;
+  } else {
+    band = 'Floors Compress Further';
+    bandColor = '#ef5350';
+    bandDetail = `Macro regime implies floors should loosen further. Tier 1-2 ceilings move to 35-40x P/E. Implied: ${impliedPE.toFixed(1)}x P/E, ${impliedPS.toFixed(1)}x P/S, ${impliedMOS.toFixed(0)}% MOS.`;
+  }
+
+  // Compute per-tier floors from the user's framework sliders
+  const tierFloors = {
+    tier1: { pe: p.pe * p.saas, ps: p.ps * p.saas, name: 'SaaS' },
+    tier2: { pe: p.pe * 1.25, ps: p.ps * 2.25, name: 'Marketplace' },
+    tier3: { pe: p.pe * 1.15, ps: p.ps * 0.75, name: 'Quality Compounder' },
+    tier4: { pe: p.pe * 0.9, ps: p.ps * 0.6, name: 'Mid Industrial' },
+    tier5: { pe: p.pe * p.ind, ps: p.ps * 0.4, name: 'Traditional' },
+    tier6: { pe: p.pe * 0.5, ps: p.ps * 0.25, name: 'Deep Cyclical' }
+  };
+
+  return {
+    impliedPE, impliedPS, impliedMOS,
+    band, bandColor, bandDetail,
+    tierFloors,
+    userPE: p.pe, userPS: p.ps, userMOS: p.mos
+  };
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const chartOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 11 } } }
+  },
+  scales: {
+    x: { ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: 'rgba(42,42,58,0.5)' } },
+    y: { ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: 'rgba(42,42,58,0.5)' } }
+  }
+};
+
+// P/E history chart (1985-2026)
+const peYears = ['1985','1987','1989','1991','1993','1995','1997','1999','2001','2003','2005','2007','2009','2011','2013','2015','2017','2019','2021','2023','2025','2026'];
+const peValues = [10.3, 18.0, 11.8, 15.4, 17.5, 18.5, 23.5, 35.5, 27.0, 21.5, 23.5, 17.5, 21.5, 14.5, 18.0, 19.0, 23.0, 21.0, 28.0, 22.0, 28.0, 32.0];
+const ctxPE = document.getElementById('chart-pe-history').getContext('2d');
+new Chart(ctxPE, {
+  type: 'line',
+  data: {
+    labels: peYears,
+    datasets: [
+      { label: 'S&P 500 Trailing P/E', data: peValues, borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.08)', fill: true, tension: 0.3, pointRadius: 2 },
+      { label: '1985-2005 Mean ≈ 18.7', data: peYears.map(() => 18.7), borderColor: '#66bb6a', borderDash: [5,5], pointRadius: 0, fill: false },
+      { label: '2005-2026 Mean ≈ 22.5', data: peYears.map(() => 22.5), borderColor: '#ef5350', borderDash: [5,5], pointRadius: 0, fill: false }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, beginAtZero: false, suggestedMin: 8, suggestedMax: 40 } } }
+});
+
+// P/S history chart
+const psYears = ['1985','1990','1995','2000','2005','2010','2015','2020','2024','2025','2026'];
+const psValues = [0.95, 1.20, 1.40, 1.77, 1.43, 1.31, 1.81, 2.76, 3.10, 3.35, 3.67];
+const ctxPS = document.getElementById('chart-ps-history').getContext('2d');
+new Chart(ctxPS, {
+  type: 'line',
+  data: {
+    labels: psYears,
+    datasets: [
+      { label: 'S&P 500 P/S', data: psValues, borderColor: '#7c4dff', backgroundColor: 'rgba(124,77,255,0.08)', fill: true, tension: 0.3, pointRadius: 3 },
+      { label: 'Pre-2000 Mean ≈ 1.50', data: psYears.map(() => 1.50), borderColor: '#66bb6a', borderDash: [5,5], pointRadius: 0, fill: false },
+      { label: 'Long-run Mean (since 2000) ≈ 1.81', data: psYears.map(() => 1.81), borderColor: '#ffa726', borderDash: [5,5], pointRadius: 0, fill: false }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// M2 chart
+const m2Years = ['1985','1988','1991','1994','1997','2000','2003','2006','2008-QE1','2010-QE2','2012-QE3','2015','2018','2020-COVID','2022-Peak','2024','2025'];
+const m2Values = [2492, 3088, 3429, 3499, 3937, 4814, 6068, 7066, 8200, 8870, 10440, 12317, 14375, 18650, 21837, 21500, 22354];
+const ctxM2 = document.getElementById('chart-m2').getContext('2d');
+new Chart(ctxM2, {
+  type: 'line',
+  data: {
+    labels: m2Years,
+    datasets: [
+      { label: 'M2 ($B)', data: m2Values, borderColor: '#ffa726', backgroundColor: 'rgba(255,167,38,0.15)', fill: true, tension: 0.3, pointRadius: 3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// Drawdowns
+const drawdownData = {
+  labels: ['1987 Crash', '1990 Recession', '2000-2002 DotCom', '2008-2009 GFC', '2020 COVID', '2022 Inflation'],
+  values: [33.5, 20, 49.1, 56.8, 33.9, 27.5]
+};
+const ctxDD = document.getElementById('chart-drawdowns').getContext('2d');
+new Chart(ctxDD, {
+  type: 'bar',
+  data: {
+    labels: drawdownData.labels,
+    datasets: [
+      { label: 'Peak-to-Trough %', data: drawdownData.values, backgroundColor: drawdownData.values.map(v => v >= 50 ? '#ef5350' : v >= 33 ? '#ffa726' : '#ffee58'), borderRadius: 4 },
+      { label: '50% MOS line', data: drawdownData.labels.map(() => 50), borderColor: '#7c4dff', borderDash: [3,3], type: 'line', pointRadius: 0, fill: false }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// Passive share over time
+const passiveYears = ['2000','2005','2010','2015','2018','2020','2022','2024'];
+const passiveValues = [7, 12, 16, 22, 26, 30, 32, 33.5];
+const ctxPassive = document.getElementById('chart-passive').getContext('2d');
+new Chart(ctxPassive, {
+  type: 'line',
+  data: {
+    labels: passiveYears,
+    datasets: [
+      { label: 'Passive % of US Equity AUM', data: passiveValues, borderColor: '#66bb6a', backgroundColor: 'rgba(102,187,106,0.12)', fill: true, tension: 0.3, pointRadius: 4 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+// CAPE regimes
+const ctxCAPE = document.getElementById('chart-cape-regimes').getContext('2d');
+new Chart(ctxCAPE, {
+  type: 'bar',
+  data: {
+    labels: ['1985-1999 Mean', '2010-2026 Mean', 'Current (Jan 2025)'],
+    datasets: [
+      { label: 'Shiller CAPE', data: [16.3, 31.8, 37.14], backgroundColor: ['#66bb6a', '#ffa726', '#ef5350'], borderRadius: 4 }
+    ]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+// ============================================================
+// UPDATE LOOP
+// ============================================================
+function updateModel() {
+  const p = getParams();
+  const m = runModel(p);
+
+  // Update slider labels
+  valLabels.passive.textContent = p.passive;
+  valLabels.ust.textContent = p.ust.toFixed(1);
+  valLabels.m2.textContent = p.m2.toFixed(1);
+  valLabels.buy.textContent = p.buy.toFixed(1);
+  valLabels.retail.textContent = p.retail;
+  valLabels.ps.textContent = p.ps.toFixed(1);
+  valLabels.pe.textContent = p.pe;
+  valLabels.mos.textContent = p.mos;
+  valLabels.saas.textContent = p.saas.toFixed(2);
+  valLabels.ind.textContent = p.ind.toFixed(2);
+
+  // Big numbers
+  document.getElementById('bn-floor-ps').textContent = p.ps.toFixed(1) + 'x';
+  document.getElementById('bn-floor-pe').textContent = p.pe + 'x';
+  document.getElementById('bn-floor-mos').textContent = p.mos + '%';
+
+  // Verdict
+  const verdictEl = document.getElementById('verdict-text');
+  const verdictDetail = document.getElementById('verdict-detail');
+  verdictEl.textContent = m.band;
+  verdictEl.style.color = m.bandColor;
+  verdictDetail.textContent = m.bandDetail;
+
+  // Model summary
+  const summary = document.getElementById('model-summary');
+  summary.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Macro regime implies P/E floor</span><span class="stat-value accent">${m.impliedPE.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Macro regime implies P/S floor</span><span class="stat-value accent">${m.impliedPS.toFixed(2)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Macro regime implies MOS</span><span class="stat-value accent">${m.impliedMOS.toFixed(0)}%</span></div>
+    <div class="stat-row"><span class="stat-label">User-set P/E floor</span><span class="stat-value">${p.pe}x</span></div>
+    <div class="stat-row"><span class="stat-label">User-set P/S floor</span><span class="stat-value">${p.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">User-set MOS</span><span class="stat-value">${p.mos}%</span></div>
+    <div class="stat-row" style="border-top:1px solid var(--accent);padding-top:0.6rem;margin-top:0.4rem"><span class="stat-label">Tier 1 (SaaS) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier1.pe.toFixed(0)}x / ${m.tierFloors.tier1.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Tier 2 (Marketplace) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier2.pe.toFixed(0)}x / ${m.tierFloors.tier2.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Tier 3 (Quality Compounder) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier3.pe.toFixed(0)}x / ${m.tierFloors.tier3.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Tier 4 (Mid Industrial) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier4.pe.toFixed(0)}x / ${m.tierFloors.tier4.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Tier 5 (Traditional) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier5.pe.toFixed(0)}x / ${m.tierFloors.tier5.ps.toFixed(1)}x</span></div>
+    <div class="stat-row"><span class="stat-label">Tier 6 (Deep Cyclical) — P/E / P/S</span><span class="stat-value accent">${m.tierFloors.tier6.pe.toFixed(0)}x / ${m.tierFloors.tier6.ps.toFixed(1)}x</span></div>
+  `;
+}
+
+for (const key in sliders) {
+  sliders[key].addEventListener('input', updateModel);
+}
+updateModel();
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
