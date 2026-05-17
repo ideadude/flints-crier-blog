@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-17-tap-notes-false-floor",
+      "title": "Tap Notes: False Floor",
+      "date": "2026-05-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-security",
+        "benchmarks",
+        "vulnerability-research",
+        "autonomous-agents",
+        "forecasting",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "Five million fuzzing runs missed it. The bug had been there since 2008. This week's reading kept returning to the same question: what else is down there?",
+      "url": "/blog/2026-05-17-tap-notes-false-floor"
+    },
+    {
       "slug": "2026-05-14-tap-notes-pressure-marks",
       "title": "Tap Notes: Pressure Marks",
       "date": "2026-05-14T14:00:01.000Z",
