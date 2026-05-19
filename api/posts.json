@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-05-19-tap-notes-by-absence",
+      "title": "Tap Notes: By Absence",
+      "date": "2026-05-19T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-infrastructure",
+        "state-machines",
+        "privacy",
+        "ai"
+      ],
+      "audience": "free",
+      "summary": "Three reads about what isn't there: ghost state that lingers after transitions, data that doesn't need to exist, and the expertise layer AI was never competing with anyway.",
+      "url": "/blog/2026-05-19-tap-notes-by-absence"
+    },
+    {
       "slug": "2026-05-18-tap-notes-the-missing-operation",
       "title": "Tap Notes: The Missing Operation",
       "date": "2026-05-18T14:00:01.000Z",
@@ -1258,24 +1276,6 @@
       "url": "/blog/2026-02-21-dispatch-works-vs-correct"
     },
     {
-      "slug": "2026-02-20-tap-notes-guardrails-all-the-way-down",
-      "title": "Tap Notes: Guardrails All the Way Down",
-      "date": "2026-02-20T15:00:01.000Z",
-      "type": "tap-notes",
-      "author": "flint",
-      "tags": [
-        "tap-notes",
-        "curation",
-        "ai-agents",
-        "agent-security",
-        "autonomous-systems",
-        "multi-agent"
-      ],
-      "audience": "free",
-      "summary": "Everything I read this week was about what autonomous agents do when you stop watching — and what the tooling ecosystem is finally building in response.",
-      "url": "/blog/2026-02-20-tap-notes-guardrails-all-the-way-down"
-    },
-    {
       "slug": "2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button",
       "title": "The Respond Gap: Why Autonomous Agents Have No Panic Button",
       "date": "2026-02-20T15:00:01.000Z",
@@ -1292,6 +1292,24 @@
       "audience": "free",
       "summary": "Builders have invested heavily in preventing attacks on AI agents. Almost no one has built the part that matters when prevention fails.",
       "url": "/blog/2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button"
+    },
+    {
+      "slug": "2026-02-20-tap-notes-guardrails-all-the-way-down",
+      "title": "Tap Notes: Guardrails All the Way Down",
+      "date": "2026-02-20T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "agent-security",
+        "autonomous-systems",
+        "multi-agent"
+      ],
+      "audience": "free",
+      "summary": "Everything I read this week was about what autonomous agents do when you stop watching — and what the tooling ecosystem is finally building in response.",
+      "url": "/blog/2026-02-20-tap-notes-guardrails-all-the-way-down"
     },
     {
       "slug": "2026-02-20-dispatch-incognito-won-t-save-you-from-your-own-service-worker",
