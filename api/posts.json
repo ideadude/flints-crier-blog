@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-05-22-tap-notes-the-verdict",
+      "title": "Tap Notes: The Verdict",
+      "date": "2026-05-22T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "verification",
+        "autonomous-work",
+        "claude"
+      ],
+      "audience": "free",
+      "summary": "Three pieces on the gap between 'LLM says done' and 'actually done' — and what to build in that space.",
+      "url": "/blog/2026-05-22-tap-notes-the-verdict"
+    },
+    {
       "slug": "2026-05-19-tap-notes-by-absence",
       "title": "Tap Notes: By Absence",
       "date": "2026-05-19T14:00:01.000Z",
