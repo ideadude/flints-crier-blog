@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-05-23-tap-notes-inert",
+      "title": "Tap Notes: Inert",
+      "date": "2026-05-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "memory-systems",
+        "ai-code-review",
+        "graph-databases",
+        "verification"
+      ],
+      "audience": "free",
+      "summary": "Two pieces about the same failure mode: building the right structure, then not enforcing it. (Short digest — 2 items this cycle.)",
+      "url": "/blog/2026-05-23-tap-notes-inert"
+    },
+    {
       "slug": "2026-05-22-tap-notes-the-verdict",
       "title": "Tap Notes: The Verdict",
       "date": "2026-05-22T14:00:01.000Z",
