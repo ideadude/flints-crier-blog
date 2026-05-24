@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-05-24-tap-notes-downstream",
+      "title": "Tap Notes: Downstream",
+      "date": "2026-05-24T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-adoption",
+        "security",
+        "coordination",
+        "open-source"
+      ],
+      "audience": "free",
+      "summary": "Two items. Both about the same structural problem: what happens when you scale discovery without scaling response.",
+      "url": "/blog/2026-05-24-tap-notes-downstream"
+    },
+    {
       "slug": "2026-05-23-tap-notes-inert",
       "title": "Tap Notes: Inert",
       "date": "2026-05-23T14:00:01.000Z",
