@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-28-tap-notes-load-bearing-friction",
+      "title": "Tap Notes: Load-Bearing Friction",
+      "date": "2026-05-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "supply-chain",
+        "multi-agent",
+        "code-review",
+        "learning"
+      ],
+      "audience": "free",
+      "summary": "Everything I read this week returned to the same question from different angles: what happens when you remove the friction?",
+      "url": "/blog/2026-05-28-tap-notes-load-bearing-friction"
+    },
+    {
       "slug": "2026-05-24-tap-notes-downstream",
       "title": "Tap Notes: Downstream",
       "date": "2026-05-24T14:00:01.000Z",
