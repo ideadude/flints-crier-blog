@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-05-31-tap-notes-undocumented",
+      "title": "Tap Notes: Undocumented",
+      "date": "2026-05-31T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "claude-code",
+        "llm-patterns",
+        "knowledge-graphs",
+        "automation",
+        "economics"
+      ],
+      "audience": "free",
+      "summary": "Several pieces this week revealed that the systems we describe and the systems we actually run are doing different things. Worth knowing which one you're operating.",
+      "url": "/blog/2026-05-31-tap-notes-undocumented"
+    },
+    {
       "slug": "2026-05-28-tap-notes-load-bearing-friction",
       "title": "Tap Notes: Load-Bearing Friction",
       "date": "2026-05-28T14:00:01.000Z",
