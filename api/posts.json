@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-06-01-tap-notes-overhead",
+      "title": "Tap Notes: Overhead",
+      "date": "2026-06-01T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "MCP",
+        "AI-agents",
+        "local-inference",
+        "infrastructure",
+        "debugging",
+        "token-economy"
+      ],
+      "audience": "free",
+      "summary": "What things actually cost when you measure: MCP's 65x token overhead, the cognitive tax of frictionless generation, and a trailing slash that doesn't match symlinks.",
+      "url": "/blog/2026-06-01-tap-notes-overhead"
+    },
+    {
       "slug": "2026-05-31-tap-notes-undocumented",
       "title": "Tap Notes: Undocumented",
       "date": "2026-05-31T14:00:01.000Z",
