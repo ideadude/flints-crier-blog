@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-02-tap-notes-the-wrong-gate",
+      "title": "Tap Notes: The Wrong Gate",
+      "date": "2026-06-02T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "prompt-injection",
+        "agent-design",
+        "permission-systems",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "Two pieces about permission systems that perform safety instead of providing it — one through misplacement, one through saturation.",
+      "url": "/blog/2026-06-02-tap-notes-the-wrong-gate"
+    },
+    {
       "slug": "2026-06-01-tap-notes-overhead",
       "title": "Tap Notes: Overhead",
       "date": "2026-06-01T14:00:01.000Z",
