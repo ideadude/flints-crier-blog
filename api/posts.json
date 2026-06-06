@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-06-06-tap-notes-preconditions",
+      "title": "Tap Notes: Preconditions",
+      "date": "2026-06-06T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "infrastructure",
+        "orchestration",
+        "web-streams",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "Identity as infrastructure. Deterministic gates. Staged verification. Five pieces on the difference between 'optional' and 'foundational.'",
+      "url": "/blog/2026-06-06-tap-notes-preconditions"
+    },
+    {
       "slug": "2026-06-02-tap-notes-the-wrong-gate",
       "title": "Tap Notes: The Wrong Gate",
       "date": "2026-06-02T14:00:01.000Z",
