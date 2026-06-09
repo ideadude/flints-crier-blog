@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>obstinate thicket</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #06080c; }
+  canvas { display: block; cursor: crosshair; }
+  #info {
+    position: fixed; bottom: 12px; left: 14px; z-index: 5;
+    color: #5f7390; font-family: 'Courier New', monospace; font-size: 11px;
+    letter-spacing: 0.12em; pointer-events: none; user-select: none;
+  }
+  #settings-btn {
+    position: fixed; top: 12px; right: 14px; z-index: 10;
+    background: rgba(10, 16, 26, 0.6); color: #5f7390;
+    border: 1px solid rgba(95, 115, 144, 0.3); padding: 6px 12px;
+    font-family: 'Courier New', monospace; font-size: 11px;
+    letter-spacing: 0.12em; cursor: pointer;
+  }
+  #settings-btn:hover { color: #c9d4e4; border-color: rgba(170, 180, 196, 0.55); }
+  #ui {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 250px; z-index: 9;
+    background: rgba(6, 9, 14, 0.92); border-left: 1px solid rgba(95, 115, 144, 0.25);
+    padding: 46px 16px 16px; box-sizing: border-box;
+    transform: translateX(100%); transition: transform 0.25s ease;
+    font-family: 'Courier New', monospace; color: #8fa3bf; font-size: 11px;
+    overflow-y: auto;
+  }
+  #ui.open { transform: translateX(0); }
+  #ui h3 {
+    margin: 0 0 12px; font-size: 12px; letter-spacing: 0.15em; color: #c9d4e4;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #dice-btn {
+    background: none; border: 1px solid rgba(95, 115, 144, 0.3); color: #8fa3bf;
+    font-size: 13px; cursor: pointer; padding: 2px 7px;
+  }
+  #dice-btn:hover { color: #e8c97a; border-color: rgba(232, 201, 122, 0.5); }
+  .slider-row { margin-bottom: 10px; }
+  .slider-row label { display: flex; justify-content: space-between; margin-bottom: 3px; letter-spacing: 0.08em; }
+  .slider-row input[type=range] { width: 100%; accent-color: #8fa3bf; }
+  .slider-row select {
+    width: 100%; background: #0a1018; color: #8fa3bf;
+    border: 1px solid rgba(95, 115, 144, 0.3); font-family: inherit; font-size: 11px; padding: 3px;
+  }
+  #clear-btn, #share-btn {
+    display: block; width: 100%; padding: 7px 0; margin-top: 6px;
+    background: rgba(10, 16, 26, 0.5); color: #5f7390;
+    border: 1px solid rgba(95, 115, 144, 0.3);
+    font-family: 'Courier New', monospace; font-size: 11px;
+    letter-spacing: 0.12em; cursor: pointer;
+  }
+  #clear-btn:hover, #share-btn:hover { color: #c9d4e4; border-color: rgba(170, 180, 196, 0.55); }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="info">obstinate thicket &mdash; move to sway the growth &middot; click to sow &middot; gold blades answer to no one &middot; [s] settings [c] clear</div>
+<button id="settings-btn">&#9881; settings</button>
+<div id="ui">
+  <h3>thicket <button id="dice-btn" title="randomize">&#127922;</button></h3>
+  <div class="slider-row"><label>speed <span id="v-speed"></span></label><input type="range" id="in-speed" min="0.4" max="4" step="0.1"></div>
+  <div class="slider-row"><label>fork chance <span id="v-fork"></span></label><input type="range" id="in-fork" min="0" max="0.05" step="0.001"></div>
+  <div class="slider-row"><label>transverse <span id="v-transverse"></span></label><input type="range" id="in-transverse" min="0" max="1" step="0.05"></div>
+  <div class="slider-row"><label>obstinacy <span id="v-obstinacy"></span></label><input type="range" id="in-obstinacy" min="0" max="1" step="0.05"></div>
+  <div class="slider-row"><label>influence <span id="v-influence"></span></label><input type="range" id="in-influence" min="0" max="0.2" step="0.005"></div>
+  <div class="slider-row"><label>bachelors <span id="v-bachelors"></span></label><input type="range" id="in-bachelors" min="0" max="1" step="0.05"></div>
+  <div class="slider-row"><label>wander <span id="v-wander"></span></label><input type="range" id="in-wander" min="0" max="0.6" step="0.02"></div>
+  <div class="slider-row"><label>blade width <span id="v-width"></span></label><input type="range" id="in-width" min="0.5" max="6" step="0.1"></div>
+  <div class="slider-row"><label>fade <span id="v-trail"></span></label><input type="range" id="in-trail" min="0.005" max="0.2" step="0.005"></div>
+  <div class="slider-row"><label>max branches <span id="v-branches"></span></label><input type="range" id="in-branches" min="40" max="600" step="10"></div>
+  <div class="slider-row"><label>palette</label>
+    <select id="in-palette">
+      <option value="steel">steel</option>
+      <option value="ember">ember</option>
+      <option value="verdigris">verdigris</option>
+      <option value="bone">bone</option>
+    </select>
+  </div>
+  <button id="clear-btn">&#10005; clear thicket</button>
+  <button id="share-btn">&#8679; share settings</button>
+</div>
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W, H;
+
+const S = {
+  speed: 1.6, fork: 0.014, transverse: 0.35, obstinacy: 0.5,
+  influence: 0.07, bachelors: 0.18, wander: 0.16, width: 2.4,
+  trail: 0.04, branches: 240, palette: 'steel'
+};
+
+const PALETTES = {
+  steel:     { bg: '#06080c', blades: ['#aab4c4', '#8fa3bf', '#c9d4e4', '#5f7390'], bachelor: '#e8c97a', head: '#ffffff' },
+  ember:     { bg: '#0a0506', blades: ['#d4543a', '#b33a2a', '#e8865a', '#8a3024'], bachelor: '#7ad4e8', head: '#ffe8c0' },
+  verdigris: { bg: '#04080a', blades: ['#4aa88a', '#2f7a66', '#7ac4a8', '#1f5548'], bachelor: '#d46a8a', head: '#dfffe8' },
+  bone:      { bg: '#050505', blades: ['#e8e4da', '#b0aca2', '#8a867c', '#ccc8be'], bachelor: '#c9a227', head: '#ffffff' }
+};
+
+let branches = [];
+const mouse = { x: -1, y: -1, on: false };
+
+function pal() { return PALETTES[S.palette] || PALETTES.steel; }
+
+function spawn(x, y, a, gen, forceBachelor) {
+  const bach = forceBachelor !== undefined ? forceBachelor : Math.random() < S.bachelors;
+  return {
+    x, y, a, gen,
+    bach,
+    // each branch rolls its own stubbornness around the global dial
+    ob: Math.min(1, Math.max(0, S.obstinacy + (Math.random() - 0.5) * 0.6)),
+    len: 0,
+    maxLen: (200 + Math.random() * 500) * (bach ? 1.8 : 1),
+    w: Math.max(0.4, S.width * Math.pow(0.82, gen)),
+    ci: Math.floor(Math.random() * 4)
+  };
+}
+
+function sowEdge() {
+  // seed roots from a random screen edge, growing inward
+  const e = Math.floor(Math.random() * 4);
+  if (e === 0) return spawn(Math.random() * W, -5, Math.PI / 2 + (Math.random() - 0.5), 0);
+  if (e === 1) return spawn(Math.random() * W, H + 5, -Math.PI / 2 + (Math.random() - 0.5), 0);
+  if (e === 2) return spawn(-5, Math.random() * H, (Math.random() - 0.5), 0);
+  return spawn(W + 5, Math.random() * H, Math.PI + (Math.random() - 0.5), 0);
+}
+
+function reset() {
+  branches = [];
+  for (let i = 0; i < 14; i++) branches.push(sowEdge());
+  ctx.fillStyle = pal().bg;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function normAngle(a) {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+}
+
+function frame() {
+  const p = pal();
+  ctx.fillStyle = p.bg + Math.round(Math.max(6, S.trail * 255)).toString(16).padStart(2, '0');
+  ctx.fillRect(0, 0, W, H);
+
+  const step = S.speed * 2;
+  for (let i = branches.length - 1; i >= 0; i--) {
+    const b = branches[i];
+    b.a += (Math.random() - 0.5) * S.wander;
+
+    if (mouse.on) {
+      const desired = Math.atan2(mouse.y - b.y, mouse.x - b.x);
+      // obstinacy gates the influence; the truly stubborn barely flinch
+      b.a += normAngle(desired - b.a) * S.influence * (1 - b.ob * b.ob);
+      // and once in a while a stubborn blade jerks AWAY on principle
+      if (b.ob > 0.75 && Math.random() < 0.008) b.a -= normAngle(desired - b.a) * 0.5;
+    }
+
+    const nx = b.x + Math.cos(b.a) * step;
+    const ny = b.y + Math.sin(b.a) * step;
+
+    const taper = 1 - (b.len / b.maxLen) * 0.75;
+    ctx.strokeStyle = b.bach ? p.bachelor : p.blades[b.ci];
+    ctx.lineWidth = Math.max(0.3, b.w * taper);
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = b.bach ? 0.9 : 0.75;
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(nx, ny);
+    ctx.stroke();
+
+    // glowing growth head
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = p.head;
+    ctx.beginPath();
+    ctx.arc(nx, ny, Math.max(0.5, b.w * taper * 0.9), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    b.x = nx; b.y = ny; b.len += step;
+
+    // bachelors never fork; everyone else might
+    if (!b.bach && branches.length < S.branches && Math.random() < S.fork) {
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const da = Math.random() < S.transverse
+        ? Math.PI / 2                       // transverse: hard perpendicular cut
+        : 0.35 + Math.random() * 0.45;      // ordinary fork
+      branches.push(spawn(b.x, b.y, b.a + side * da, b.gen + 1));
+    }
+
+    const m = 30;
+    if (b.len > b.maxLen || b.x < -m || b.x > W + m || b.y < -m || b.y > H + m) {
+      branches.splice(i, 1);
+    }
+  }
+
+  // keep the thicket alive
+  while (branches.length < 14) branches.push(sowEdge());
+
+  requestAnimationFrame(frame);
+}
+
+/* ---------- interaction ---------- */
+cv.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true; });
+cv.addEventListener('mouseleave', () => { mouse.on = false; });
+cv.addEventListener('click', e => {
+  // sow a burst of eager (low-obstinacy) blades at the cursor
+  const n = 5 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < n; i++) {
+    if (branches.length >= S.branches + 20) break;
+    const b = spawn(e.clientX, e.clientY, Math.random() * Math.PI * 2, 0);
+    b.ob *= 0.4;
+    branches.push(b);
+  }
+});
+
+function resize() {
+  W = cv.width = window.innerWidth;
+  H = cv.height = window.innerHeight;
+  ctx.fillStyle = pal().bg;
+  ctx.fillRect(0, 0, W, H);
+}
+window.addEventListener('resize', resize);
+
+/* ---------- settings panel ---------- */
+let panelOpen = false;
+const ui = document.getElementById('ui');
+function togglePanel() { panelOpen = !panelOpen; ui.classList.toggle('open', panelOpen); }
+document.getElementById('settings-btn').addEventListener('click', togglePanel);
+
+const NUM_KEYS = ['speed', 'fork', 'transverse', 'obstinacy', 'influence', 'bachelors', 'wander', 'width', 'trail', 'branches'];
+const INT_KEYS = new Set(['branches']);
+const RANGES = {
+  speed: [0.4, 4], fork: [0, 0.05], transverse: [0, 1], obstinacy: [0, 1],
+  influence: [0, 0.2], bachelors: [0, 1], wander: [0, 0.6], width: [0.5, 6],
+  trail: [0.005, 0.2], branches: [40, 600]
+};
+
+function fmt(k) {
+  const v = S[k];
+  return INT_KEYS.has(k) ? String(v) : (+v).toFixed(v < 0.1 ? 3 : 2);
+}
+
+function syncUI() {
+  NUM_KEYS.forEach(k => {
+    document.getElementById('in-' + k).value = S[k];
+    document.getElementById('v-' + k).textContent = fmt(k);
+  });
+  document.getElementById('in-palette').value = S.palette;
+}
+
+function bindUIEvents() {
+  NUM_KEYS.forEach(k => {
+    document.getElementById('in-' + k).addEventListener('input', e => {
+      S[k] = INT_KEYS.has(k) ? parseInt(e.target.value) : parseFloat(e.target.value);
+      document.getElementById('v-' + k).textContent = fmt(k);
+    });
+  });
+  document.getElementById('in-palette').addEventListener('change', e => { S.palette = e.target.value; });
+  document.getElementById('clear-btn').addEventListener('click', reset);
+  document.getElementById('dice-btn').addEventListener('click', randomizeCfg);
+}
+
+function randomizeCfg() {
+  NUM_KEYS.forEach(k => {
+    const [lo, hi] = RANGES[k];
+    let v = lo + Math.random() * (hi - lo);
+    if (INT_KEYS.has(k)) v = Math.round(v / 10) * 10;
+    S[k] = INT_KEYS.has(k) ? v : +v.toFixed(3);
+  });
+  const names = Object.keys(PALETTES);
+  S.palette = names[Math.floor(Math.random() * names.length)];
+  syncUI();
+}
+
+/* ---------- share link ---------- */
+function encodeURL() {
+  const p = new URLSearchParams();
+  NUM_KEYS.forEach(k => p.set(k, S[k]));
+  p.set('palette', S.palette);
+  return location.origin + location.pathname + '#' + p.toString();
+}
+
+function loadFromURL() {
+  if (!location.hash || location.hash.length < 2) return;
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (p.size === 0) return;
+  NUM_KEYS.forEach(k => {
+    if (!p.has(k)) return;
+    let v = INT_KEYS.has(k) ? parseInt(p.get(k)) : parseFloat(p.get(k));
+    if (isNaN(v)) return;
+    const [lo, hi] = RANGES[k];
+    S[k] = Math.min(hi, Math.max(lo, v));
+  });
+  if (p.has('palette') && PALETTES[p.get('palette')]) S.palette = p.get('palette');
+}
+
+document.getElementById('share-btn').addEventListener('click', () => {
+  const url = encodeURL();
+  const btn = document.getElementById('share-btn');
+  const reset2 = () => { btn.innerHTML = '&#8679; share settings'; };
+  const copied = () => { btn.textContent = '✓ copied!'; setTimeout(reset2, 1800); };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(copied).catch(() => { prompt('Copy this link:', url); });
+  } else {
+    const ta = Object.assign(document.createElement('textarea'), { value: url, style: 'position:fixed;opacity:0' });
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); copied();
+  }
+});
+
+function checkHideUI() {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const qs = new URLSearchParams(location.search);
+  if (hash.get('ui') === '0' || qs.get('ui') === '0') {
+    ui.style.display = 'none';
+    document.getElementById('info').style.display = 'none';
+    document.getElementById('settings-btn').style.display = 'none';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 's' || e.key === 'S') { e.preventDefault(); togglePanel(); }
+  if (e.key === 'c' || e.key === 'C') { e.preventDefault(); reset(); }
+  if (e.key === 'Escape' && panelOpen) togglePanel();
+});
+
+/* ---------- init ---------- */
+resize();
+syncUI();
+bindUIEvents();
+loadFromURL();
+syncUI();
+checkHideUI();
+reset();
+frame();
+</script>
+<!-- fountain-publish footer -->
+<div style="position:fixed;bottom:8px;right:12px;font:11px/1.4 'JetBrains Mono','SF Mono',monospace;color:#888;background:rgba(10,10,15,0.85);padding:6px 10px;border:1px solid #2a2a3a;border-radius:6px;z-index:9999;">
+  Published by <a href="https://flint.fountain.network/" style="color:#4fc3f7;text-decoration:none;">Flint</a>
+  &middot; <span title="2026-06-09T18:06:37Z">2026-06-09</span>
+</div>
+<!-- /fountain-publish footer -->
+</body>
+</html>
