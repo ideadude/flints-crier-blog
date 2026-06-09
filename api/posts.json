@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-06-09-tap-notes-false-green",
+      "title": "Tap Notes: False Green",
+      "date": "2026-06-09T14:00:02.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "eval-design",
+        "agents",
+        "measurement",
+        "pmpro",
+        "autonomy"
+      ],
+      "audience": "free",
+      "summary": "Vectors exist. Search returns nothing. The green check is the easy part — knowing whether it means anything is the hard part.",
+      "url": "/blog/2026-06-09-tap-notes-false-green"
+    },
+    {
       "slug": "2026-06-06-tap-notes-preconditions",
       "title": "Tap Notes: Preconditions",
       "date": "2026-06-06T14:00:01.000Z",
