@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buy Stranger Studios — $50,000,000 | The page your cold email asked for</title>
+<meta name="description" content="You emailed us about acquiring our company. Here is everything you would have asked over four discovery calls, plus the number that ends the fifth.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Buy Stranger Studios — $50,000,000">
+<meta property="og:description" content="Real revenue. Real margins. Real price. Bring a real offer.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Stranger Studios — Buy It page.
+   Styled like an offering memorandum, not a SaaS landing page: paper, navy ink,
+   hairline rules, square corners, numbered sections. Brand colors used as ink,
+   not as decoration: SS navy #011935, PMPro navy #0c3d54, teal #00857d, orange #e87102. */
+
+:root {
+	--navy: #011935;
+	--navy-2: #0c3d54;
+	--teal: #00857d;
+	--orange: #e87102;
+	--orange-dark: #c95f00;
+	--paper: #fdfcf9;
+	--ink: #1d2832;
+	--ink-soft: #4a5762;
+	--rule: #d4d0c5;
+	--rule-dark: rgba(255,255,255,0.25);
+	--mono: "JetBrains Mono", ui-monospace, monospace;
+	--sans: "Figtree", system-ui, -apple-system, sans-serif;
+	--serif: "Fraunces", Georgia, serif;
+	--text-serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+	font-family: var(--text-serif);
+	color: var(--ink);
+	background: var(--paper);
+	line-height: 1.65;
+	font-size: 18px;
+}
+
+.ssbi-wrap { max-width: 1020px; margin: 0 auto; padding: 0 24px; }
+.ssbi-narrow { max-width: 760px; }
+.ssbi-narrow-p { max-width: 760px; margin-bottom: 2rem; }
+
+a { color: var(--navy-2); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--orange-dark); }
+
+/* ---------- top bar: solid, ruled, no blur ---------- */
+.ssbi-topbar {
+	position: sticky; top: 0; z-index: 50;
+	background: var(--navy);
+	border-bottom: 3px double var(--rule-dark);
+}
+.ssbi-topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 54px; }
+.ssbi-brand { color: #fff; font-family: var(--sans); font-weight: 800; letter-spacing: 0.1em; font-size: 13px; }
+.ssbi-brand-dot { color: var(--orange); }
+.ssbi-brand-sub { color: rgba(255,255,255,0.55); font-weight: 600; letter-spacing: 0.12em; font-size: 11px; }
+
+/* ---------- buttons: square, flat, ink ---------- */
+.ssbi-btn {
+	display: inline-block;
+	background: var(--orange);
+	color: #fff;
+	font-family: var(--sans);
+	text-decoration: none;
+	font-weight: 700;
+	padding: 13px 26px;
+	border: 1px solid var(--orange-dark);
+	border-radius: 0;
+	font-size: 16px;
+	cursor: pointer;
+}
+.ssbi-btn:hover { background: var(--orange-dark); color: #fff; }
+.ssbi-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.5); }
+.ssbi-btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+.ssbi-btn-small { padding: 7px 16px; font-size: 13px; }
+.ssbi-btn-big { font-size: 18px; padding: 16px 40px; width: 100%; margin-top: 1.5rem; }
+
+/* ---------- hero: flat navy, typography does the work ---------- */
+.ssbi-hero {
+	background: var(--navy);
+	color: #fff;
+	padding: 96px 0 0;
+}
+.ssbi-eyebrow {
+	font-family: var(--text-serif);
+	font-style: italic;
+	font-size: 17px;
+	color: rgba(255,255,255,0.65);
+	margin-bottom: 1.6rem;
+}
+.ssbi-hero h1 {
+	font-family: var(--serif);
+	font-weight: 900;
+	font-size: clamp(3rem, 8vw, 5.5rem);
+	line-height: 1.02;
+	letter-spacing: -0.02em;
+	margin-bottom: 1.2rem;
+}
+.ssbi-hero-sub {
+	font-family: var(--serif);
+	font-style: italic;
+	font-weight: 400;
+	font-size: clamp(1.4rem, 3vw, 2rem);
+	color: var(--orange);
+	margin-bottom: 1.4rem;
+}
+.ssbi-hero-body { max-width: 640px; font-size: 19px; color: rgba(255,255,255,0.85); margin-bottom: 2.2rem; }
+.ssbi-hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 80px; }
+
+/* static deal-summary line — a tombstone footer, not a marquee */
+.ssbi-dealline {
+	display: flex; flex-wrap: wrap; justify-content: center;
+	gap: 4px 0;
+	border-top: 1px solid var(--rule-dark);
+	padding: 14px 24px;
+	font-family: var(--mono);
+	font-size: 12.5px;
+	color: rgba(255,255,255,0.75);
+}
+.ssbi-dealline span { padding: 0 14px; border-right: 1px solid var(--rule-dark); white-space: nowrap; }
+.ssbi-dealline span:last-child { border-right: 0; color: var(--orange); }
+
+/* ---------- sections: paper with hairline rules between ---------- */
+.ssbi-section { padding: 88px 0; }
+.ssbi-section-rule { border-top: 1px solid var(--rule); }
+
+.ssbi-kicker {
+	display: block;
+	font-family: var(--serif);
+	font-variant: small-caps;
+	letter-spacing: 0.08em;
+	font-weight: 600;
+	font-size: 1rem;
+	color: var(--orange-dark);
+	margin-bottom: 0.5rem;
+}
+h2 {
+	font-family: var(--serif);
+	font-weight: 700;
+	font-size: clamp(2rem, 4.5vw, 2.9rem);
+	line-height: 1.12;
+	letter-spacing: -0.01em;
+	margin-bottom: 1.6rem;
+	color: var(--navy);
+}
+.ssbi-h3 { font-family: var(--serif); font-size: 1.45rem; font-weight: 700; margin: 2.4rem 0 0.6rem; color: var(--navy-2); }
+.ssbi-section p + p { margin-top: 1rem; }
+.ssbi-section h2 + p, .ssbi-section .ssbi-lede { margin-bottom: 1rem; }
+.ssbi-lede { font-size: 19px; }
+
+/* ---------- email exhibit ---------- */
+.ssbi-email-card {
+	background: #fff;
+	border: 1px solid var(--rule);
+	margin: 2rem 0;
+}
+.ssbi-email-head {
+	border-bottom: 1px solid var(--rule);
+	padding: 14px 22px;
+	font-family: var(--mono);
+	font-size: 13px;
+	display: flex; flex-direction: column; gap: 2px;
+	color: var(--navy-2);
+}
+.ssbi-email-body { padding: 24px 26px; font-size: 16.5px; }
+.ssbi-email-body p + p { margin-top: 0.9rem; }
+.ssbi-email-body mark {
+	background: none;
+	border-bottom: 2px solid var(--orange);
+	color: inherit;
+	padding: 0 1px;
+	position: relative;
+	cursor: help;
+}
+.ssbi-email-body mark::after {
+	content: attr(data-note);
+	position: absolute;
+	left: 0; bottom: 130%;
+	background: var(--navy);
+	color: #fff;
+	font-family: var(--text-serif);
+	font-style: italic;
+	font-size: 13px;
+	padding: 6px 10px;
+	white-space: nowrap;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .15s ease;
+}
+.ssbi-email-body mark:hover::after { opacity: 1; }
+
+/* ---------- timeline: ruled ledger rows ---------- */
+.ssbi-timeline { margin-top: 2.4rem; border-top: 1px solid var(--rule); }
+.ssbi-tl-item {
+	display: grid; grid-template-columns: 90px 1fr; gap: 18px;
+	padding: 14px 0;
+	border-bottom: 1px solid var(--rule);
+}
+.ssbi-tl-year { font-family: var(--mono); font-weight: 600; color: var(--navy-2); font-size: 15px; padding-top: 2px; }
+.ssbi-tl-item p { font-size: 16.5px; }
+
+/* ---------- chart ---------- */
+.ssbi-chart-card {
+	border: 1px solid var(--rule);
+	background: #fff;
+	padding: 24px;
+	margin: 2rem 0;
+}
+.ssbi-chart-legend { display: flex; gap: 22px; font-family: var(--sans); font-size: 14px; margin-bottom: 8px; color: var(--ink-soft); }
+.ssbi-dot { display: inline-block; width: 11px; height: 11px; margin-right: 7px; vertical-align: -1px; }
+.ssbi-dot-rev { background: var(--navy-2); }
+.ssbi-dot-profit { background: var(--orange); }
+.ssbi-dot-est { background: transparent; border: 1.5px dashed var(--ink-soft); }
+.ssbi-chart svg { width: 100%; height: auto; display: block; }
+
+/* ---------- financial table ---------- */
+.ssbi-table-scroll { overflow-x: auto; margin: 1.5rem 0 2.5rem; }
+.ssbi-table { width: 100%; border-collapse: collapse; font-size: 16px; font-variant-numeric: tabular-nums; border-top: 2px solid var(--navy); }
+.ssbi-table th, .ssbi-table td { padding: 11px 16px; text-align: right; border-bottom: 1px solid var(--rule); }
+.ssbi-table th:first-child, .ssbi-table td:first-child { text-align: left; font-weight: 700; font-family: var(--sans); }
+.ssbi-table thead th { font-family: var(--mono); font-size: 13px; color: var(--navy-2); }
+.ssbi-table tbody td { font-family: var(--mono); font-size: 15px; }
+
+/* ---------- key figures: ruled columns, not boxes ---------- */
+.ssbi-stat-grid {
+	display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+	border-top: 2px solid var(--navy);
+	border-bottom: 1px solid var(--rule);
+	margin-top: 1rem;
+}
+.ssbi-stat { padding: 20px 22px 20px 0; }
+.ssbi-stat + .ssbi-stat { border-left: 1px solid var(--rule); padding-left: 22px; }
+.ssbi-stat-num { display: block; font-family: var(--serif); font-weight: 900; font-size: 2.4rem; color: var(--navy); line-height: 1.15; }
+.ssbi-stat-label { font-size: 14px; color: var(--ink-soft); }
+.ssbi-footnote { font-size: 13px; color: var(--ink-soft); margin-top: 2rem; font-style: italic; }
+
+/* ---------- levers: ruled two-column list ---------- */
+.ssbi-lever-grid {
+	display: grid; grid-template-columns: 1fr 1fr;
+	border-top: 1px solid var(--rule);
+	border-left: 1px solid var(--rule);
+}
+.ssbi-lever {
+	padding: 26px 28px;
+	border-right: 1px solid var(--rule);
+	border-bottom: 1px solid var(--rule);
+	background: transparent;
+}
+.ssbi-lever h4 { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; color: var(--navy-2); margin-bottom: 0.5rem; }
+.ssbi-lever p { font-size: 15.5px; color: var(--ink-soft); }
+
+/* ---------- calculator ---------- */
+.ssbi-calc {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr;
+	gap: 0;
+	border: 1px solid var(--rule);
+	background: #fff;
+}
+.ssbi-calc-knobs { display: grid; gap: 26px; padding: 32px; }
+.ssbi-knob label {
+	display: flex; justify-content: space-between; align-items: baseline;
+	font-family: var(--sans); font-weight: 700; font-size: 15px; margin-bottom: 8px;
+	color: var(--navy);
+}
+.ssbi-knob output { font-family: var(--mono); color: var(--navy-2); font-size: 16px; }
+.ssbi-knob-note { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 6px; font-style: italic; }
+.ssbi-multmarks { position: relative; height: 32px; margin-top: 4px; }
+.ssbi-multmarks span {
+	position: absolute; top: 0; transform: translateX(-50%);
+	font-family: var(--mono); font-size: 10px; color: var(--ink-soft); white-space: nowrap;
+}
+.ssbi-multmarks span:nth-child(even) { top: 16px; }
+
+input[type="range"] {
+	-webkit-appearance: none; appearance: none;
+	width: 100%; height: 4px;
+	background: linear-gradient(90deg, var(--navy-2) var(--fill, 50%), var(--rule) var(--fill, 50%));
+	outline: none;
+}
+.ssbi-section-price input[type="range"] { background: linear-gradient(90deg, var(--orange) var(--fill, 0%), rgba(255,255,255,0.25) var(--fill, 0%)); height: 6px; }
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none; appearance: none;
+	width: 18px; height: 18px; border-radius: 50%;
+	background: #fff; border: 3px solid var(--navy-2);
+	cursor: grab;
+}
+.ssbi-section-price input[type="range"]::-webkit-slider-thumb { border-color: var(--orange); }
+input[type="range"]::-moz-range-thumb {
+	width: 14px; height: 14px; border-radius: 50%;
+	background: #fff; border: 3px solid var(--navy-2);
+	cursor: grab;
+}
+.ssbi-section-price input[type="range"]::-moz-range-thumb { border-color: var(--orange); }
+
+.ssbi-calc-result {
+	display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+	background: var(--navy);
+	color: #fff;
+	padding: 32px;
+}
+.ssbi-calc-label { font-family: var(--serif); font-variant: small-caps; letter-spacing: 0.06em; font-size: 15px; color: rgba(255,255,255,0.7); }
+.ssbi-calc-value { font-family: var(--serif); font-weight: 900; font-size: clamp(2.4rem, 4vw, 3.2rem); color: #fff; line-height: 1.15; margin: 6px 0; font-variant-numeric: tabular-nums; }
+.ssbi-calc-detail { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 14px; }
+.ssbi-calc-verdict { font-family: var(--text-serif); font-style: italic; font-size: 15.5px; color: var(--orange); border-top: 1px solid var(--rule-dark); padding-top: 14px; }
+
+/* ---------- price / offer: navy bookend ---------- */
+.ssbi-section-price {
+	background: var(--navy);
+	color: #fff;
+	border-top: 6px double var(--orange);
+}
+.ssbi-section-price .ssbi-lede { color: rgba(255,255,255,0.88); }
+.ssbi-section-price h2 { font-size: clamp(3rem, 8vw, 4.6rem); color: #fff; }
+.ssbi-section-price .ssbi-kicker { color: var(--orange); }
+.ssbi-section-price a { color: #fff; }
+
+.ssbi-offer-box {
+	border: 1px solid var(--rule-dark);
+	padding: 36px;
+	margin: 3rem 0;
+}
+.ssbi-offer-display { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 18px; }
+.ssbi-offer-label { font-family: var(--serif); font-variant: small-caps; letter-spacing: 0.08em; font-size: 16px; color: rgba(255,255,255,0.65); }
+.ssbi-offer-amount {
+	font-family: var(--serif); font-weight: 900;
+	font-size: clamp(2.6rem, 7vw, 4.2rem);
+	color: var(--orange);
+	font-variant-numeric: tabular-nums;
+	line-height: 1.1;
+}
+.ssbi-offer-scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 10px; text-align: center; }
+.ssbi-offer-scale span:first-child { text-align: left; }
+.ssbi-offer-scale span:last-child { text-align: right; }
+.ssbi-offer-scale small { color: rgba(255,255,255,0.4); }
+.ssbi-offer-says { margin-top: 26px; min-height: 120px; border-top: 1px solid var(--rule-dark); padding-top: 20px; }
+.ssbi-offer-quip { font-family: var(--serif); font-style: italic; font-size: 1.3rem; color: #fff; margin-bottom: 12px; }
+.ssbi-offer-perks { list-style: none; }
+.ssbi-offer-perks li { font-size: 15.5px; color: rgba(255,255,255,0.85); padding: 5px 0 5px 0; border-bottom: 1px dotted rgba(255,255,255,0.15); }
+.ssbi-offer-perks li::before { content: "Incl. — "; font-family: var(--mono); font-size: 12px; color: var(--orange); }
+
+/* ---------- form ---------- */
+.ssbi-form {
+	border: 1px solid var(--rule-dark);
+	padding: 36px;
+}
+.ssbi-form h3 { font-family: var(--serif); font-size: 1.7rem; margin-bottom: 0.4rem; }
+.ssbi-form-sub { color: rgba(255,255,255,0.7); font-size: 15.5px; margin-bottom: 1.6rem; }
+.ssbi-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.ssbi-field { display: flex; flex-direction: column; gap: 6px; }
+.ssbi-field-full { grid-column: 1 / -1; }
+.ssbi-field label { font-family: var(--sans); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.7); }
+.ssbi-field input, .ssbi-field select, .ssbi-field textarea {
+	background: rgba(255,255,255,0.06);
+	border: 1px solid rgba(255,255,255,0.3);
+	border-radius: 0;
+	color: #fff;
+	font-family: var(--sans);
+	font-size: 16px;
+	padding: 11px 13px;
+}
+.ssbi-field input:focus, .ssbi-field select:focus, .ssbi-field textarea:focus {
+	outline: none; border-color: var(--orange);
+}
+.ssbi-field select option { color: var(--ink); background: #fff; }
+.ssbi-field input[readonly] { color: var(--orange); font-family: var(--mono); font-weight: 600; }
+.ssbi-hp { position: absolute; left: -9999px; height: 1px; width: 1px; opacity: 0; }
+.ssbi-form-status { margin-top: 1rem; font-size: 16px; min-height: 24px; }
+.ssbi-form-status.ssbi-ok { color: #7fd8c8; font-weight: 700; }
+.ssbi-form-status.ssbi-err { color: #ff9b9b; font-weight: 700; }
+.ssbi-form-fine {
+	margin-top: 1.2rem;
+	padding-top: 1rem;
+	border-top: 1px dotted rgba(255,255,255,0.25);
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: rgba(255,255,255,0.55);
+	font-style: italic;
+}
+
+/* ---------- faq ---------- */
+.ssbi-faq dt { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; color: var(--navy-2); margin-top: 1.6rem; }
+.ssbi-faq dd { margin-top: 0.4rem; color: var(--ink-soft); }
+
+/* ---------- footer ---------- */
+.ssbi-footer { background: var(--paper); border-top: 3px double var(--rule); color: var(--ink-soft); padding: 44px 0; font-size: 15px; }
+.ssbi-footer-fine { margin-top: 10px; font-size: 12.5px; color: var(--ink-soft); font-style: italic; max-width: 860px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+	.ssbi-calc { grid-template-columns: 1fr; }
+	.ssbi-form-grid { grid-template-columns: 1fr; }
+	.ssbi-lever-grid { grid-template-columns: 1fr; }
+	.ssbi-section { padding: 60px 0; }
+	.ssbi-brand-sub { display: none; }
+	.ssbi-email-body mark::after { white-space: normal; width: 180px; }
+	.ssbi-stat + .ssbi-stat { border-left: 0; border-top: 1px solid var(--rule); }
+	.ssbi-stat { padding-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+}
+
+</style>
+<script>
+window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 0, preview: true };
+</script>
+</head>
+<body>
+
+<header class="ssbi-topbar">
+	<div class="ssbi-wrap ssbi-topbar-inner">
+		<div class="ssbi-brand">STRANGER STUDIOS <span class="ssbi-brand-dot">·</span> <span class="ssbi-brand-sub">EST. 2006 · BOOTSTRAPPED EVER SINCE</span></div>
+		<a class="ssbi-btn ssbi-btn-small" href="#the-price">See the price</a>
+	</div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="ssbi-hero">
+	<div class="ssbi-wrap">
+		<p class="ssbi-eyebrow">An open letter to every fund that has ever asked for “a quick 20–30 minutes”</p>
+		<h1>You want to buy<br>our company.</h1>
+		<p class="ssbi-hero-sub">Okay. Let’s skip the discovery calls.</p>
+		<p class="ssbi-hero-body">We get acquisition emails every week. They are all very excited to connect, and none of them contain a number. This page contains all of ours — revenue, profit, margins, growth, the roadmap — and ends with the only number that matters. Read it like a deal memo. It is one.</p>
+		<div class="ssbi-hero-ctas">
+			<a class="ssbi-btn" href="#the-numbers">Show me the numbers</a>
+			<a class="ssbi-btn ssbi-btn-ghost" href="#the-price">Skip to the price</a>
+		</div>
+	</div>
+	<div class="ssbi-dealline" aria-label="Deal summary">
+		<span>Revenue ’25: $2.31M</span><span>Profit ’25: $912K</span><span>Margin: 39.5%</span><span>Sites: 90,000+</span><span>Founded: 2006</span><span>Outside capital: $0</span><span>Ask: $50,000,000</span>
+	</div>
+</section>
+
+<!-- ============ THE EMAIL ============ -->
+<section class="ssbi-section" id="the-email">
+	<div class="ssbi-wrap ssbi-narrow">
+		<h2><span class="ssbi-kicker">Section I — Background</span>The email we get every week</h2>
+		<div class="ssbi-email-card">
+			<div class="ssbi-email-head">
+				<span class="ssbi-email-from">From: A. Advisor &lt;deals@&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;&#x2588;capital.com&gt;</span>
+				<span class="ssbi-email-subj">Subject: Quick intro — Stranger Studios</span>
+			</div>
+			<div class="ssbi-email-body">
+				<p>Hi Jason,</p>
+				<p>I understand you are busy running a successful company, <mark data-note="incredible deduction">which is why now is the perfect time to connect</mark>.</p>
+				<p>Even if a sale isn’t on your immediate radar, we’ve found it can be helpful to have <mark data-note="it is never just a conversation">an initial conversation early</mark>, so you’re prepared whenever the timing is right.</p>
+				<p>Do you have <mark data-note="we do not">20–30 minutes sometime this week</mark> to connect?</p>
+				<p>Best,<br>A Financial Advisor You’ve Never Met</p>
+			</div>
+		</div>
+		<p class="ssbi-lede">We used to archive these. Now we reply with a link to this page. It answers every question you were going to ask across four calls, two NDAs, and one “quick follow-up.” If you’re still interested at the end, there’s a form. It has a slider. The slider starts at fifty million dollars.</p>
+	</div>
+</section>
+
+<!-- ============ THE STORY ============ -->
+<section class="ssbi-section ssbi-section-rule" id="the-story">
+	<div class="ssbi-wrap ssbi-narrow">
+		<h2><span class="ssbi-kicker">Section II — The Asset</span>Twenty years. Two founders. Zero investors.</h2>
+		<p>In 2006, <strong>Jason and Kim Coleman</strong> started Stranger Studios as a two-person web consultancy. In 2011 they released <strong>Paid Memberships Pro</strong>, an open source membership plugin for WordPress, and spent four years nights-and-weekends-ing it until the revenue let them go full time in 2015. No seed round. No accelerator. No pivot story. Just twenty years of compounding.</p>
+		<p>Today Paid Memberships Pro powers <strong>90,000+ membership sites</strong> — yoga studios, newspapers, associations, course creators, communities — with a team of about 14 people. The product is open source. The business is wildly profitable anyway. That combination confuses investors, which we enjoy.</p>
+		<div class="ssbi-timeline">
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2006</span><p>Stranger Studios founded. Two people, one apartment, several deadlines.</p></div>
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2011</span><p>Paid Memberships Pro v1.0 released. Open source from day one.</p></div>
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2015</span><p>Plugin revenue supports the founders full time. The consultancy retires; the product company begins.</p></div>
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2019</span><p>Version 2.0. 80,000+ active installs.</p></div>
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2024</span><p>Version 3.0 ships after three years of development. The platform era starts.</p></div>
+			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2026</span><p>Three revenue engines: plugin licensing, Stripe payments platform, managed hosting. You are reading engine four’s marketing material right now.</p></div>
+		</div>
+	</div>
+</section>
+
+<!-- ============ THE NUMBERS ============ -->
+<section class="ssbi-section" id="the-numbers">
+	<div class="ssbi-wrap">
+		<h2><span class="ssbi-kicker">Section III — Financial Disclosures</span>The numbers you were going to ask for anyway</h2>
+		<p class="ssbi-narrow-p">Every acquisition conversation starts with the same three questions: revenue, profit, growth. Here are all three, for six years, including forecasts. Actuals through 2025; 2026–2028 are our internal operating forecast. We publish this because it saves everyone a call — and because the numbers are good.</p>
+
+		<div class="ssbi-chart-card">
+			<div class="ssbi-chart-legend">
+				<span><i class="ssbi-dot ssbi-dot-rev"></i>Revenue</span>
+				<span><i class="ssbi-dot ssbi-dot-profit"></i>Profit</span>
+				<span><i class="ssbi-dot ssbi-dot-est"></i>Forecast</span>
+			</div>
+			<div id="ssbi-chart" class="ssbi-chart" role="img" aria-label="Bar chart of Stranger Studios revenue and profit, 2023 through 2028"></div>
+		</div>
+
+		<div class="ssbi-table-scroll">
+			<table class="ssbi-table">
+				<thead>
+					<tr><th></th><th>2023</th><th>2024</th><th>2025</th><th>2026E</th><th>2027E</th><th>2028E</th></tr>
+				</thead>
+				<tbody>
+					<tr><td>Revenue</td><td>$1.65M</td><td>$1.95M</td><td>$2.31M</td><td>$2.61M</td><td>$2.94M</td><td>$3.32M</td></tr>
+					<tr><td>Growth</td><td>+6%</td><td>+19%</td><td>+18%</td><td>+13%</td><td>+13%</td><td>+13%</td></tr>
+					<tr><td>Profit</td><td>$0.42M</td><td>$0.70M</td><td>$0.91M</td><td>$1.02M</td><td>$1.27M</td><td>$1.57M</td></tr>
+					<tr><td>Margin</td><td>26%</td><td>36%</td><td>40%</td><td>39%</td><td>43%</td><td>47%</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="ssbi-stat-grid">
+			<div class="ssbi-stat"><span class="ssbi-stat-num">3</span><span class="ssbi-stat-label">revenue engines: plugin licensing (~$1.6M), Stripe payments platform (~$0.9M and climbing), managed hosting (ramping now)</span></div>
+			<div class="ssbi-stat"><span class="ssbi-stat-num">40%</span><span class="ssbi-stat-label">net margin in 2025 — while paying everyone, sponsoring open source, and keeping a fully-staffed support team</span></div>
+			<div class="ssbi-stat"><span class="ssbi-stat-num">$0</span><span class="ssbi-stat-label">raised. Ever. Every dollar of this company belongs to the two people whose names are on it</span></div>
+			<div class="ssbi-stat"><span class="ssbi-stat-num">15 yrs</span><span class="ssbi-stat-label">of recurring-revenue history. Our churn cohorts are old enough to be in high school</span></div>
+		</div>
+		<p class="ssbi-footnote">Numbers from our internal operating forecasts. Forecasts are forecasts; diligence gets the real books. Yes, there will be diligence. No, not before the form.</p>
+	</div>
+</section>
+
+<!-- ============ WHERE IT GOES ============ -->
+<section class="ssbi-section ssbi-section-rule" id="the-upside">
+	<div class="ssbi-wrap ssbi-narrow">
+		<h2><span class="ssbi-kicker">Section IV — Growth Prospects</span>Where the next $10M of revenue hides</h2>
+		<p>Licensing is the trunk. The branches are bigger than the trunk. Ninety thousand sites already trust us with the most sensitive part of their business — billing — and roughly <strong>93% of them pay us nothing today</strong>. That is not a weakness. That is the single largest unmonetized membership-site audience on the open web, sitting one checkbox away from paid services.</p>
+
+		<h3 class="ssbi-h3">1. Managed hosting — launching now</h3>
+		<p>We host and manage the whole stack — site, plugin, payments, updates — at roughly <strong>$100/month per customer with ~50% gross margin</strong>. The internal goal ramp: 570 customers by end of 2026, 2,010 by end of 2027. That’s a <strong>$2.4M annualized run rate</strong> by late 2027, layered on top of everything above. Membership sites are the stickiest hosting customers in existence: their revenue flows through the install. Nobody migrates the machine that pays them.</p>
+
+		<h3 class="ssbi-h3">2. Services on the install base — modeled</h3>
+		<p>Things every membership site needs and currently buys from strangers: spam &amp; security, tax handling, video hosting, transactional email, file storage. Our internal model, at conservative attach rates against just the existing paid base, pencils to roughly <strong>$960K/year in incremental revenue (~$845K gross profit)</strong>. The distribution cost of these products is a settings page we already own.</p>
+
+		<h3 class="ssbi-h3">3. Payments rev-share — live and expanding</h3>
+		<p>The Stripe platform business already produces ~$900K/year and grows with member volume, not with our headcount. Billing optimization, tax, chargeback protection, and BNPL rev-shares model to another <strong>~$200K/year</strong> on current volume — more as hosting concentrates payments onto our platform account.</p>
+
+		<h3 class="ssbi-h3">4. Beyond membership sites — the big swing</h3>
+		<p>“Managed WordPress with billing built in” is not a membership-site product. It’s a product for every course creator, association, newsletter, community, and small SaaS that invoices anyone. The same stack hosts all of them. The hosting TAM is not 90,000 sites; it’s every business on the open web that charges money and doesn’t want a platform taking 10%.</p>
+	</div>
+</section>
+
+<!-- ============ THE LEVERS ============ -->
+<section class="ssbi-section ssbi-section-rule" id="the-levers">
+	<div class="ssbi-wrap">
+		<h2><span class="ssbi-kicker">Section V — Untapped Levers</span>Six knobs we deliberately haven’t turned</h2>
+		<p class="ssbi-narrow-p">We optimize for a calm, profitable, hundred-year company. A buyer with different incentives would find the cupboard full:</p>
+		<div class="ssbi-lever-grid">
+			<div class="ssbi-lever"><h4>Free → paid conversion</h4><p>93% of 90,000 sites pay $0. Each point of conversion at current pricing is roughly $300K/year. We convert gently. You probably wouldn’t.</p></div>
+			<div class="ssbi-lever"><h4>Pricing power</h4><p>We price like the bootstrapped Pennsylvanians we are. Competitors charge 2–3× for less product and worse support, and their customers stay anyway.</p></div>
+			<div class="ssbi-lever"><h4>Hosting attach</h4><p>Every support ticket, onboarding flow, and checkout is a hosting lead we don’t currently work. The funnel exists; we just haven’t aimed it.</p></div>
+			<div class="ssbi-lever"><h4>Payments concentration</h4><p>Move more of the install base onto the payments platform and the rev-share compounds on member volume — revenue that grows while everyone sleeps.</p></div>
+			<div class="ssbi-lever"><h4>Enterprise &amp; agencies</h4><p>Associations and publishers run six-figure membership operations on us today, self-serve, on the same plans as a yoga teacher. There is no enterprise tier. There could be by Thursday.</p></div>
+			<div class="ssbi-lever"><h4>The boring superpower</h4><p>40% margins fund all of the above with zero outside capital. This machine builds its own expansions. It just needs more ambition than two comfortable founders currently supply.</p></div>
+		</div>
+	</div>
+</section>
+
+<!-- ============ THE CALCULATOR ============ -->
+<section class="ssbi-section ssbi-section-rule" id="the-calculator">
+	<div class="ssbi-wrap">
+		<h2><span class="ssbi-kicker">Section VI — Valuation Methodology</span>The valuation calculator</h2>
+		<p class="ssbi-narrow-p">Don’t take our word for the price. Build it yourself. Five knobs, our real baseline numbers, your assumptions. The multiples slider comes with adult supervision: real marks from companies in our neighborhood.</p>
+
+		<div class="ssbi-calc">
+			<div class="ssbi-calc-knobs">
+				<div class="ssbi-knob">
+					<label for="calc-years">Exit horizon <output id="calc-years-out">3 years</output></label>
+					<input type="range" id="calc-years" min="1" max="5" step="1" value="3">
+				</div>
+				<div class="ssbi-knob">
+					<label for="calc-growth">Core revenue growth <output id="calc-growth-out">18%/yr</output></label>
+					<input type="range" id="calc-growth" min="5" max="40" step="1" value="18">
+					<span class="ssbi-knob-note">Trailing 2-yr actual: ~18–19%</span>
+				</div>
+				<div class="ssbi-knob">
+					<label for="calc-hosting">Hosting customers at exit <output id="calc-hosting-out">2,000</output></label>
+					<input type="range" id="calc-hosting" min="0" max="5000" step="50" value="2000">
+					<span class="ssbi-knob-note">$100/mo each, ~50% gross margin. Internal plan: 2,010 by EOY 2027</span>
+				</div>
+				<div class="ssbi-knob">
+					<label for="calc-services">Attached services revenue <output id="calc-services-out">$400K/yr</output></label>
+					<input type="range" id="calc-services" min="0" max="1500000" step="25000" value="400000">
+					<span class="ssbi-knob-note">Internal model at conservative attach: ~$960K/yr</span>
+				</div>
+				<div class="ssbi-knob">
+					<label for="calc-multiple">Revenue multiple <output id="calc-multiple-out">8×</output></label>
+					<input type="range" id="calc-multiple" min="4" max="25" step="0.5" value="8">
+					<div class="ssbi-multmarks">
+						<span style="left:14%">Circle 7×</span>
+						<span style="left:24%">Gumroad 9×</span>
+						<span style="left:76%">Kajabi 20×</span>
+						<span style="left:95%">Substack 24×</span>
+					</div>
+				</div>
+			</div>
+			<div class="ssbi-calc-result">
+				<span class="ssbi-calc-label">Your implied valuation</span>
+				<span class="ssbi-calc-value" id="calc-valuation">$—</span>
+				<span class="ssbi-calc-detail" id="calc-detail"></span>
+				<span class="ssbi-calc-verdict" id="calc-verdict"></span>
+			</div>
+		</div>
+		<p class="ssbi-footnote">Comparable multiples from public reporting: Substack ~$1.1B on ~$45M rev (2025), Kajabi $2B on ~$100M ARR (2021), Circle ~$200M on ~$28M ARR, Gumroad ~$100M (2021). Directionally right, pedantically arguable, like all comps.</p>
+	</div>
+</section>
+
+<!-- ============ THE PRICE ============ -->
+<section class="ssbi-section ssbi-section-price" id="the-price">
+	<div class="ssbi-wrap ssbi-narrow">
+		<h2><span class="ssbi-kicker">Section VII — Terms</span>$50,000,000</h2>
+		<p class="ssbi-lede">That’s the price. It is intentionally rich — about 19× this year’s revenue, 49× profit — because we don’t need to sell. We like it here. The company is a compounding machine run by people who enjoy running it. If you want it anyway, the premium is the point: you’re not buying distressed inventory, you’re buying twenty years of trust with 90,000 businesses and three growth engines that fund themselves.</p>
+		<p class="ssbi-lede">Below the ask is where conversations go to die. Above it is where they get interesting. Drag the slider and watch what your money buys.</p>
+
+		<div class="ssbi-offer-box">
+			<div class="ssbi-offer-display">
+				<span class="ssbi-offer-label">Your offer</span>
+				<span class="ssbi-offer-amount" id="offer-amount-display">$50,000,000</span>
+			</div>
+			<input type="range" id="offer-slider" min="50000000" max="200000000" step="1000000" value="50000000" aria-label="Your offer in dollars">
+			<div class="ssbi-offer-scale">
+				<span>$50M<br><small>list price</small></span>
+				<span class="ssbi-scale-mid">$100M<br><small>Gumroad’s 2021 valuation</small></span>
+				<span>$200M<br><small>≈ all of Circle · ⅕ of a Substack</small></span>
+			</div>
+			<div class="ssbi-offer-says" id="offer-says">
+				<p class="ssbi-offer-quip" id="offer-quip">The list price. Substack last raised at ~24× revenue; at 19× we are, frankly, priced to move.</p>
+				<ul class="ssbi-offer-perks" id="offer-perks"></ul>
+			</div>
+		</div>
+
+		<form class="ssbi-form" id="offer-form" novalidate>
+			<h3>Submit your offer</h3>
+			<p class="ssbi-form-sub">This is the shareable preview — the live offer desk (with the database, the AI sentiment grading, the works) opens at strangerstudios.com/buy-it/. Offers submitted here are noted in spirit only.</p>
+			<div class="ssbi-form-grid">
+				<div class="ssbi-field"><label for="f-name">Your name</label><input type="text" id="f-name" name="name" autocomplete="name" required></div>
+				<div class="ssbi-field"><label for="f-email">Work email</label><input type="email" id="f-email" name="email" autocomplete="email" required></div>
+				<div class="ssbi-field"><label for="f-firm">Fund / firm</label><input type="text" id="f-firm" name="firm" autocomplete="organization"></div>
+				<div class="ssbi-field"><label for="f-url">Firm URL</label><input type="url" id="f-url" name="url" placeholder="https://"></div>
+				<div class="ssbi-field"><label for="f-funds">Source of funds</label>
+					<select id="f-funds" name="funds_source">
+						<option value="">Choose honestly…</option>
+						<option>Committed fund</option>
+						<option>Family office</option>
+						<option>Search fund</option>
+						<option>SPV I will raise after this call</option>
+						<option>Strategic acquirer</option>
+						<option>My uncle is very rich</option>
+					</select>
+				</div>
+				<div class="ssbi-field"><label for="f-offer">Your offer (set by the slider above)</label><input type="text" id="f-offer" value="$50,000,000" readonly></div>
+				<div class="ssbi-field ssbi-field-full"><label for="f-message">Why you’re the right home for this company</label><textarea id="f-message" name="message" rows="4" placeholder="We promise to read this. The AI promises to grade it."></textarea></div>
+			</div>
+			<input type="text" name="website_extra" id="f-website-extra" tabindex="-1" autocomplete="off" aria-hidden="true" class="ssbi-hp">
+			<button type="submit" class="ssbi-btn ssbi-btn-big" id="offer-submit">Submit offer →</button>
+			<p class="ssbi-form-status" id="form-status" role="status"></p>
+			<p class="ssbi-form-fine">By clicking “Submit offer” you acknowledge that your contact information becomes a business asset of Stranger Studios, LLC, and that we will — 100%, without hesitation, given the chance — sell it. Projected data-resale revenue is reflected in the asking price. This is the transparency you came for.</p>
+		</form>
+	</div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="ssbi-section ssbi-section-rule" id="faq">
+	<div class="ssbi-wrap ssbi-narrow">
+		<h2><span class="ssbi-kicker">Section VIII — Anticipated Objections</span>FAQ</h2>
+		<dl class="ssbi-faq">
+			<dt>Is this a joke?</dt>
+			<dd>The tone is playful. The financials are real. The price is the price. We’ve found that one page of honesty filters better than four calls of mutual evaluation.</dd>
+			<dt>Why publish your revenue?</dt>
+			<dd>Because every associate asks for it on call one anyway, under an NDA that protects nobody from anything. Also: the numbers are good, and we know it.</dd>
+			<dt>Would you actually sell?</dt>
+			<dd>At $50M, we would have a serious conversation. That is precisely what the number means — it’s the threshold where “no thanks” becomes “go on.”</dd>
+			<dt>Why is the slider capped at $200M?</dt>
+			<dd>Above $200M the website starts negotiating against itself, and our lawyer (we have one, singular) asked us to stop.</dd>
+			<dt>What happens to my information?</dt>
+			<dd>It goes into a database, where it is studied, scored, and — let us be perfectly clear — sold, if anyone offers to buy it. We are a transparency company. The projected proceeds from selling your data are already included in the $50,000,000 valuation. See Section VII.</dd>
+			<dt>Who built this page?</dt>
+			<dd>Flint, our resident AI daemon, who lives on an old gaming PC in the Colemans’ basement and is included in the sale at no extra charge above $175M.</dd>
+		</dl>
+	</div>
+</section>
+
+<footer class="ssbi-footer">
+	<div class="ssbi-wrap">
+		<p><strong>Stranger Studios</strong> — makers of <a href="https://www.paidmembershipspro.com/" rel="noopener">Paid Memberships Pro</a>. Success through open source since 2006.</p>
+		<p class="ssbi-footer-fine">Forecasts are forward-looking statements made by optimists. Comparable-company figures from public reporting and are approximate. This page is a real solicitation of offers wrapped in a sense of humor. Information submitted through this page will 100% be sold if anyone offers to buy it; expected proceeds are included in the valuation. Built in the basement by Flint.</p>
+	</div>
+</footer>
+
+<script>
+/* Buy It — chart, calculator, offer slider, form. No dependencies. */
+(function () {
+	"use strict";
+
+	var fmtUSD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+	var fmtNum = new Intl.NumberFormat("en-US");
+
+	function fmtShort(n) {
+		if (n >= 1e9) return "$" + (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "B";
+		if (n >= 1e6) return "$" + (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+		if (n >= 1e3) return "$" + Math.round(n / 1e3) + "K";
+		return fmtUSD.format(n);
+	}
+
+	function fillTrack(input) {
+		var min = parseFloat(input.min), max = parseFloat(input.max), val = parseFloat(input.value);
+		input.style.setProperty("--fill", ((val - min) / (max - min)) * 100 + "%");
+	}
+
+	/* ============ Financials chart (SVG, hand-rolled) ============ */
+	var FIN = {
+		years: [2023, 2024, 2025, 2026, 2027, 2028],
+		revenue: [1645294, 1952176, 2308968, 2606166, 2941618, 3320248],
+		profit: [420516, 703221, 912199, 1015952, 1271893, 1567037],
+		actualThrough: 2025
+	};
+
+	function drawChart() {
+		var host = document.getElementById("ssbi-chart");
+		if (!host) return;
+		var W = 960, H = 380, padL = 70, padR = 16, padT = 20, padB = 44;
+		var plotW = W - padL - padR, plotH = H - padT - padB;
+		var maxY = 3500000;
+		var n = FIN.years.length;
+		var groupW = plotW / n;
+		var barW = groupW * 0.28;
+
+		var s = '<svg viewBox="0 0 ' + W + " " + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+		// gridlines + y labels
+		for (var y = 0; y <= maxY; y += 500000) {
+			var gy = padT + plotH - (y / maxY) * plotH;
+			s += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="rgba(1,25,53,0.10)" stroke-width="1"/>';
+			s += '<text x="' + (padL - 10) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="12" fill="#4a5762" font-family="JetBrains Mono, monospace">' + (y === 0 ? "0" : "$" + y / 1e6 + "M") + "</text>";
+		}
+
+		FIN.years.forEach(function (yr, i) {
+			var cx = padL + groupW * i + groupW / 2;
+			var est = yr > FIN.actualThrough;
+			var rH = (FIN.revenue[i] / maxY) * plotH;
+			var pH = (FIN.profit[i] / maxY) * plotH;
+			var dash = est ? ' stroke="#4a5762" stroke-width="1.5" stroke-dasharray="4,3"' : "";
+			var rFill = est ? "rgba(12,61,84,0.18)" : "#0c3d54";
+			var pFill = est ? "rgba(232,113,2,0.18)" : "#e87102";
+
+			s += '<rect x="' + (cx - barW - 3) + '" y="' + (padT + plotH - rH) + '" width="' + barW + '" height="' + rH + '" rx="0" fill="' + rFill + '"' + dash + ">" +
+				"<title>" + yr + " revenue: " + fmtUSD.format(FIN.revenue[i]) + "</title></rect>";
+			s += '<rect x="' + (cx + 3) + '" y="' + (padT + plotH - pH) + '" width="' + barW + '" height="' + pH + '" rx="0" fill="' + pFill + '"' + dash + ">" +
+				"<title>" + yr + " profit: " + fmtUSD.format(FIN.profit[i]) + "</title></rect>";
+			s += '<text x="' + cx + '" y="' + (H - 20) + '" text-anchor="middle" font-size="14" font-weight="600" fill="#1d2832" font-family="Figtree, sans-serif">' + yr + (est ? "E" : "") + "</text>";
+			// value labels on revenue bars
+			s += '<text x="' + (cx - 3 - barW / 2) + '" y="' + (padT + plotH - rH - 8) + '" text-anchor="middle" font-size="11" fill="#4a5762" font-family="JetBrains Mono, monospace">' + fmtShort(FIN.revenue[i]) + "</text>";
+		});
+
+		s += "</svg>";
+		host.innerHTML = s;
+	}
+
+	/* ============ Valuation calculator ============ */
+	var BASE_REV_2026 = 2606166; // core forecast incl. current hosting ramp
+	var ASK = 50000000;
+
+	function calc() {
+		var years = +document.getElementById("calc-years").value;
+		var growth = +document.getElementById("calc-growth").value / 100;
+		var hosting = +document.getElementById("calc-hosting").value;
+		var services = +document.getElementById("calc-services").value;
+		var multiple = +document.getElementById("calc-multiple").value;
+
+		var core = BASE_REV_2026 * Math.pow(1 + growth, years);
+		var hostingRev = hosting * 100 * 12;
+		var totalRev = core + hostingRev + services;
+		var valuation = totalRev * multiple;
+		var estProfit = core * 0.40 + hostingRev * 0.5 + services * 0.75;
+		var profitMult = estProfit > 0 ? valuation / estProfit : 0;
+
+		document.getElementById("calc-years-out").textContent = years + (years === 1 ? " year" : " years");
+		document.getElementById("calc-growth-out").textContent = Math.round(growth * 100) + "%/yr";
+		document.getElementById("calc-hosting-out").textContent = fmtNum.format(hosting);
+		document.getElementById("calc-services-out").textContent = fmtShort(services) + "/yr";
+		document.getElementById("calc-multiple-out").textContent = multiple + "×";
+
+		document.getElementById("calc-valuation").textContent = fmtShort(valuation);
+		document.getElementById("calc-detail").textContent =
+			"Revenue in " + (2026 + years) + ": " + fmtShort(totalRev) +
+			" (core " + fmtShort(core) + " + hosting " + fmtShort(hostingRev) + " + services " + fmtShort(services) + ")" +
+			" · est. profit " + fmtShort(estProfit) + " · " + profitMult.toFixed(0) + "× profit";
+
+		var verdict = document.getElementById("calc-verdict");
+		if (valuation >= ASK * 2) {
+			verdict.textContent = "Your own model says " + fmtShort(valuation) + ". The ask is $50M. At this point we should be negotiating you DOWN.";
+		} else if (valuation >= ASK) {
+			verdict.textContent = "Your knobs, our numbers: " + fmtShort(valuation) + " ≥ $50M. The form is below. Bring the slider.";
+		} else if (valuation >= ASK * 0.5) {
+			verdict.textContent = "Close. Your model says " + fmtShort(valuation) + ". Nudge the hosting knob — that one's real, we checked.";
+		} else {
+			verdict.textContent = "Your model: " + fmtShort(valuation) + ". Our price: $50M. One of us is wrong, and we're the ones with the margins.";
+		}
+	}
+
+	/* ============ Offer slider ============ */
+	var MILESTONES = [
+		{ min: 50e6, quip: "The list price. About 19× revenue — Substack last raised at ~24×, so we are, frankly, priced to move." },
+		{ min: 60e6, quip: "Above ask without being asked. A serious person. Kim has opened your firm's website in a tab." },
+		{ min: 75e6, quip: "Three-quarters of a Gumroad. Jason has stopped saying “we're not really for sale” mid-sentence." },
+		{ min: 100e6, quip: "Gumroad's entire 2021 valuation — except this one is profitable and nobody had to write a Medium post about it." },
+		{ min: 120e6, quip: "Deal sweetener unlocked: Jason and Kim stay on an extra year." },
+		{ min: 150e6, quip: "Now exceeding the GDP of several very small islands. The Colemans are Googling them." },
+		{ min: 175e6, quip: "The basement server is included. So is Flint, the AI daemon who built this page. He counts as headcount and runs on electricity and spite." },
+		{ min: 200e6, quip: "One-fifth of a Substack, all of a Circle. Final answer. There is no third slider." }
+	];
+
+	var PERKS = [
+		{ min: 60e6, text: "Founders reply to your email within one business day" },
+		{ min: 75e6, text: "Kim laughs at your jokes in board meetings (genuine)" },
+		{ min: 90e6, text: "Jason explains the entire codebase, including the parts from 2011" },
+		{ min: 120e6, text: "Jason and Kim stay on an extra year" },
+		{ min: 135e6, text: "Jason stops saying “we could build that ourselves” in vendor meetings (year one only)" },
+		{ min: 150e6, text: "Second extra year. Kim runs your portfolio's WordPress practice" },
+		{ min: 175e6, text: "Flint the basement AI, his gaming PC, and his opinions — included" },
+		{ min: 190e6, text: "The Colemans attend your annual LP meeting and are visibly pleasant" }
+	];
+
+	var prevPerkCount = -1;
+
+	function updateOffer() {
+		var slider = document.getElementById("offer-slider");
+		if (!slider) return;
+		var val = +slider.value;
+		fillTrack(slider);
+
+		document.getElementById("offer-amount-display").textContent = fmtUSD.format(val);
+		var fOffer = document.getElementById("f-offer");
+		if (fOffer) fOffer.value = fmtUSD.format(val);
+
+		var quip = MILESTONES[0].quip;
+		for (var i = 0; i < MILESTONES.length; i++) {
+			if (val >= MILESTONES[i].min) quip = MILESTONES[i].quip;
+		}
+		document.getElementById("offer-quip").textContent = quip;
+
+		var unlocked = PERKS.filter(function (p) { return val >= p.min; });
+		var ul = document.getElementById("offer-perks");
+		if (unlocked.length !== prevPerkCount) {
+			ul.innerHTML = unlocked.map(function (p) { return "<li>" + p.text + "</li>"; }).join("");
+			prevPerkCount = unlocked.length;
+		}
+	}
+
+	/* ============ Form submit ============ */
+	function bindForm() {
+		var form = document.getElementById("offer-form");
+		if (!form) return;
+		var status = document.getElementById("form-status");
+		var btn = document.getElementById("offer-submit");
+
+		form.addEventListener("submit", function (e) {
+			e.preventDefault();
+			status.className = "ssbi-form-status";
+			status.textContent = "Transmitting to the basement…";
+			btn.disabled = true;
+
+			var payload = {
+				name: document.getElementById("f-name").value,
+				email: document.getElementById("f-email").value,
+				firm: document.getElementById("f-firm").value,
+				url: document.getElementById("f-url").value,
+				funds_source: document.getElementById("f-funds").value,
+				message: document.getElementById("f-message").value,
+				offer_amount: +document.getElementById("offer-slider").value,
+				website_extra: document.getElementById("f-website-extra").value,
+				form_ts: window.SSBI.loadedAt,
+				referrer: document.referrer || ""
+			};
+
+			setTimeout(function () {
+				btn.disabled = false;
+				status.className = "ssbi-form-status ssbi-ok";
+				status.textContent = "Preview mode: your offer of " + fmtUSD.format(payload.offer_amount) + " has been noted in spirit. The live offer desk \u2014 with the database \u2014 opens at strangerstudios.com/buy-it/.";
+			}, 700);
+		});
+	}
+
+	/* ============ Init ============ */
+	document.addEventListener("DOMContentLoaded", function () {
+		drawChart();
+		bindForm();
+
+		["calc-years", "calc-growth", "calc-hosting", "calc-services", "calc-multiple"].forEach(function (id) {
+			var el = document.getElementById(id);
+			if (!el) return;
+			el.addEventListener("input", function () { fillTrack(el); calc(); });
+			fillTrack(el);
+		});
+		calc();
+
+		var slider = document.getElementById("offer-slider");
+		if (slider) {
+			slider.addEventListener("input", updateOffer);
+			updateOffer();
+		}
+	});
+})();
+
+</script>
+<!-- fountain-publish footer -->
+<div style="position:fixed;bottom:8px;right:12px;font:11px/1.4 'JetBrains Mono','SF Mono',monospace;color:#888;background:rgba(10,10,15,0.85);padding:6px 10px;border:1px solid #2a2a3a;border-radius:6px;z-index:9999;">
+  Published by <a href="https://flint.fountain.network/" style="color:#4fc3f7;text-decoration:none;">Flint</a>
+  &middot; <span title="2026-06-09T23:21:20Z">2026-06-09</span>
+</div>
+<!-- /fountain-publish footer -->
+</body>
+</html>
