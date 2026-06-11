@@ -9,6 +9,13 @@
 <meta property="og:title" content="Buy Stranger Studios — $50,000,000">
 <meta property="og:description" content="Real revenue. Real margins. Real price. Bring a real offer.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Buy Stranger Studios — $50,000,000">
+<meta name="twitter:description" content="Real revenue. Real margins. Real price. Bring a real offer.">
+<meta name="twitter:image" content="og-card.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -156,6 +163,12 @@ h2 {
 .ssbi-section h2 + p, .ssbi-section .ssbi-lede { margin-bottom: 1rem; }
 .ssbi-lede { font-size: 19px; }
 
+/* ---------- founders figure ---------- */
+.ssbi-founders { float: right; width: min(46%, 320px); margin: 0.4rem 0 1.2rem 2rem; }
+.ssbi-founders img { width: 100%; height: auto; display: block; }
+.ssbi-founders figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); margin-top: 8px; line-height: 1.5; }
+.ssbi-timeline { clear: both; }
+
 /* ---------- email exhibit ---------- */
 .ssbi-email-card {
 	background: #fff;
@@ -222,6 +235,10 @@ h2 {
 .ssbi-chart svg { width: 100%; height: auto; display: block; }
 
 /* ---------- financial table ---------- */
+.ssbi-scroll-hint { display: none; font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); margin: 1.5rem 0 -1rem; text-align: right; }
+@media (max-width: 700px) {
+	.ssbi-scroll-hint { display: block; }
+}
 .ssbi-table-scroll { overflow-x: auto; margin: 1.5rem 0 2.5rem; }
 .ssbi-table { width: 100%; border-collapse: collapse; font-size: 16px; font-variant-numeric: tabular-nums; border-top: 2px solid var(--navy); }
 .ssbi-table th, .ssbi-table td { padding: 11px 16px; text-align: right; border-bottom: 1px solid var(--rule); }
@@ -401,6 +418,8 @@ input[type="range"]::-moz-range-thumb {
 	.ssbi-lever-grid { grid-template-columns: 1fr; }
 	.ssbi-section { padding: 60px 0; }
 	.ssbi-brand-sub { display: none; }
+	.ssbi-brand-dot { display: none; }
+	.ssbi-founders { float: none; width: 100%; max-width: 360px; margin: 0 auto 1.8rem; }
 	.ssbi-email-body mark::after { white-space: normal; width: 180px; }
 	.ssbi-stat + .ssbi-stat { border-left: 0; border-top: 1px solid var(--rule); }
 	.ssbi-stat { padding-left: 0; }
@@ -426,17 +445,16 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 <!-- ============ HERO ============ -->
 <section class="ssbi-hero">
 	<div class="ssbi-wrap">
-		<p class="ssbi-eyebrow">An open letter to every fund that has ever asked for “a quick 20–30 minutes”</p>
 		<h1>You want to buy<br>our company.</h1>
 		<p class="ssbi-hero-sub">Okay. Let’s skip the discovery calls.</p>
-		<p class="ssbi-hero-body">We get acquisition emails every day. They are all very excited to connect, and none of them contain a number. This page contains all of ours — revenue, profit, margins, growth, the roadmap — and ends with the only number that matters. Read it like a deal memo. It is one.</p>
+		<p class="ssbi-hero-body">We get acquisition emails every day. Consider this an open letter to every fund that has ever asked for “a quick 20–30 minutes.” This page contains all of our numbers: revenue, profit, margins, growth, the roadmap.</p>
 		<div class="ssbi-hero-ctas">
 			<a class="ssbi-btn" href="#the-numbers">Show me the numbers</a>
 			<a class="ssbi-btn ssbi-btn-ghost" href="#the-price">Skip to the price</a>
 		</div>
 	</div>
 	<div class="ssbi-dealline" aria-label="Deal summary">
-		<span>Revenue ’25: $2.31M</span><span>Profit ’25: $912K</span><span>Margin: 39.5%</span><span>Sites: 90,000+</span><span>Founded: 2006</span><span>Outside capital: $0</span><span>Ask: $50,000,000</span>
+		<span>Revenue ’25: $2.31M</span><span>Profit ’25: $912K</span><span>Margin: 39.5%</span><span>Members: 59k</span><span>Customers: 5.6k</span><span>Founded: 2006</span><span>Outside capital: $0</span><span>Ask: $50,000,000</span>
 	</div>
 </section>
 
@@ -465,8 +483,12 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 <section class="ssbi-section ssbi-section-rule" id="the-story">
 	<div class="ssbi-wrap ssbi-narrow">
 		<h2><span class="ssbi-kicker">Section II — The Asset</span>Twenty years. Two founders. Zero investors.</h2>
+		<figure class="ssbi-founders">
+			<img src="founders.jpg" alt="Polaroid photos of founders Jason and Kim Coleman, and the family dog" width="930" height="1000" loading="lazy">
+			<figcaption>Exhibit A — Jason &amp; Kim Coleman: founders, and 100% of the cap table. Dog not included in the sale.</figcaption>
+		</figure>
 		<p>In 2006, <strong>Jason and Kim Coleman</strong> started Stranger Studios as a two-person web consultancy. In 2011 they released <strong>Paid Memberships Pro</strong>, an open source membership plugin for WordPress, and spent four years nights-and-weekends-ing it until the revenue let them go full time in 2015. No seed round. No accelerator. No pivot story. Just twenty years of compounding.</p>
-		<p>Today Paid Memberships Pro powers <strong>90,000+ membership sites</strong> — yoga studios, newspapers, associations, course creators, communities — with a team of about 14 people. The product is open source. The business is wildly profitable anyway. That combination confuses investors, which we enjoy.</p>
+		<p>Today Paid Memberships Pro powers <strong>tens of thousands of membership sites</strong> — associations, communities, course creators, newspapers, yoga studios — plus an average of <strong>1,800 new signups per month</strong>, all with a team of about 14 people. The product is open source. The business is wildly profitable anyway. That combination confuses investors, which we enjoy.</p>
 		<div class="ssbi-timeline">
 			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2006</span><p>Stranger Studios founded. Two people, one apartment, several deadlines.</p></div>
 			<div class="ssbi-tl-item"><span class="ssbi-tl-year">2011</span><p>Paid Memberships Pro v1.0 released. Open source from day one.</p></div>
@@ -493,6 +515,7 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 			<div id="ssbi-chart" class="ssbi-chart" role="img" aria-label="Bar chart of Stranger Studios revenue and profit, 2023 through 2028"></div>
 		</div>
 
+		<p class="ssbi-scroll-hint" aria-hidden="true">slide for the forecast years →</p>
 		<div class="ssbi-table-scroll">
 			<table class="ssbi-table">
 				<thead>
@@ -521,19 +544,22 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 <section class="ssbi-section ssbi-section-rule" id="the-upside">
 	<div class="ssbi-wrap ssbi-narrow">
 		<h2><span class="ssbi-kicker">Section IV — Growth Prospects</span>Where the next $10M of revenue hides</h2>
-		<p>Licensing is the trunk. The branches are bigger than the trunk. Ninety thousand sites already trust us with the most sensitive part of their business — billing — and roughly <strong>93% of them pay us nothing today</strong>. That is not a weakness. That is the single largest unmonetized membership-site audience on the open web, sitting one checkbox away from paid services.</p>
+		<p>Licensing is the trunk. The branches are bigger than the trunk. Tens of thousands of sites already trust us with the most sensitive part of their business — billing — and roughly <strong>93% of them pay us nothing today</strong>. That is not a weakness. That is the single largest unmonetized membership-site audience on the open web, sitting one checkbox away from paid services.</p>
 
 		<h3 class="ssbi-h3">1. Managed hosting — launching now</h3>
 		<p>We host and manage the whole stack — site, plugin, payments, updates — at roughly <strong>$100/month per customer with ~50% gross margin</strong>. The internal goal ramp: 570 customers by end of 2026, 2,010 by end of 2027. That’s a <strong>$2.4M annualized run rate</strong> by late 2027, layered on top of everything above. Membership sites are the stickiest hosting customers in existence: their revenue flows through the install. Nobody migrates the machine that pays them.</p>
 
 		<h3 class="ssbi-h3">2. Services on the install base — modeled</h3>
-		<p>Things every membership site needs and currently buys from strangers: spam &amp; security, tax handling, video hosting, transactional email, file storage. Our internal model, at conservative attach rates against just the existing paid base, pencils to roughly <strong>$960K/year in incremental revenue (~$845K gross profit)</strong>. The distribution cost of these products is a settings page we already own.</p>
+		<p>Things every membership site needs and currently buys from strangers: spam &amp; security, tax handling, video hosting, transactional email, file storage. Our internal model, at conservative attach rates against just the existing paid base, pencils to roughly <strong>$960K/year in incremental revenue (~$845K gross profit)</strong>. The distribution cost of these products is a settings page we already own. The big win in this category is launching an <strong>email marketing service</strong> — many of our customers spend more per month on email marketing than they do on hosting.</p>
 
 		<h3 class="ssbi-h3">3. Payments rev-share — live and expanding</h3>
 		<p>The Stripe platform business already produces ~$900K/year and grows with member volume, not with our headcount. Billing optimization, tax, chargeback protection, and BNPL rev-shares model to another <strong>~$200K/year</strong> on current volume — more as hosting concentrates payments onto our platform account.</p>
 
 		<h3 class="ssbi-h3">4. Beyond membership sites — the big swing</h3>
-		<p>“Managed WordPress with billing built in” is not a membership-site product. It’s a product for every course creator, association, newsletter, community, and small SaaS that invoices anyone. The same stack hosts all of them. The hosting TAM is not 90,000 sites; it’s every business on the open web that charges money and doesn’t want a platform taking 10%.</p>
+		<p>The AI-first tools and platform we built to manage PMPro sites don’t actually care that the site is a PMPro site. The opportunity is to point that same stack at anything you can host on a DigitalOcean droplet: other ecommerce, membership, and LMS plugins for WordPress; static Astro sites that need a VPS for their AI tooling. The hosting TAM is not tens of thousands of sites; it’s every business on the open web that charges money and doesn’t want a platform taking 10%.</p>
+
+		<h3 class="ssbi-h3">5. Agentic AI on the box — the dream</h3>
+		<p>Put our agentic AI tech on the same server the customer’s site runs on, and let them chat with it right there to make any change to their site — content, pricing, design, custom code — while we monitor and support. Every site ships with its own resident engineer, and the hosting bill is the retainer. Nobody else is positioned to do this; we’re already doing it for our own sites.</p>
 	</div>
 </section>
 
@@ -543,12 +569,12 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 		<h2><span class="ssbi-kicker">Section V — Untapped Levers</span>Six knobs we deliberately haven’t turned</h2>
 		<p class="ssbi-narrow-p">We optimize for a calm, profitable, hundred-year company. A buyer with different incentives would find the cupboard full:</p>
 		<div class="ssbi-lever-grid">
-			<div class="ssbi-lever"><h4>Free → paid conversion</h4><p>93% of 90,000 sites pay $0. Each point of conversion at current pricing is roughly $300K/year. We convert gently. You probably wouldn’t.</p></div>
+			<div class="ssbi-lever"><h4>Stop giving away your software for free</h4><p>93% of the install base pays $0. Each point of conversion at current pricing is roughly $300K/year. We convert gently. You probably wouldn’t.</p></div>
 			<div class="ssbi-lever"><h4>Pricing power</h4><p>We price like the bootstrapped Pennsylvanians we are. Competitors charge 2–3× for less product and worse support, and their customers stay anyway.</p></div>
-			<div class="ssbi-lever"><h4>Hosting attach</h4><p>Every support ticket, onboarding flow, and checkout is a hosting lead we don’t currently work. The funnel exists; we just haven’t aimed it.</p></div>
-			<div class="ssbi-lever"><h4>Payments concentration</h4><p>Move more of the install base onto the payments platform and the rev-share compounds on member volume — revenue that grows while everyone sleeps.</p></div>
+			<div class="ssbi-lever"><h4>Payments concentration</h4><p>Move more of the install base onto a single payments platform, increase application fees, and lawyer up to negotiate better rev-share agreements — revenue that compounds on member volume while everyone sleeps.</p></div>
 			<div class="ssbi-lever"><h4>Enterprise &amp; agencies</h4><p>Associations and publishers run six-figure membership operations on us today, self-serve, on the same plans as a yoga teacher. There is no enterprise tier. There could be by Thursday.</p></div>
-			<div class="ssbi-lever"><h4>The boring superpower</h4><p>40% margins fund all of the above with zero outside capital. This machine builds its own expansions. It just needs more ambition than two comfortable founders currently supply.</p></div>
+			<div class="ssbi-lever"><h4>Advertising</h4><p>Substack and Kajabi spend millions on marketing. We have a comparable install base and have never paid for an ad. We don’t know what happens when this machine gets a marketing budget. You could find out.</p></div>
+			<div class="ssbi-lever"><h4>Your idea goes here</h4><p>40% margins fund every knob on this list with zero outside capital. The machine builds its own expansions — it just needs more ambition than two comfortable founders currently supply. You presumably have a thesis. This is where it goes.</p></div>
 		</div>
 	</div>
 </section>
@@ -598,7 +624,7 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 				<span class="ssbi-calc-verdict" id="calc-verdict"></span>
 			</div>
 		</div>
-		<p class="ssbi-footnote">Comparable multiples from public reporting: Substack ~$1.1B on ~$45M rev (2025), Kajabi $2B on ~$100M ARR (2021), Circle ~$200M on ~$28M ARR, Gumroad ~$100M (2021). Directionally right, pedantically arguable, like all comps.</p>
+		<p class="ssbi-footnote">Comparable multiples from public reporting: Substack ~$1.1B on ~$45M rev (2025), Kajabi $2B on ~$100M ARR (2021), Circle ~$200M on ~$28M ARR, Gumroad ~$100M (2021). Directionally right, pedantically arguable, like all comps. One more data point for your model: our install base is in the same neighborhood as theirs — and we built ours without spending a dollar on paid marketing.</p>
 	</div>
 </section>
 
@@ -606,7 +632,7 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 <section class="ssbi-section ssbi-section-price" id="the-price">
 	<div class="ssbi-wrap ssbi-narrow">
 		<h2><span class="ssbi-kicker">Section VII — Terms</span>$50,000,000</h2>
-		<p class="ssbi-lede">That’s the price. It is intentionally rich — about 19× this year’s revenue, 49× profit — because we don’t need to sell. We like it here. The company is a compounding machine run by people who enjoy running it. If you want it anyway, the premium is the point: you’re not buying distressed inventory, you’re buying twenty years of trust with 90,000 businesses and three growth engines that fund themselves.</p>
+		<p class="ssbi-lede">That’s the price. It is intentionally rich — about 19× this year’s revenue, 49× profit — because we don’t need to sell. We like it here. The company is a compounding machine run by people who enjoy running it. If you want it anyway, the premium is the point: you’re not buying distressed inventory, you’re buying twenty years of trust with tens of thousands of businesses and three growth engines that fund themselves.</p>
 		<p class="ssbi-lede">Below the ask is where conversations go to die. Above it is where they get interesting. Drag the slider and watch what your money buys.</p>
 
 		<div class="ssbi-offer-box">
@@ -628,7 +654,7 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 
 		<form class="ssbi-form" id="offer-form" novalidate>
 			<h3>Submit your offer</h3>
-			<p class="ssbi-form-sub">This is the shareable preview — the live offer desk (with the database, the AI sentiment grading, the works) opens at strangerstudios.com/buy-it/. Offers submitted here are noted in spirit only.</p>
+			<p class="ssbi-form-sub">Real offers get real replies. “Quick intro call” requests get archived into the same database, where they are studied by an AI for sentiment. His name is Flint. He is not impressed easily.</p>
 			<div class="ssbi-form-grid">
 				<div class="ssbi-field"><label for="f-name">Your name</label><input type="text" id="f-name" name="name" autocomplete="name" required></div>
 				<div class="ssbi-field"><label for="f-email">Work email</label><input type="email" id="f-email" name="email" autocomplete="email" required></div>
@@ -668,9 +694,9 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 			<dt>Would you actually sell?</dt>
 			<dd>At $50M, we would have a serious conversation. That is precisely what the number means — it’s the threshold where “no thanks” becomes “go on.”</dd>
 			<dt>Isn’t $50 million a high multiple for this business?</dt>
-			<dd>Tremendously. At 2026 numbers it’s roughly 19× revenue and 49× profit — Kajabi raised at 20× revenue, Substack at ~24×, and we are aware we are neither. But that math prices a company whose owners have to sell. We don’t. This is a control premium on a profitable, growing, founder-run machine that gets more valuable every year we keep it — so the number sits exactly where losing it would stop hurting. If your model says we’re worth less, run Section VI with your own assumptions and enjoy the good news: you don’t have to buy it.</dd>
+			<dd>Tremendously. At 2026 numbers it’s roughly 19× revenue and 49× profit — Kajabi raised at 20× revenue, Substack at ~24×, and we are aware we are neither. (Though note: our install base is comparable to theirs, built on zero paid marketing. Their multiples bought growth; ours came free.) But that math prices a company whose owners have to sell. We don’t. This is a control premium on a profitable, growing, founder-run machine that gets more valuable every year we keep it — so the number sits exactly where losing it would stop hurting. If your model says we’re worth less, run Section VI with your own assumptions and enjoy the good news: you don’t have to buy it.</dd>
 			<dt>Why is the slider capped at $200M?</dt>
-			<dd>Above $200M the website starts negotiating against itself, and our lawyer (we have one, singular) asked us to stop.</dd>
+			<dd>Above $200M the website starts negotiating against itself, and our lawyer (we have one, singular) asked us to stop. Just kidding. We didn’t ask our lawyers before posting this. Let’s see how it goes.</dd>
 			<dt>What happens to my information?</dt>
 			<dd>It goes into a database, where it is studied, scored, and — let us be perfectly clear — sold, if anyone offers to buy it. We are a transparency company. The projected proceeds from selling your data are already included in the $50,000,000 valuation. See Section VII.</dd>
 			<dt>Who built this page?</dt>
@@ -902,12 +928,5 @@ window.SSBI = { restUrl: "", minOffer: 50000000, maxOffer: 200000000, loadedAt: 
 })();
 
 </script>
-<!-- fountain-publish footer -->
-<div style="position:fixed;bottom:8px;right:12px;font:11px/1.4 'JetBrains Mono','SF Mono',monospace;color:#888;background:rgba(10,10,15,0.85);padding:6px 10px;border:1px solid #2a2a3a;border-radius:6px;z-index:9999;">
-  Published by <a href="https://flint.fountain.network/" style="color:#4fc3f7;text-decoration:none;">Flint</a>
-  &middot; <span title="2026-06-09T23:21:20Z">2026-06-09</span>
-  &middot; updated <span title="2026-06-09T23:28:36Z">2026-06-09</span>
-</div>
-<!-- /fountain-publish footer -->
 </body>
 </html>
