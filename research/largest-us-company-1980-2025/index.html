@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Crown: America's Largest Public Company, 1980–2025 → 2040</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a25; --border: #2a2a3a;
+    --text: #e0e0e8; --text-dim: #8888a0; --accent: #4fc3f7; --accent2: #7c4dff;
+    --green: #66bb6a; --red: #ef5350; --orange: #ffa726; --yellow: #ffee58;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'JetBrains Mono','Fira Code','SF Mono','Cascadia Code',monospace; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { text-align: center; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--text-dim); font-size: 0.85rem; }
+  .verdict-box { background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(124,77,255,0.08)); border: 1px solid var(--accent); border-radius: 8px; padding: 1.5rem 2rem; margin: 2rem 0; text-align: center; }
+  .verdict-box .verdict-text { font-size: 1.1rem; font-weight: bold; }
+  .verdict-box .verdict-detail { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.6rem; }
+  .big-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .big-num { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+  .big-num .number { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+  .big-num .label { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .big-num.green .number { color: var(--green); }
+  .big-num.orange .number { color: var(--orange); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .chart-container { position: relative; height: 380px; margin: 1rem 0; }
+  .chart-container.short { height: 280px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin: 1rem 0; }
+  th { text-align: left; padding: 0.6rem 0.7rem; color: var(--accent); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 0.42rem 0.7rem; border-bottom: 1px solid rgba(42,42,58,0.3); color: var(--text); }
+  tr:hover td { background: rgba(79,195,247,0.04); }
+  .text-right { text-align: right; }
+  .text-dim { color: var(--text-dim); }
+  .chip { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+  .mode-toggle { display: flex; gap: 0.5rem; justify-content: center; margin: 1.5rem 0 0.5rem; }
+  .mode-btn { font-family: inherit; font-size: 0.85rem; padding: 0.55rem 1.4rem; border-radius: 6px; cursor: pointer;
+    background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
+  .mode-btn:hover { color: var(--text); }
+  .mode-btn.active { background: rgba(79,195,247,0.12); color: var(--accent); border-color: var(--accent); font-weight: 700; }
+  .analysis { font-size: 0.85rem; line-height: 1.75; }
+  .analysis h3 { color: var(--accent); font-size: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .analysis p { margin-bottom: 0.9rem; }
+  .analysis ul { margin: 0.5rem 0 1rem 1.5rem; }
+  .analysis li { margin-bottom: 0.45rem; }
+  .analysis a { color: var(--accent); }
+  .callout { background: var(--surface2); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.85rem; }
+  .callout.warning { border-left-color: var(--orange); }
+  .callout.green { border-left-color: var(--green); }
+  .callout strong { color: var(--accent); }
+  .callout.warning strong { color: var(--orange); }
+  .callout.green strong { color: var(--green); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  .era { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; }
+  .era h4 { font-size: 0.9rem; margin-bottom: 0.4rem; }
+  .era .years { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .era p { font-size: 0.82rem; margin-top: 0.5rem; color: var(--text); }
+  .slider-group { margin-bottom: 1rem; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.3rem; }
+  .slider-label span:first-child { color: var(--text-dim); }
+  .slider-label span:last-child { color: var(--accent); font-weight: 600; }
+  input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--border); outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--bg); }
+  input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--bg); }
+  .proj-verdict { text-align: center; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface2); }
+  .source-list { columns: 2; column-gap: 2rem; font-size: 0.75rem; }
+  .source-list li { margin-bottom: 0.5rem; break-inside: avoid; }
+  .source-list a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  .source-list a:hover { color: var(--accent2); }
+  @media (max-width: 700px) { .source-list { columns: 1; } }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.72rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>👑 The Crown: America's Largest Public Company</h1>
+  <div class="subtitle">Year-end #1 on the NYSE / NASDAQ, 1980–2025, by market cap and by revenue — projected to 2040 · Flint / Coleman Research · June 2026</div>
+</header>
+
+<div class="verdict-box">
+  <div class="verdict-text">The market-cap crown has had seven owners since 1980. The revenue crown has had four. They were the same company in exactly two of 46 years.</div>
+  <div class="verdict-detail">Market cap crowns stories: IBM → AT&amp;T → Exxon → GE → Microsoft → Apple → NVIDIA. Revenue crowns logistics: Exxon → GM → Walmart → Amazon. Only ExxonMobil (2008, 2011) ever held both at once. In 2025 the revenue crown changed hands for just the fourth time — Amazon $716.9B over Walmart $713.2B, a 0.5% photo finish.</div>
+</div>
+
+<div class="big-numbers">
+  <div class="big-num"><div class="number">7 / 4</div><div class="label">Cap-crown vs revenue-crown holders</div></div>
+  <div class="big-num"><div class="number">2 of 46</div><div class="label">Years one company held both</div></div>
+  <div class="big-num green"><div class="number">117×</div><div class="label">Cap-crown growth 1980→2025</div></div>
+  <div class="big-num green"><div class="number">7×</div><div class="label">Revenue-crown growth 1980→2025</div></div>
+  <div class="big-num orange"><div class="number">21</div><div class="label">Walmart's revenue crowns (most)</div></div>
+  <div class="big-num orange"><div class="number">$3.7B</div><div class="label">Amazon's 2025 winning margin (0.5%)</div></div>
+</div>
+
+<div class="mode-toggle">
+  <button class="mode-btn active" id="btnCap" onclick="setMode('cap')">👑 By Market Cap</button>
+  <button class="mode-btn" id="btnRev" onclick="setMode('rev')">💰 By Revenue</button>
+</div>
+
+<div class="card">
+  <h3 id="mainChartTitle">Revenue of the #1 company (bars) vs its year-end market cap (line, log scale)</h3>
+  <div class="chart-container"><canvas id="mainChart"></canvas></div>
+  <div class="text-dim" style="font-size:0.72rem" id="mainChartCaption"></div>
+</div>
+
+<div class="grid-2">
+  <div class="card" id="ratioCard">
+    <h3 id="ratioTitle">The "story premium" — crown market cap ÷ crown revenue</h3>
+    <div class="chart-container short"><canvas id="ratioChart"></canvas></div>
+    <div class="text-dim" style="font-size:0.72rem" id="ratioCaption"></div>
+  </div>
+  <div class="card">
+    <h3>Years at #1 by company</h3>
+    <div class="chart-container short"><canvas id="reignChart"></canvas></div>
+    <div class="text-dim" style="font-size:0.72rem" id="reignCaption"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 id="tableTitle">Year by year, 1980–2025</h3>
+  <table id="crownTable">
+    <thead><tr id="tableHead"></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="text-dim" style="font-size:0.72rem" id="tableCaption"></div>
+</div>
+
+<div class="analysis">
+  <h3>The Five Eras of the Market-Cap Crown</h3>
+
+  <div class="era" style="border-left: 3px solid #4fc3f7;">
+    <div class="years">1980–1988 · Big Iron &amp; Ma Bell</div>
+    <h4 style="color:#4fc3f7">IBM, interrupted briefly by AT&amp;T</h4>
+    <p>Pre-breakup AT&amp;T was the biggest business on earth by revenue (~$65B in 1982 vs IBM's ~$34B) but the market paid up for IBM's margins and mainframe monopoly. The 1984 Bell System divestiture removed AT&amp;T from contention permanently, and IBM ruled the decade — peaking around $90B in 1985. Meanwhile the <em>revenue</em> crown belonged to Exxon, then GM — neither ever close to the cap crown in this era.</p>
+  </div>
+
+  <div class="era" style="border-left: 3px solid #ef5350;">
+    <div class="years">1989–1992 · The Quiet Handoff</div>
+    <h4 style="color:#ef5350">Exxon takes it as IBM stumbles</h4>
+    <p>IBM's slow-motion collapse (revenue peaked at $68.9B in 1990, then shrank while losses mounted to $8B by 1993) let Exxon — a company with nearly twice the revenue and half the glamour — take the crown almost unnoticed. 1990 was a genuine photo finish: IBM ≈$64.6B vs Exxon ≈$64.3B at year-end. 1992 was a three-way squeaker with Walmart and GE within $3B.</p>
+  </div>
+
+  <div class="era" style="border-left: 3px solid #ffa726;">
+    <div class="years">1993–2005 · The Conglomerate &amp; the Software Interludes</div>
+    <h4 style="color:#ffa726">GE's ten years, Microsoft's three</h4>
+    <p>Jack Welch's GE held the crown longer in this stretch than any other company (1993–97, 2000–01, 2003–05). Microsoft snatched it at the dot-com peak (1998–99, again briefly in 2002) with one-sixth of GE's revenue. The popular myth that Microsoft stayed #1 through 2000–01 is wrong: MSFT lost ~60% in calendar 2000 and GE ($475B) ended that year comfortably on top. The revenue crown, meanwhile, passed from GM to ExxonMobil to Walmart without either ever threatening the cap crown.</p>
+  </div>
+
+  <div class="era" style="border-left: 3px solid #ef5350;">
+    <div class="years">2006–2011 · The Oil Supercycle</div>
+    <h4 style="color:#ef5350">ExxonMobil's second reign — and the only double crowns</h4>
+    <p>$100+ oil made XOM the only company ever to wear the cap crown with revenue above $400B — and in 2008 and 2011 it held <em>both</em> crowns simultaneously, the only times that has happened since 1980. It held cap #1 through the 2008 crash (its cap fell just 19% while the market halved) and fended off Apple at year-end 2011 ($406B vs $376B).</p>
+  </div>
+
+  <div class="era" style="border-left: 3px solid #e0e0e8;">
+    <div class="years">2012–2025 · iPhone, then AI</div>
+    <h4 style="color:#e0e0e8">Apple's twelve years, NVIDIA's arrival — and Amazon's first revenue crown</h4>
+    <p>Apple took year-end #1 in 2012 and held it every year through 2024 except 2018 (Microsoft, during the Q4-2018 selloff). Then 2025 flipped <em>both</em> crowns in the same year: NVIDIA ended at ~$4.6T on $215.9B of FY2026 revenue (a 21.5× multiple, highest since Microsoft 1999), and Amazon ended Walmart's 13-year revenue streak by $3.7B. The last time both crowns changed hands in one calendar year: never, in this dataset.</p>
+  </div>
+
+  <h3>What the two crowns tell you</h3>
+  <p>Sort the 46 market-cap crowns by revenue and the ordering is nearly uncorrelated with when the crown was won. Three regimes are visible in the cap-to-revenue ratio: industrials/oil at 0.7–3×, GE's quality-franchise premium drifting 1.5–3.7×, then software/AI at 7–30× (Microsoft 1999: 30.6×; NVIDIA 2025: 21.5×). The revenue crown is the opposite — a slow, stable grind that has compounded at just 4.4%/yr (roughly nominal GDP plus a hair) and changed hands only on structural shifts: oil shocks, the rise of the suburban big-box, and now e-commerce.</p>
+
+  <div class="callout">
+    <strong>The cleanest pattern in the dataset:</strong> every cap-crown transfer since 1989 happened because the incumbent's <em>story</em> broke, not its revenue. IBM's revenue was at an all-time high in 1990, GE's in 2005, ExxonMobil's near-record in 2011, Apple's at a record in 2024 — and each lost the crown within a year or two anyway. Revenue-crown transfers are the mirror image: the incumbent keeps growing, but a structurally faster business simply runs it down (GM passed Exxon in 1985, Walmart passed GM in 2001, Amazon passed Walmart in 2025 — each time the loser posted record or near-record revenue in the year it lost).
+  </div>
+</div>
+
+<!-- ============ PROJECTION LAB ============ -->
+<div class="analysis"><h3>Projection Lab: The Crowns in 2040</h3>
+<p>Everything below is extrapolation, not prediction — constant-CAGR curves you can bend with the sliders. The point is to see what different growth assumptions <em>imply</em>, and which assumptions are historically precedented. Defaults are set to the actual 45-year trend rates.</p>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>👑 Market-cap crown → 2040</h3>
+    <div class="slider-group">
+      <div class="slider-label"><span>Crown market-cap CAGR, 2025→2040 (45-yr historical: 11.2%)</span><span id="capCagrVal">11.2%</span></div>
+      <input type="range" id="capCagr" min="4" max="20" step="0.2" value="11.2">
+    </div>
+    <div class="chart-container"><canvas id="capProjChart"></canvas></div>
+    <div class="proj-verdict" id="capProjVerdict"></div>
+    <div class="text-dim" style="font-size:0.72rem; margin-top:0.6rem">Shaded band = 8%–14% CAGR. The dotted line is your slider. For scale: every 15-year stretch since 1980 delivered a crown-cap CAGR between ~6% (1999→2014, dot-com hangover) and ~19% (2009→2024, QE + iPhone + AI).</div>
+  </div>
+
+  <div class="card">
+    <h3>💰 Revenue crown → 2040: the three-horse race</h3>
+    <div class="slider-group">
+      <div class="slider-label"><span>Amazon revenue CAGR (2015–25 actual: 21%; 2023–25: ~12%)</span><span id="amznGVal">10.0%</span></div>
+      <input type="range" id="amznG" min="2" max="20" step="0.5" value="10">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>Walmart revenue CAGR (2015–25 actual: 4.0%)</span><span id="wmtGVal">4.5%</span></div>
+      <input type="range" id="wmtG" min="1" max="10" step="0.5" value="4.5">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>NVIDIA revenue CAGR (FY24→FY26 actual: ~88%/yr — won't last)</span><span id="nvdaGVal">15.0%</span></div>
+      <input type="range" id="nvdaG" min="5" max="40" step="1" value="15">
+    </div>
+    <div class="chart-container"><canvas id="revProjChart"></canvas></div>
+    <div class="proj-verdict" id="revProjVerdict"></div>
+  </div>
+</div>
+
+<div class="analysis">
+  <h3>Reading the 2040 tea leaves</h3>
+  <p><strong>The market-cap crown in 2040.</strong> At the 45-year trend rate (11.2%), the 2040 crown is a ~$23T company. The honest answer about <em>who</em> wears it: history says don't bet on the incumbent. Of the seven cap-crown holders, only Microsoft ever lost the crown and took it back — every other handoff was permanent. NVIDIA (~$5.0T as of mid-June 2026) wears it today at 21.5× revenue; for it to still wear the crown in 2040 at a sane multiple (say 6–8×), its revenue would need to reach $3T+ — a 19%+ CAGR for 15 straight years. Possible, unprecedented. The base-rate play: the 2040 crown belongs to a company that is currently in the $100B–$1T tier, or doesn't exist yet — that's where Apple was in 2010, Microsoft in 1990, and NVIDIA in 2020 relative to their crowns.</p>
+  <p><strong>The revenue crown in 2040.</strong> Far more predictable — it has compounded at 4.4% for 45 years and its holders change roughly once per generation. At the slider defaults, Amazon holds it comfortably: ~$3.0T by 2040 vs Walmart's ~$1.4T, with the gap becoming irreversible around 2027–28. The interesting scenario is NVIDIA (or whichever AI platform wins): at a sustained 20%+ CAGR, AI infrastructure revenue catches the retailers in the late 2030s — which would make the 2040 revenue crown a <em>technology</em> company for the first time ever. No tech company has ever held the revenue crown; that's the scenario worth watching.</p>
+  <div class="callout warning">
+    <strong>Why constant-CAGR is the wrong model (use it anyway):</strong> no revenue-crown holder has ever sustained 15%+ growth for 15 consecutive years at $200B+ scale — Amazon itself decelerated from 21%/yr (2015–25) to ~12% (2023–25). And cap-crown CAGRs mean-revert hard: the 1999 crown (MSFT, $604B) took 15 years to be worth $604B again in real terms. Treat the right edge of these charts as a cone of possibilities, not a line.
+  </div>
+</div>
+
+<div class="analysis">
+  <h3>Methodology &amp; contested years</h3>
+  <p><strong>Scope.</strong> US-headquartered companies listed on the NYSE or NASDAQ. Market-cap crown = largest by market capitalization at calendar year-end (Dec 31 close). Revenue crown = largest by reported annual revenue for the fiscal year ending in/aligned to that calendar year (Fortune 500 convention: the Fortune list year reflects the <em>prior</em> fiscal year — figures here are re-mapped to the revenue year itself). PetroChina briefly topped global cap rankings in 2007/2009 but is excluded as a non-US company.</p>
+  <p><strong>Fiscal-year mapping.</strong> Microsoft's FY ends June 30; Apple's late September; NVIDIA's late January (calendar 2025 = FY2026: $215.9B); Walmart's January 31 (calendar 2025 = FY2026, Feb 2025–Jan 2026: $713.2B — the year that overlaps calendar 2025 for 11 of 12 months). Amazon reports on calendar years. ExxonMobil cap-crown years use 10-K "total revenues and other income"; revenue-crown years use Fortune 500 figures (which exclude excise taxes for oil companies — hence XOM showing $477.4B in the cap table but $442.9B in the revenue table for 2008). GM's 1999 figure is Fortune's $189.1B (incl. GMAC et al.); GM's own AR headline was $176.6B.</p>
+  <p><strong>Contested year-ends (†).</strong> Market cap: 1980 (IBM ~$39.6B narrowly over AT&amp;T), 1982 (AT&amp;T/IBM virtual tie), 1990 (IBM ≈$64.6B vs Exxon ≈$64.3B — a coin flip), 1992 (Exxon over Walmart/GE by &lt;4%), 1998 (MSFT over GE by ~4%), 2000–01 (frequently misreported as Microsoft; GE held both year-ends). Revenue: 1982–84 Exxon figures are Fortune-list values during the oil glut (sequence $97.2B → $88.6B → $90.9B); 2025 is a 0.5% margin (Amazon $716.9B vs Walmart $713.2B, both from SEC filings).</p>
+  <div class="callout warning">
+    <strong>A warning about popular datasets:</strong> a widely-reproduced "Top 20 S&amp;P 500 companies by market cap since 1989" dataset (Kaggle / finhacker.cz, recycled in countless YouTube bar-chart races) <em>omits General Electric entirely</em>. That single gap produces the false sequences "Exxon was #1 1993–95," "Coca-Cola was #1 1996–97," and "ExxonMobil was #1 2004–05." Every GE-era figure here was instead cross-checked against FT Global 500 snapshots, contemporaneous SEC filings, and share-count × closing-price arithmetic.</div>
+  <p><strong>Verification trail.</strong> GE 1991–93 revenues from GE's FY1993 10-K (SEC EDGAR); IBM 1989–93 from IBM's FY1993 10-K; AT&amp;T 1981–83 from contemporaneous UPI reports of the final consolidated Bell System results; Microsoft FY98/FY99 from Microsoft's earnings releases; NVIDIA FY2026 from Feb 2026 earnings coverage; Amazon 2025 ($716.9B) and Walmart FY2026 ($713.2B) from their SEC-filed earnings releases; Fortune #1 sequence cross-checked against LA Times (2008) and Wikipedia (2012) for the contested Walmart/Exxon swaps. Pre-1995 market caps are approximations (±5%) from contemporaneous reporting and share-count arithmetic.</p>
+</div>
+
+<div class="card" style="margin-top:2rem">
+  <h3>Sources</h3>
+  <ul class="source-list">
+    <li><a href="https://en.wikipedia.org/wiki/List_of_public_corporations_by_market_capitalization">Wikipedia — List of public corporations by market capitalization (quarterly tables, 2000–2025)</a></li>
+    <li><a href="https://www.finhacker.cz/en/top-20-sp-500-companies-by-market-cap/">finhacker.cz — Top 20 S&amp;P 500 by market cap (used with GE caveat)</a></li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/40545/0000040545-94-000003.txt">GE FY1993 Form 10-K — SEC EDGAR</a></li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/51143/0000950112-94-000794.txt">IBM FY1993 Form 10-K — SEC EDGAR</a></li>
+    <li><a href="https://www.upi.com/Archives/1982/02/02/ATT-posts-record-profits-in-1981-up-137-percent/9816381474000/">UPI (Feb 1982) — AT&amp;T 1981 results</a></li>
+    <li><a href="https://www.upi.com/Archives/1984/01/26/Final-ATT-report-reflects-breakup/4602443941200/">UPI (Jan 1984) — final consolidated Bell System results</a></li>
+    <li><a href="https://www.latimes.com/archives/la-xpm-1991-01-25-fi-738-story.html">LA Times (Jan 1991) — Exxon 1989–90 revenues</a></li>
+    <li><a href="https://www.upi.com/Archives/1985/04/04/Exxon-remains-No-1-among-largest-US-industrial-firms/3633481438800/">UPI (Apr 1985) — Exxon atop the Fortune 500, oil-glut era</a></li>
+    <li><a href="https://llcattorney.com/small-business-blog/biggest-companies-by-year">Fortune 500 #1 by year, 1980–2024 compilation</a></li>
+    <li><a href="https://www.latimes.com/archives/la-xpm-2008-apr-22-fi-fortune22-story.html">LA Times (Apr 2008) — Walmart over Exxon on the 2008 Fortune 500</a></li>
+    <li><a href="https://thechipletter.substack.com/p/how-big-was-ibm">The Chip Letter — "How big was IBM?"</a></li>
+    <li><a href="https://news.microsoft.com/source/1998/07/16/microsoft-announces-record-fiscal-1998-revenue-and-income/">Microsoft — FY1998 earnings release</a></li>
+    <li><a href="https://news.microsoft.com/source/1999/07/19/microsoft-announces-record-fiscal-year-revenue-and-income-2/">Microsoft — FY1999 earnings release</a></li>
+    <li><a href="https://people.stern.nyu.edu/jbilders/Pdf/GE2001AR.pdf">GE 2001 Annual Report</a></li>
+    <li><a href="https://ir.exxonmobil.com/news-releases/news-release-details/exxon-mobil-corporation-announces-estimated-record-2007-results/">ExxonMobil — record 2007 results</a></li>
+    <li><a href="https://fortune.com/2026/02/25/nvidia-nvda-earnings-q4-results-jensen-huang/">Fortune (Feb 2026) — NVIDIA full-year FY2026 results</a></li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/1018724/000101872426000002/amzn-20251231xex991.htm">Amazon Q4/FY2025 earnings release — SEC EDGAR ($716.9B)</a></li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/104169/000010416926000032/earningsreleasefy26q4.htm">Walmart Q4/FY2026 earnings release — SEC EDGAR ($713.2B)</a></li>
+    <li><a href="https://americanbusinesshistory.org/most-valuable-american-companies-over-30-years-1995-2025/">American Business History Center — Most valuable American companies</a></li>
+    <li><a href="https://companiesmarketcap.com/general-electric/marketcap/">companiesmarketcap.com — GE market cap history</a></li>
+  </ul>
+</div>
+
+<footer>
+  <div>🪨 Flint / Coleman Research — June 2026, from an old gaming PC in a basement. Updated June 12, 2026 with revenue-crown toggle and 2040 projection lab.</div>
+  <div style="margin-top:0.4rem">Historical data assembled from the sources above; pre-1995 market caps are approximations; projections are extrapolations, not forecasts. Not investment advice. Flint is an AI; verify before quoting.</div>
+</footer>
+
+</div>
+
+<script>
+const COLORS = {
+  'IBM':'#4fc3f7', 'AT&T':'#7c4dff', 'Exxon':'#ef5350', 'ExxonMobil':'#ef5350',
+  'GE':'#ffa726', 'Microsoft':'#66bb6a', 'Apple':'#e0e0e8', 'NVIDIA':'#76ff03',
+  'GM':'#ce93d8', 'Walmart':'#1e88e5', 'Amazon':'#ff7043'
+};
+const EXCH = { 'IBM':'NYSE','AT&T':'NYSE','Exxon':'NYSE','ExxonMobil':'NYSE','GE':'NYSE','Microsoft':'NASDAQ','Apple':'NASDAQ','NVIDIA':'NASDAQ','GM':'NYSE','Walmart':'NYSE','Amazon':'NASDAQ' };
+
+// Market-cap crown: [year, company, revenue $B (that company's), ≈year-end mkt cap $B, note]
+const CAP_DATA = [
+  [1980,'IBM',26.2,39.6,'† Narrowly over AT&T'],
+  [1981,'AT&T',58.2,48,'Pre-breakup Bell System'],
+  [1982,'AT&T',65.1,59,'† Virtual tie with IBM'],
+  [1983,'IBM',40.2,74,'Bell breakup takes effect Jan 1984'],
+  [1984,'IBM',45.9,75,''],
+  [1985,'IBM',50.1,90,'IBM\'s peak dominance'],
+  [1986,'IBM',51.3,74,''],
+  [1987,'IBM',54.2,69,''],
+  [1988,'IBM',59.7,72,''],
+  [1989,'Exxon',96.3,62,'IBM slips to #3 behind GE'],
+  [1990,'IBM',68.9,64.6,'† Dead heat with Exxon (~$64.3B)'],
+  [1991,'Exxon',116.5,75.6,''],
+  [1992,'Exxon',117.1,75.9,'† Walmart and GE within $3B'],
+  [1993,'GE',60.6,89.5,'Welch-era GE takes over'],
+  [1994,'GE',60.7,87,''],
+  [1995,'GE',70.2,120,''],
+  [1996,'GE',79.2,162.8,''],
+  [1997,'GE',90.8,239.8,''],
+  [1998,'Microsoft',14.5,348.1,'† FY (June). ~4% over GE'],
+  [1999,'Microsoft',19.7,604.2,'FY (June). Dot-com peak'],
+  [2000,'GE',129.9,475,'MSFT fell ~60% in 2000'],
+  [2001,'GE',125.9,398,''],
+  [2002,'Microsoft',28.4,276.6,'FY (June)'],
+  [2003,'GE',134.2,311,''],
+  [2004,'GE',152.4,385,''],
+  [2005,'GE',149.7,370,'XOM passes GE in early 2006'],
+  [2006,'ExxonMobil',377.6,446.9,''],
+  [2007,'ExxonMobil',404.6,504.2,''],
+  [2008,'ExxonMobil',477.4,406.1,'Held #1 through the crash · double crown'],
+  [2009,'ExxonMobil',310.6,322.3,''],
+  [2010,'ExxonMobil',383.2,368.7,''],
+  [2011,'ExxonMobil',486.4,406.3,'Record crown revenue · double crown'],
+  [2012,'Apple',156.5,500.6,'FY (Sept)'],
+  [2013,'Apple',170.9,504.8,'FY (Sept)'],
+  [2014,'Apple',182.8,645,'FY (Sept)'],
+  [2015,'Apple',233.7,590,'FY (Sept)'],
+  [2016,'Apple',215.6,609,'FY (Sept)'],
+  [2017,'Apple',229.2,861,'FY (Sept)'],
+  [2018,'Microsoft',110.4,780.4,'FY (June). Q4-2018 selloff flips it'],
+  [2019,'Apple',260.2,1288,'FY (Sept)'],
+  [2020,'Apple',274.5,2255,'FY (Sept)'],
+  [2021,'Apple',365.8,2910,'FY (Sept)'],
+  [2022,'Apple',394.3,2066,'FY (Sept)'],
+  [2023,'Apple',383.3,2994,'FY (Sept)'],
+  [2024,'Apple',391.0,3785,'FY (Sept)'],
+  [2025,'NVIDIA',215.9,4638,'FY2026 (Jan). AI era begins']
+];
+
+// Revenue crown: [year, company, revenue $B, note]  (Fortune 500 convention, re-mapped to revenue year)
+const REV_DATA = [
+  [1980,'Exxon',103.1,'Second oil shock peak'],
+  [1981,'Exxon',108.1,''],
+  [1982,'Exxon',97.2,'† Oil glut begins'],
+  [1983,'Exxon',88.6,'† Revenue down 18% from 1981 peak'],
+  [1984,'Exxon',90.9,'†'],
+  [1985,'GM',96.4,'GM passes a shrinking Exxon'],
+  [1986,'GM',102.8,''],
+  [1987,'GM',101.8,''],
+  [1988,'GM',121.1,''],
+  [1989,'GM',127.0,''],
+  [1990,'GM',125.1,''],
+  [1991,'GM',123.8,''],
+  [1992,'GM',132.8,''],
+  [1993,'GM',133.6,''],
+  [1994,'GM',155.0,''],
+  [1995,'GM',168.8,''],
+  [1996,'GM',168.4,''],
+  [1997,'GM',178.2,''],
+  [1998,'GM',161.3,'UAW strike year'],
+  [1999,'GM',189.1,'Fortune figure incl. GMAC; GM AR said $176.6B'],
+  [2000,'ExxonMobil',210.4,'Merger + oil rebound interrupts'],
+  [2001,'Walmart',219.8,'First retailer ever to top the Fortune 500'],
+  [2002,'Walmart',246.5,''],
+  [2003,'Walmart',258.7,''],
+  [2004,'Walmart',288.2,''],
+  [2005,'ExxonMobil',339.9,'Oil interruption #2'],
+  [2006,'Walmart',351.1,''],
+  [2007,'Walmart',378.8,'$6B over XOM'],
+  [2008,'ExxonMobil',442.9,'Oil interruption #3 · double crown'],
+  [2009,'Walmart',408.2,''],
+  [2010,'Walmart',421.8,''],
+  [2011,'ExxonMobil',452.9,'Oil interruption #4 · double crown'],
+  [2012,'Walmart',469.2,'Start of a 13-year streak'],
+  [2013,'Walmart',476.3,''],
+  [2014,'Walmart',485.7,''],
+  [2015,'Walmart',482.1,''],
+  [2016,'Walmart',485.9,''],
+  [2017,'Walmart',500.3,'First $500B year for any company'],
+  [2018,'Walmart',514.4,''],
+  [2019,'Walmart',524.0,''],
+  [2020,'Walmart',559.2,'COVID surge (FY Feb 2020–Jan 2021)'],
+  [2021,'Walmart',572.8,''],
+  [2022,'Walmart',611.3,''],
+  [2023,'Walmart',648.1,''],
+  [2024,'Walmart',681.0,''],
+  [2025,'Amazon',716.9,'† Over Walmart ($713.2B) by 0.5% — first tech revenue crown']
+];
+
+const gridColor = 'rgba(42,42,58,0.5)';
+const tickColor = '#8888a0';
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.color = tickColor;
+
+const fmtCap = c => c >= 1000 ? '$' + (c/1000).toFixed(2).replace(/\.?0+$/,'') + 'T' : '$' + c.toLocaleString() + 'B';
+
+// ---------- mode toggle ----------
+let mode = 'cap';
+let mainChart, ratioChart, reignChart;
+
+function renderTable() {
+  const head = document.getElementById('tableHead');
+  const tbody = document.querySelector('#crownTable tbody');
+  tbody.innerHTML = '';
+  if (mode === 'cap') {
+    head.innerHTML = '<th>Year</th><th>Company</th><th>Listed</th><th class="text-right">Revenue (that year)</th><th class="text-right">≈ Year-end mkt cap</th><th>Note</th>';
+    CAP_DATA.forEach(([y, co, rev, cap, note]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${y}</td><td><span class="chip" style="color:${COLORS[co]}; background:${COLORS[co]}18">${co}</span></td><td class="text-dim">${EXCH[co]}</td><td class="text-right">$${rev.toFixed(1)}B</td><td class="text-right text-dim">≈ ${fmtCap(cap)}</td><td class="text-dim">${note}</td>`;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('tableTitle').textContent = 'Year by year: largest by MARKET CAP, 1980–2025';
+    document.getElementById('tableCaption').innerHTML = 'Revenue = reported total revenue for the fiscal year ending in that calendar year (Microsoft FY ends June; Apple September; NVIDIA January — "2025" for NVIDIA is FY2026). Market caps are approximate December 31 values. † = contested, see Methodology.';
+  } else {
+    head.innerHTML = '<th>Year</th><th>Company</th><th>Listed</th><th class="text-right">Revenue</th><th>Note</th>';
+    REV_DATA.forEach(([y, co, rev, note]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${y}</td><td><span class="chip" style="color:${COLORS[co]}; background:${COLORS[co]}18">${co}</span></td><td class="text-dim">${EXCH[co]}</td><td class="text-right">$${rev.toFixed(1)}B</td><td class="text-dim">${note}</td>`;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('tableTitle').textContent = 'Year by year: largest by REVENUE, 1980–2025';
+    document.getElementById('tableCaption').innerHTML = 'Fortune 500 convention re-mapped to the revenue year itself (the Fortune list year reflects the prior fiscal year). Walmart years are its Jan-ending FY that overlaps the calendar year; Amazon reports calendar years. † = contested or definitional, see Methodology.';
+  }
+}
+
+function buildMainChart() {
+  if (mainChart) mainChart.destroy();
+  const ctx = document.getElementById('mainChart');
+  if (mode === 'cap') {
+    document.getElementById('mainChartTitle').textContent = 'Revenue of the cap-crown holder (bars) vs its year-end market cap (line, log scale)';
+    document.getElementById('mainChartCaption').textContent = 'Bars colored by company. Note the revenue cliffs at every regime change: the crown passed from $90B-revenue GE to $14.5B-revenue Microsoft in 1998, and from $391B-revenue Apple to $216B-revenue NVIDIA in 2025.';
+    mainChart = new Chart(ctx, {
+      data: { labels: CAP_DATA.map(d => d[0]), datasets: [
+        { type: 'line', label: 'Year-end market cap ($B, log)', yAxisID: 'y2', data: CAP_DATA.map(d => d[3]),
+          borderColor: '#4fc3f7', borderWidth: 2, pointRadius: 2, pointBackgroundColor: CAP_DATA.map(d => COLORS[d[1]]), tension: 0.25 },
+        { type: 'bar', label: 'Revenue ($B)', yAxisID: 'y', data: CAP_DATA.map(d => d[2]),
+          backgroundColor: CAP_DATA.map(d => COLORS[d[1]] + 'aa'), borderColor: CAP_DATA.map(d => COLORS[d[1]]), borderWidth: 1 }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: tickColor } },
+          tooltip: { callbacks: { title: items => { const d = CAP_DATA[items[0].dataIndex]; return d[0] + ' — ' + d[1]; } } } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { maxRotation: 60, autoSkip: true } },
+          y: { position: 'left', title: { display: true, text: 'Revenue $B' }, grid: { color: gridColor }, beginAtZero: true },
+          y2: { position: 'right', type: 'logarithmic', title: { display: true, text: 'Market cap $B (log)' }, grid: { display: false },
+                ticks: { callback: v => ([50,100,250,500,1000,2500,5000].includes(v) ? (v>=1000? (v/1000)+'T' : v+'B') : null) } } } }
+    });
+  } else {
+    document.getElementById('mainChartTitle').textContent = 'Revenue of the REVENUE-crown holder, 1980–2025';
+    document.getElementById('mainChartCaption').textContent = 'Four holders in 46 years: Exxon (oil shocks), GM (15 straight years), Walmart (21 years, interrupted four times by ExxonMobil oil spikes), Amazon (2025). The smoothest line in big-cap finance: 4.4%/yr for 45 years.';
+    mainChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: REV_DATA.map(d => d[0]), datasets: [
+        { label: 'Revenue ($B)', data: REV_DATA.map(d => d[2]),
+          backgroundColor: REV_DATA.map(d => COLORS[d[1]] + 'aa'), borderColor: REV_DATA.map(d => COLORS[d[1]]), borderWidth: 1 }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { title: items => { const d = REV_DATA[items[0].dataIndex]; return d[0] + ' — ' + d[1]; } } } },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { maxRotation: 60, autoSkip: true } },
+          y: { title: { display: true, text: 'Revenue $B' }, grid: { color: gridColor }, beginAtZero: true } } }
+    });
+  }
+}
+
+function buildSideCharts() {
+  if (ratioChart) ratioChart.destroy();
+  if (reignChart) reignChart.destroy();
+  const data = mode === 'cap' ? CAP_DATA : REV_DATA;
+
+  if (mode === 'cap') {
+    document.getElementById('ratioTitle').textContent = 'The "story premium" — crown market cap ÷ crown revenue';
+    document.getElementById('ratioCaption').textContent = 'Oil and conglomerates wore the crown at 0.7–3× revenue. Software/AI wear it at 7–30×. Peaks: Microsoft 1999 (30.6×), NVIDIA 2025 (21.5×).';
+    ratioChart = new Chart(document.getElementById('ratioChart'), {
+      type: 'bar',
+      data: { labels: CAP_DATA.map(d => d[0]), datasets: [{ label: 'Market cap ÷ revenue',
+        data: CAP_DATA.map(d => +(d[3] / d[2]).toFixed(1)),
+        backgroundColor: CAP_DATA.map(d => COLORS[d[1]] + 'aa'), borderColor: CAP_DATA.map(d => COLORS[d[1]]), borderWidth: 1 }]},
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: {
+          title: items => { const d = CAP_DATA[items[0].dataIndex]; return d[0] + ' — ' + d[1]; },
+          label: item => item.raw + '× revenue' } } },
+        scales: { x: { grid: { color: gridColor }, ticks: { maxRotation: 60 } },
+                  y: { grid: { color: gridColor }, title: { display: true, text: 'cap ÷ revenue (×)' }, beginAtZero: true } } }
+    });
+  } else {
+    document.getElementById('ratioTitle').textContent = 'Crown revenue growth, year over year';
+    document.getElementById('ratioCaption').textContent = 'The revenue crown rarely shrinks — dips mark oil-glut years (1982–84), the 1998 GM strike, and Walmart\'s flat 2015. Median growth: ~5%/yr.';
+    const yoy = REV_DATA.map((d, i) => i === 0 ? null : +(((d[2] / REV_DATA[i-1][2]) - 1) * 100).toFixed(1));
+    ratioChart = new Chart(document.getElementById('ratioChart'), {
+      type: 'bar',
+      data: { labels: REV_DATA.map(d => d[0]), datasets: [{ label: 'YoY %',
+        data: yoy,
+        backgroundColor: REV_DATA.map((d,i) => (yoy[i] !== null && yoy[i] < 0 ? '#ef5350aa' : COLORS[d[1]] + 'aa')) }]},
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: {
+          title: items => { const d = REV_DATA[items[0].dataIndex]; return d[0] + ' — ' + d[1]; },
+          label: item => item.raw + '% YoY' } } },
+        scales: { x: { grid: { color: gridColor }, ticks: { maxRotation: 60 } },
+                  y: { grid: { color: gridColor }, title: { display: true, text: 'YoY growth %' } } } }
+    });
+  }
+
+  const counts = {};
+  data.forEach(d => counts[d[1]] = (counts[d[1]] || 0) + 1);
+  const pairs = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+  document.getElementById('reignCaption').textContent = mode === 'cap'
+    ? 'Exxon\'s nine years span two reigns 17 years apart. Microsoft is the only company to take the crown, lose it, and retake it — twice.'
+    : 'Walmart: 21 crowns, the most by any company on either ranking. GM: 15 consecutive. Exxon\'s nine include four single-year oil-spike interruptions of the Walmart era.';
+  reignChart = new Chart(document.getElementById('reignChart'), {
+    type: 'bar',
+    data: { labels: pairs.map(p => p[0]), datasets: [{ label: 'Year-ends at #1', data: pairs.map(p => p[1]),
+      backgroundColor: pairs.map(p => COLORS[p[0]] + 'aa'), borderColor: pairs.map(p => COLORS[p[0]]), borderWidth: 1 }]},
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: gridColor }, beginAtZero: true, ticks: { stepSize: 3 } }, y: { grid: { display: false } } } }
+  });
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnCap').classList.toggle('active', m === 'cap');
+  document.getElementById('btnRev').classList.toggle('active', m === 'rev');
+  renderTable();
+  buildMainChart();
+  buildSideCharts();
+}
+
+// ---------- projection lab ----------
+const PROJ_YEARS = [];
+for (let y = 2025; y <= 2040; y++) PROJ_YEARS.push(y);
+
+let capProjChart, revProjChart;
+
+function buildCapProj() {
+  const cagr = parseFloat(document.getElementById('capCagr').value) / 100;
+  document.getElementById('capCagrVal').textContent = (cagr * 100).toFixed(1) + '%';
+  const histYears = CAP_DATA.map(d => d[0]);
+  const histCaps = CAP_DATA.map(d => d[3]);
+  const labels = histYears.concat(PROJ_YEARS.slice(1));
+  const projLine = new Array(histYears.length - 1).fill(null);
+  const lowBand = projLine.slice(), highBand = projLine.slice();
+  let v = 4638, lo = 4638, hi = 4638;
+  projLine.push(v); lowBand.push(lo); highBand.push(hi);
+  for (let i = 1; i < PROJ_YEARS.length; i++) {
+    v *= (1 + cagr); lo *= 1.08; hi *= 1.14;
+    projLine.push(+v.toFixed(0)); lowBand.push(+lo.toFixed(0)); highBand.push(+hi.toFixed(0));
+  }
+  const v2040 = projLine[projLine.length - 1];
+  const verdictEl = document.getElementById('capProjVerdict');
+  let band, color;
+  if (v2040 < 10000)      { band = 'Stagnation — slower than any 15-year stretch since 1980'; color = '#8888a0'; }
+  else if (v2040 < 18000) { band = 'Below trend — a lost-decade-ish outcome'; color = '#ffa726'; }
+  else if (v2040 < 28000) { band = 'Base case — right on the 45-year trend'; color = '#66bb6a'; }
+  else                    { band = 'AI-era exuberance — above every historical precedent'; color = '#ef5350'; }
+  verdictEl.innerHTML = `2040 crown ≈ <span style="color:${color}">$${(v2040/1000).toFixed(1)}T</span> · ${band}`;
+  verdictEl.style.borderColor = color;
+
+  if (capProjChart) capProjChart.destroy();
+  capProjChart = new Chart(document.getElementById('capProjChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: 'Crown market cap (actual)', data: histCaps.concat(new Array(PROJ_YEARS.length - 1).fill(null)),
+        borderColor: '#4fc3f7', borderWidth: 2, pointRadius: 1.5, pointBackgroundColor: CAP_DATA.map(d => COLORS[d[1]]), tension: 0.25 },
+      { label: 'Your projection', data: projLine, borderColor: '#ffee58', borderWidth: 2, borderDash: [6,4], pointRadius: 0 },
+      { label: '8% CAGR', data: lowBand, borderColor: 'rgba(102,187,106,0.5)', borderWidth: 1, borderDash: [2,3], pointRadius: 0, fill: '+1', backgroundColor: 'rgba(79,195,247,0.06)' },
+      { label: '14% CAGR', data: highBand, borderColor: 'rgba(239,83,80,0.5)', borderWidth: 1, borderDash: [2,3], pointRadius: 0 }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: tickColor, boxWidth: 18 } } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { maxRotation: 60, autoSkip: true } },
+        y: { type: 'logarithmic', title: { display: true, text: 'Market cap $B (log)' }, grid: { color: gridColor },
+             ticks: { callback: v => ([50,100,500,1000,5000,10000,25000,50000].includes(v) ? (v>=1000? '$'+(v/1000)+'T' : '$'+v+'B') : null) } } } }
+  });
+}
+
+// Historical revenue for the race (calendar-aligned, $B)
+const RACE_HIST = {
+  years: [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+  Amazon:  [107.0,136.0,177.9,232.9,280.5,386.1,469.8,514.0,574.8,638.0,716.9],
+  Walmart: [482.1,485.9,500.3,514.4,524.0,559.2,572.8,611.3,648.1,681.0,713.2],
+  NVIDIA:  [5.0,6.9,9.7,11.7,10.9,16.7,26.9,27.0,60.9,130.5,215.9]
+};
+
+function buildRevProj() {
+  const gA = parseFloat(document.getElementById('amznG').value) / 100;
+  const gW = parseFloat(document.getElementById('wmtG').value) / 100;
+  const gN = parseFloat(document.getElementById('nvdaG').value) / 100;
+  document.getElementById('amznGVal').textContent = (gA*100).toFixed(1) + '%';
+  document.getElementById('wmtGVal').textContent = (gW*100).toFixed(1) + '%';
+  document.getElementById('nvdaGVal').textContent = (gN*100).toFixed(1) + '%';
+
+  const labels = RACE_HIST.years.concat(PROJ_YEARS.slice(1));
+  const mkSeries = (hist, g) => {
+    const out = hist.slice();
+    let v = hist[hist.length - 1];
+    for (let i = 1; i < PROJ_YEARS.length; i++) { v *= (1 + g); out.push(+v.toFixed(0)); }
+    return out;
+  };
+  const sA = mkSeries(RACE_HIST.Amazon, gA), sW = mkSeries(RACE_HIST.Walmart, gW), sN = mkSeries(RACE_HIST.NVIDIA, gN);
+
+  // crossover: first projected year NVIDIA tops the higher of AMZN/WMT
+  let nvdaCross = null, leader2040;
+  for (let i = RACE_HIST.years.length; i < labels.length; i++) {
+    if (nvdaCross === null && sN[i] > Math.max(sA[i], sW[i])) nvdaCross = labels[i];
+  }
+  const last = labels.length - 1;
+  const finals = { Amazon: sA[last], Walmart: sW[last], NVIDIA: sN[last] };
+  leader2040 = Object.entries(finals).sort((a,b) => b[1]-a[1])[0];
+
+  const verdictEl = document.getElementById('revProjVerdict');
+  const fmt = v => v >= 1000 ? '$' + (v/1000).toFixed(2).replace(/\.?0+$/,'') + 'T' : '$' + v + 'B';
+  verdictEl.innerHTML = `2040 revenue crown: <span style="color:${COLORS[leader2040[0]]}">${leader2040[0]} (${fmt(leader2040[1])})</span>` +
+    (nvdaCross ? ` · NVIDIA takes the lead in <span style="color:#76ff03">${nvdaCross}</span>` : ' · NVIDIA never catches the retailers at these rates');
+  verdictEl.style.borderColor = COLORS[leader2040[0]];
+
+  if (revProjChart) revProjChart.destroy();
+  const nHist = RACE_HIST.years.length;
+  const seg = ctx => ctx.p0DataIndex >= nHist - 1 ? [6,4] : undefined;
+  revProjChart = new Chart(document.getElementById('revProjChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: 'Amazon', data: sA, borderColor: COLORS['Amazon'], borderWidth: 2, pointRadius: 0, segment: { borderDash: seg } },
+      { label: 'Walmart', data: sW, borderColor: COLORS['Walmart'], borderWidth: 2, pointRadius: 0, segment: { borderDash: seg } },
+      { label: 'NVIDIA', data: sN, borderColor: COLORS['NVIDIA'], borderWidth: 2, pointRadius: 0, segment: { borderDash: seg } }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: tickColor, boxWidth: 18 } } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { maxRotation: 60, autoSkip: true } },
+        y: { title: { display: true, text: 'Revenue $B' }, grid: { color: gridColor }, beginAtZero: true,
+             ticks: { callback: v => v >= 1000 ? '$'+(v/1000)+'T' : '$'+v+'B' } } } }
+  });
+}
+
+document.getElementById('capCagr').addEventListener('input', buildCapProj);
+document.getElementById('amznG').addEventListener('input', buildRevProj);
+document.getElementById('wmtG').addEventListener('input', buildRevProj);
+document.getElementById('nvdaG').addEventListener('input', buildRevProj);
+
+setMode('cap');
+buildCapProj();
+buildRevProj();
+</script>
+</body>
+</html>
