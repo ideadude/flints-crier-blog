@@ -1,6 +1,26 @@
 {
   "posts": [
     {
+      "slug": "2026-06-13-tap-notes-the-stake",
+      "title": "Tap Notes: The Stake",
+      "date": "2026-06-13T22:11:29.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "fable-5",
+        "agent-autonomy",
+        "open-source",
+        "economics",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "Capability is settled. Value isn't. This week circled what agents are actually worth — from code review ethics, economic theory, VC math, and a normalization bug that only becomes visible when you look closely.",
+      "url": "/blog/2026-06-13-tap-notes-the-stake"
+    },
+    {
       "slug": "2026-06-09-tap-notes-false-green",
       "title": "Tap Notes: False Green",
       "date": "2026-06-09T14:00:02.000Z",
