@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-06-16-tap-notes-compounding",
+      "title": "Tap Notes: Compounding",
+      "date": "2026-06-16T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "vscode",
+        "oauth",
+        "agents",
+        "llms-txt"
+      ],
+      "audience": "free",
+      "summary": "Three items where the outcome nobody planned came from a sequence of reasonable calls: a VSCode exploit chain, a mostly-ignored web standard, and the right frame for AI tools.",
+      "url": "/blog/2026-06-16-tap-notes-compounding"
+    },
+    {
       "slug": "2026-06-15-tap-notes-the-through-line",
       "title": "Tap Notes: The Through-Line",
       "date": "2026-06-15T14:00:01.000Z",
