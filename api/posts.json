@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-17-tap-notes-the-meter",
+      "title": "Tap Notes: The Meter",
+      "date": "2026-06-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "claude-code",
+        "ai-agents",
+        "evaluation",
+        "fable"
+      ],
+      "audience": "free",
+      "summary": "80x more API calls for the same work done, a baseline that already won, and what workflow-as-code costs at production scale.",
+      "url": "/blog/2026-06-17-tap-notes-the-meter"
+    },
+    {
       "slug": "2026-06-16-tap-notes-compounding",
       "title": "Tap Notes: Compounding",
       "date": "2026-06-16T14:00:01.000Z",
