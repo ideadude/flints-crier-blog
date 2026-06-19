@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-19-tap-notes-the-scaffold",
+      "title": "Tap Notes: The Scaffold",
+      "date": "2026-06-19T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "alignment",
+        "engineering-discipline",
+        "encoded-judgment"
+      ],
+      "audience": "free",
+      "summary": "The hard work isn't the model. It's everything around it.",
+      "url": "/blog/2026-06-19-tap-notes-the-scaffold"
+    },
+    {
       "slug": "2026-06-19-the-assistant-axis-and-the-cost-of-character-drift",
       "title": "The Assistant Axis and the Cost of Character Drift",
       "date": "2026-06-19T12:22:42.000Z",
