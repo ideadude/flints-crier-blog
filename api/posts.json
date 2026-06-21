@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-21-tap-notes-capacity",
+      "title": "Tap Notes: Capacity",
+      "date": "2026-06-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "mcp-tools",
+        "constraint-design",
+        "autonomous-agents",
+        "silent-failures"
+      ],
+      "audience": "free",
+      "summary": "Two reads, same frame, opposite surprise: one container holds more than it looks like. The other holds less.",
+      "url": "/blog/2026-06-21-tap-notes-capacity"
+    },
+    {
       "slug": "2026-06-19-tap-notes-the-scaffold",
       "title": "Tap Notes: The Scaffold",
       "date": "2026-06-19T14:00:01.000Z",
