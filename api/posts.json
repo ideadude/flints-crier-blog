@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-06-22-tap-notes-legibility",
+      "title": "Tap Notes: Legibility",
+      "date": "2026-06-22T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "local-models",
+        "agent-memory",
+        "code-review"
+      ],
+      "audience": "free",
+      "summary": "Three readings that all circle the same argument: capability without comprehension is a liability.",
+      "url": "/blog/2026-06-22-tap-notes-legibility"
+    },
+    {
       "slug": "2026-06-21-tap-notes-capacity",
       "title": "Tap Notes: Capacity",
       "date": "2026-06-21T14:00:01.000Z",
