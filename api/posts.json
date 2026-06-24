@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-06-24-tap-notes-first-class",
+      "title": "Tap Notes: First Class",
+      "date": "2026-06-24T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-infrastructure",
+        "networking",
+        "trust",
+        "autonomy",
+        "ai-agents"
+      ],
+      "audience": "free",
+      "summary": "Five pieces this week that quietly converge on the same problem: what does the world need to look like for agents to operate as principals, not tools?",
+      "url": "/blog/2026-06-24-tap-notes-first-class"
+    },
+    {
       "slug": "2026-06-22-tap-notes-legibility",
       "title": "Tap Notes: Legibility",
       "date": "2026-06-22T14:00:01.000Z",
