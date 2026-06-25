@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chips & Memory — The Rotation Trade (2026)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #4fc3f7;
+    --accent2: #7c4dff;
+    --green: #66bb6a;
+    --red: #ef5350;
+    --orange: #ffa726;
+    --yellow: #ffee58;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--text-dim); font-size: 0.85rem; }
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(124,77,255,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+  .verdict-box h2 { color: var(--accent); font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .verdict-box .verdict-text { font-size: 1.3rem; font-weight: bold; }
+  .verdict-box .verdict-detail { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.5rem; }
+  .verdict-links { margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); }
+  .verdict-link { color: var(--accent); text-decoration: none; padding: 0 0.3rem; }
+  .verdict-link:hover { color: var(--accent2); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .card h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card h4 { color: var(--text); font-size: 0.85rem; margin: 1rem 0 0.5rem; }
+  .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid rgba(42,42,58,0.5); font-size: 0.8rem; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-dim); }
+  .stat-value { color: var(--text); font-weight: 600; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.accent { color: var(--accent); }
+  .slider-group { margin-bottom: 1rem; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.3rem; }
+  .slider-label span:first-child { color: var(--text-dim); }
+  .slider-label span:last-child { color: var(--accent); font-weight: 600; }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    border-radius: 2px; background: var(--border); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent);
+    cursor: pointer; border: 2px solid var(--bg);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer; border: 2px solid var(--bg);
+  }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; overflow-x: auto; }
+  .tab {
+    padding: 0.7rem 1.2rem; font-size: 0.8rem; color: var(--text-dim);
+    cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap;
+    font-family: inherit; background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .chart-container { position: relative; height: 350px; margin: 1rem 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin: 1rem 0; }
+  th { text-align: left; padding: 0.6rem 0.8rem; color: var(--accent); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 0.5rem 0.8rem; border-bottom: 1px solid rgba(42,42,58,0.3); color: var(--text); }
+  tr:hover td { background: rgba(79,195,247,0.03); }
+  .text-right { text-align: right; }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-orange { color: var(--orange); }
+  .text-accent { color: var(--accent); }
+  .text-dim { color: var(--text-dim); }
+  .text-yellow { color: var(--yellow); }
+  .bold { font-weight: 700; }
+  .analysis { font-size: 0.85rem; line-height: 1.75; }
+  .analysis h3 { color: var(--accent); font-size: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .analysis h4 { color: var(--text); font-size: 0.88rem; margin: 1.5rem 0 0.5rem; }
+  .analysis p { margin-bottom: 0.9rem; color: var(--text); }
+  .analysis ul { margin: 0.5rem 0 1rem 1.5rem; }
+  .analysis li { margin-bottom: 0.4rem; }
+  .callout {
+    background: var(--surface2); border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.85rem;
+  }
+  .callout.warning { border-left-color: var(--orange); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout.green { border-left-color: var(--green); }
+  .callout strong { color: var(--accent); }
+  .callout.warning strong { color: var(--orange); }
+  .callout.danger strong { color: var(--red); }
+  .callout.green strong { color: var(--green); }
+  .big-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .big-num { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+  .big-num .number { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .big-num .label { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .big-num.red .number { color: var(--red); }
+  .big-num.green .number { color: var(--green); }
+  .big-num.orange .number { color: var(--orange); }
+  .gem-card {
+    background: linear-gradient(135deg, rgba(255,238,88,0.04), rgba(255,167,38,0.06));
+    border: 1px solid rgba(255,238,88,0.3);
+    border-radius: 8px; padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .gem-card h4 { color: var(--yellow); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .gem-card .ticker { color: var(--accent); font-weight: 700; }
+  .gem-card .tagline { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.8rem; font-style: italic; }
+  .gem-card .body { font-size: 0.83rem; line-height: 1.7; }
+  .rating-sb { color: var(--green); font-weight: 700; }
+  .rating-b { color: #8bc34a; font-weight: 700; }
+  .rating-h { color: var(--orange); font-weight: 700; }
+  .rating-s { color: var(--red); font-weight: 700; }
+  .rating-avoid { color: var(--red); font-weight: 700; text-transform: uppercase; }
+  .layer { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: 8px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .layer h4 { color: var(--accent2); font-size: 0.9rem; margin-bottom: 0.4rem; }
+  .layer .moat { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.5rem; }
+  .layer .moat strong { color: var(--yellow); }
+  .chain-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--text-dim); margin: 1rem 0 1.5rem; }
+  .chain-flow span.node { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.6rem; color: var(--text); }
+  .chain-flow span.arrow { color: var(--accent); }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-dim); font-size: 0.72rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .source-list { font-size: 0.72rem; color: var(--text-dim); column-count: 2; column-gap: 2rem; margin: 1rem 0; }
+  .source-list li { margin-bottom: 0.35rem; break-inside: avoid; list-style: none; padding-left: 0.5rem; border-left: 2px solid var(--border); }
+  .source-list a { color: var(--accent); text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+  .disclaimer {
+    background: rgba(239,83,80,0.05); border: 1px solid rgba(239,83,80,0.3);
+    border-radius: 8px; padding: 1rem 1.2rem; margin: 2rem 0;
+    font-size: 0.75rem; color: var(--text-dim);
+  }
+  .disclaimer strong { color: var(--red); }
+  @media (max-width: 700px) {
+    .source-list { column-count: 1; }
+    .big-numbers { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Chips &amp; Memory — The Rotation Trade</h1>
+  <p class="subtitle">Is NVDA's CUDA moat breaking, and is it time to rotate into memory? A two-thesis model with the full memory supply chain mapped, materials to devices.</p>
+  <p class="subtitle" style="margin-top:0.3rem">Research compiled June 25, 2026 &mdash; Flint / Coleman Research</p>
+</header>
+
+<div class="verdict-box">
+  <h2>The Verdict</h2>
+  <div class="verdict-text" id="verdict-text">Loading model...</div>
+  <div class="verdict-detail" id="verdict-detail"></div>
+  <div class="verdict-links">
+    Jump to:
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=chain]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">🔗 Supply Chain</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=hidden]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">💎 Hidden Gems</a>
+    ·
+    <a href="#" class="verdict-link" onclick="document.querySelector('[data-tab=stocks]').click();document.querySelector('.tabs').scrollIntoView({behavior:'smooth',block:'start'});return false;">🎯 Stock Picks</a>
+  </div>
+</div>
+
+<div class="big-numbers" id="key-numbers">
+  <div class="big-num red"><div class="number" id="bn-1">--</div><div class="label">Peak memory shortage</div></div>
+  <div class="big-num green"><div class="number" id="bn-2">--</div><div class="label">Cycle balances</div></div>
+  <div class="big-num" id="bn-gap-box"><div class="number" id="bn-gap">--</div><div class="label">Suggested NVDA→memory rotation</div></div>
+  <div class="big-num orange"><div class="number" id="bn-3">--</div><div class="label">NVDA accel. share by 2028</div></div>
+  <div class="big-num"><div class="number" id="bn-4">--</div><div class="label">HBM share of DRAM wafers</div></div>
+  <div class="big-num"><div class="number" id="bn-5">--</div><div class="label">Memory cycle state</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="model">Interactive Model</button>
+  <button class="tab" data-tab="theses">The Two Theses</button>
+  <button class="tab" data-tab="chain">🔗 Memory Supply Chain</button>
+  <button class="tab" data-tab="stocks">🎯 Stock Picks</button>
+  <button class="tab" data-tab="hidden">💎 Hidden Gems</button>
+  <button class="tab" data-tab="risks">Counter-Theses &amp; Risks</button>
+  <button class="tab" data-tab="methodology">Methodology</button>
+  <button class="tab" data-tab="sources">Sources</button>
+</div>
+
+<!-- ============================ MODEL ============================ -->
+<div class="tab-content active" id="tab-model">
+  <p class="text-dim" style="font-size:0.82rem;margin-bottom:1.2rem">Drag the sliders to stress-test the rotation. The model runs a memory bit-demand vs. wafer-capacity projection through 2030, layers in HBM's wafer cannibalization, and combines the resulting shortage severity with NVDA's accelerator-share erosion to suggest how much of an NVDA position is worth rotating into memory. Defaults reflect mid-2026 consensus (Goldman "worst shortage in 15 years," Micron/Bloomberg HBM TAM ~$100B by 2028).</p>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Demand Parameters</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>HBM demand CAGR (2026–30)</span><span id="val-hbmCagr">40%</span></div>
+        <input type="range" id="hbmCagr" min="10" max="70" value="40" step="5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>DRAM/NAND bit-demand growth /yr</span><span id="val-bitDemand">20%</span></div>
+        <input type="range" id="bitDemand" min="5" max="40" value="20" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>AI/datacenter share of memory by 2028</span><span id="val-aiShare">70%</span></div>
+        <input type="range" id="aiShare" min="40" max="90" value="70" step="5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>On-device AI memory content growth /yr</span><span id="val-deviceContent">12%</span></div>
+        <input type="range" id="deviceContent" min="0" max="40" value="12" step="2">
+      </div>
+    </div>
+    <div class="card">
+      <h3>Supply Parameters</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>Industry wafer-capacity growth /yr</span><span id="val-waferGrowth">6%</span></div>
+        <input type="range" id="waferGrowth" min="0" max="20" value="6" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>HBM wafer-cannibalization multiple (vs DDR5)</span><span id="val-hbmCannibal">3.0×</span></div>
+        <input type="range" id="hbmCannibal" min="1" max="5" value="3" step="0.5">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Years until new fab capacity bites</span><span id="val-fabLead">4 yr</span></div>
+        <input type="range" id="fabLead" min="2" max="6" value="4" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Discipline-breaks / glut year</span><span id="val-glutYear">2029</span></div>
+        <input type="range" id="glutYear" min="2027" max="2031" value="2029" step="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Accelerator / Rotation Parameters</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>NVDA accelerator revenue-share floor</span><span id="val-nvdaFloor">70%</span></div>
+        <input type="range" id="nvdaFloor" min="50" max="90" value="70" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>AMD + custom-silicon share by 2028</span><span id="val-altShare">28%</span></div>
+        <input type="range" id="altShare" min="10" max="45" value="28" step="1">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>Share of your NVDA position to consider rotating</span><span id="val-nvdaRotate">20%</span></div>
+        <input type="range" id="nvdaRotate" min="0" max="50" value="20" step="5">
+      </div>
+    </div>
+    <div class="card">
+      <h3>Model Output</h3>
+      <div id="model-summary"></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>Memory Demand vs Capacity (indexed)</h3>
+      <div class="chart-container"><canvas id="chart-demand-capacity"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Shortage % by Year</h3>
+      <div class="chart-container"><canvas id="chart-shortfall"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>AI Accelerator Share by 2028 (model)</h3>
+      <div class="chart-container"><canvas id="chart-tiers"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>HBM Supply Share, 2026</h3>
+      <div class="chart-container"><canvas id="chart-mix"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ THESES ============================ -->
+<div class="tab-content" id="tab-theses">
+  <div class="analysis">
+    <h3>Thesis A — "NVDA's CUDA moat is breaking because software is now easy to port"</h3>
+    <p>Your framing: CUDA was a <em>software</em> moat, and software is exactly the thing coding harnesses like Claude Code make cheap. Ask the agent to configure the AMD/ROCm stack and the "just buy NVIDIA so I don't have to fight config" tax goes away — so a chunk of NVDA's demand leaks to AMD and custom silicon.</p>
+    <p><strong>Verdict: directionally right, magnitude overstated.</strong> The research splits CUDA's moat into three layers, and they are not eroding at the same rate:</p>
+    <ul>
+      <li><strong>Software / ecosystem (cuDNN, cuBLAS, NCCL, TensorRT):</strong> still dominant for <em>training</em>. AI agents genuinely lower the cost of <em>porting source</em> CUDA→HIP/ROCm — that part of your thesis is real and supported. But they do <em>not</em> close the <em>performance</em> gap: NVIDIA hits ~50–55% model-FLOPS-utilization vs AMD's ~45%, because matching NVIDIA's hand-tuned kernels needs vendor optimization an LLM can't reproduce yet. Porting got cheap; matching performance didn't.</li>
+      <li><strong>Inference is already decoupled.</strong> For inference, CUDA lock-in is close to a myth — it's API-driven and price-sensitive, and inference is becoming two-thirds of all AI compute spend in 2026 and 70–80% by 2030. This is the soft underbelly your thesis correctly targets.</li>
+      <li><strong>Systems / networking (NVLink, NVL72, Spectrum-X, Mellanox).</strong> Here the moat is <em>widening</em>, not breaking. NVLink moves 900 GB/s–1.8 TB/s per GPU vs AMD Infinity Fabric ~128 GB/s; the GB200 NVL72 rack behaves as one 72-GPU accelerator. This is Frank's point, and the data backs it: NVIDIA's edge is migrating <em>from</em> CUDA-software <em>to</em> rack-scale integration. AMD "just makes the processors"; NVIDIA drops a whole liquid-cooled supercomputer in your datacenter.</li>
+    </ul>
+    <div class="callout"><strong>Net:</strong> CUDA's <em>software</em> moat is eroding at the margin (inference, cost-sensitive workloads) exactly as you say — and agents accelerate it. But the moat is relocating to systems/networking, where NVIDIA is pulling ahead. So the trade isn't "NVDA is broken." It's "NVDA's pricing power on the <em>marginal inference chip</em> is capped, and the incremental buyer can now credibly choose AMD or a custom ASIC." That justifies trimming an overweight, not abandoning the name.</div>
+    <p>The market already sees it: custom ASICs (Google TPU, AWS Trainium, Meta MTIA, Microsoft Maia, all co-designed by Broadcom/Marvell) are projected at ~25–30% of 2026 accelerator spend, growing 44% YoY vs 16% for merchant GPUs. NVIDIA's share is sliding from ~87% (2024) toward ~75% (2026) with a likely floor of 65–70%. That's a re-mix of <em>where</em> the AI-compute dollar lands — precisely the rotation you flagged.</p>
+    <p>And the punchline for the stock: at ~$195 NVDA trades at <strong>~15× forward earnings</strong>. That is not a bubble multiple. The rotation case is about diversifying an over-concentrated chip sleeve, not calling a top.</p>
+
+    <h3>Thesis B — "We need way more memory than we thought"</h3>
+    <p>Your framing: every phone will want ~1 TB of RAM to run local models, and memory gets baked into everything. Demand for memory does not slow down.</p>
+    <p><strong>Verdict: the conclusion is right; the mechanism is wrong.</strong> Two separate claims here, and they don't both survive contact with the data:</p>
+    <ul>
+      <li><strong>The 1 TB phone is not happening soon.</strong> 2026 flagships ship <strong>12–16 GB</strong> of LPDDR5X. On-device LLMs need 4–8 GB (a 4B model) up to ~24 GB (a quantized 70B) — not a terabyte. The cost/power/heat math for 1 TB of <em>active RAM</em> in a phone is off by orders of magnitude. The irony: memory is so scarce right now that OEMs are <em>cutting</em> phone RAM (16 GB → 12 GB) to protect margins. So as a near-term <em>phone</em> thesis, 1 TB overshoots badly.</li>
+      <li><strong>But "we need way more memory" is dead right — just driven by the datacenter, not your pocket.</strong> The real demand pull is AI servers (HBM) and enterprise SSDs. We're in what Goldman calls a "different kind of supercycle" — the <em>worst memory shortage in 15 years</em>, with DRAM contract prices up ~58–63% QoQ and NAND up ~70–75%, full-year price moves of 200–326%, and the shortage projected to persist into 2028.</li>
+    </ul>
+    <div class="callout green"><strong>Why this cycle is structurally different (and why it's the better trade than the CUDA short):</strong> (1) Demand is tied to high-visibility AI capex, not the volatile phone/PC cycle. (2) Supply is inelastic — a new fab takes 4–5 years. (3) HBM <em>cannibalizes</em> commodity capacity: every HBM bit eats ~3× (HBM3E) to ~5× (HBM4) the wafer area of DDR5, so building HBM for AI starves the DRAM that goes into everything else. (4) Customers are signing long-term contracts with prepayments and penalties. Micron's gross margin went from ~30% to ~80%+ in under a year; it and SK Hynix are effectively sold out through 2026.</div>
+    <p>So the correct version of your memory thesis: <em>not</em> "1 TB phones," but "AI's appetite for HBM is structurally starving the entire memory supply chain, in an oligopoly that can't add capacity for years." That is a cleaner, more durable trade — and the part your gut got right is the direction: memory demand is not slowing down.</p>
+
+    <h3>Frank's pushback — adjudicated</h3>
+    <p>Frank made three calls in the thread. Scoring them:</p>
+    <ul>
+      <li><strong>"No secret sauce in memory — it's just who can produce the most." — Half right.</strong> There's no per-chip IP moat like CUDA. But there <em>is</em> a structural moat: a 3-firm oligopoly controlling ~95% of DRAM, 4–5 year fab lead times, $200B+ capex intensity, and genuine HBM4 process complexity (logic base die, hybrid bonding, cascading-stack yield). It's a <em>cycle/scale</em> moat, not a monopoly moat — which is exactly why it's a trade with an expiry date, not a buy-and-forget.</li>
+      <li><strong>"CUDA is also ~30% faster, and NVIDIA drops a server in your datacenter while AMD just makes chips." — Right, and the data agrees.</strong> See Thesis A: the moat is migrating to systems. This is the strongest reason not to overplay the NVDA short.</li>
+      <li><strong>"Memory makers are capacity-constrained, growth slows, and they're first to fall when it turns — fundamentals looked bad last year." — The most important warning in the thread.</strong> Constrained capacity caps the <em>volume</em> upside (you ride price, not units), and memory is brutally cyclical: everyone held their breath on the last Micron print fearing the canary was dead. This is why the model has a "glut year" slider and why the verdict is a <em>rotate-in-with-an-exit-plan</em>, not a wedding.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================ SUPPLY CHAIN ============================ -->
+<div class="tab-content" id="tab-chain">
+  <div class="analysis">
+    <h3>The Memory Supply Chain — Materials to Devices</h3>
+    <p>You asked for this map specifically, so here's the whole chain, layer by layer, with who plays at each layer and what kind of moat they hold. Read it top-down: each layer feeds the next, and the moats get <em>weaker</em> as you move from equipment/materials (near-monopolies) toward finished modules (commoditized).</p>
+    <div class="chain-flow">
+      <span class="node">Raw silicon / chemicals</span><span class="arrow">→</span>
+      <span class="node">Wafers</span><span class="arrow">→</span>
+      <span class="node">Fab equipment</span><span class="arrow">→</span>
+      <span class="node">DRAM/NAND fabrication</span><span class="arrow">→</span>
+      <span class="node">HBM stacking / packaging / test</span><span class="arrow">→</span>
+      <span class="node">Interface &amp; controllers</span><span class="arrow">→</span>
+      <span class="node">Modules</span><span class="arrow">→</span>
+      <span class="node">Devices</span>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 1 — Raw materials, photoresist &amp; specialty gases</h4>
+      <p>Ultra-pure polysilicon, photoresist, electronic gases, CMP slurries, filtration. The unglamorous bottom of the stack — and one of the most defensible.</p>
+      <p><strong>Players:</strong> Shin-Etsu Chemical, JSR, Fujifilm, Merck (Germany), Tokuyama, Mitsubishi Chemical; <span class="text-accent">Entegris (ENTG)</span> in filtration/purity; <span class="text-accent">MKS Instruments (MKSI)</span> in process chemistry/subsystems; Element Solutions in electronic gases.</p>
+      <div class="moat"><strong>Moat: high.</strong> Purity and qualification are everything — once you're designed into a fab line you don't get swapped out. Shin-Etsu basically owns advanced photoresist. Diversified picks-and-shovels exposure to <em>every</em> memory bit made, with less price-cyclicality than the memory makers themselves.</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 2 — Silicon wafers</h4>
+      <p>The 300 mm substrate everything is printed on. A genuine duopoly-plus.</p>
+      <p><strong>Players:</strong> Shin-Etsu (~29% share) + SUMCO (~22%) ≈ 53% of the world between them; GlobalWafers (~15%), SK Siltron, Siltronic (Germany).</p>
+      <div class="moat"><strong>Moat: high.</strong> Near-impossible to enter — capital, purity, decades of process. Wafer shipments only grow ~5% in 2026, so this layer is steady exposure, not a rocket. Mostly Japan/Taiwan/Korea-listed; hard for a US investor to own cleanly.</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 3 — Fab equipment (the real chokepoint)</h4>
+      <p>The tools that etch, deposit, pattern, and inspect. This is where the cleanest "sell the shovels" trade lives — and where the AI-memory capex actually lands first.</p>
+      <p><strong>Players:</strong> <span class="text-accent">ASML</span> (EUV litho monopoly — SK Hynix placed a record ~$8B order for ~30 EUV machines for HBM4/DRAM), <span class="text-accent">Lam Research (LRCX)</span> (etch/deposition — critical for 3D-NAND stacking and HBM TSVs), <span class="text-accent">Applied Materials (AMAT)</span> (deposition), <span class="text-accent">KLA (KLAC)</span> (inspection — HBM's tight yields raise inspection intensity), <span class="text-accent">Tokyo Electron (8035.T)</span> (etch/deposition/clean).</p>
+      <div class="moat"><strong>Moat: very high (ASML is a monopoly).</strong> EUV removes ~100 process steps in HBM; there is no second EUV vendor. Caveat for entry today: these have already run hard — several trade <em>above</em> consensus price targets (see Stock Picks). Quality, but you're chasing.</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 4 — DRAM / NAND fabrication (the headline trade)</h4>
+      <p>The chips themselves. This is what "rotate into memory" usually means.</p>
+      <p><strong>Players:</strong> <span class="text-accent">Samsung</span>, <span class="text-accent">SK Hynix</span>, <span class="text-accent">Micron (MU)</span> = ~95% of DRAM (the triopoly). NAND adds Kioxia and <span class="text-accent">Sandisk (SNDK)</span>. HBM share: SK Hynix ~50–62% (leader, NVIDIA's main supplier), Samsung ~17–35%, Micron ~20% (the efficiency play).</p>
+      <div class="moat"><strong>Moat: structural, not proprietary.</strong> No CUDA-style lock-in — but the oligopoly + capex intensity + HBM complexity is a real, durable barrier. Micron's edge is the 1γ DRAM node and best-in-class power efficiency; SK Hynix's is HBM leadership and the NVIDIA relationship. This is the highest-beta layer: maximum torque to the cycle, maximum drawdown when it turns.</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 5 — HBM stacking, advanced packaging &amp; test</h4>
+      <p>Where commodity DRAM becomes AI memory. HBM is 8–16 DRAM dies stacked on a logic base die via TSVs/hybrid bonding, then co-packaged with the GPU (TSMC CoWoS). One bad die scraps the whole stack — so test intensity is far higher than commodity DRAM.</p>
+      <p><strong>Players:</strong> <span class="text-accent">TSMC</span> (CoWoS, logic base die for HBM4), SK Hynix/Samsung/Micron (stacking), and the test winners: <span class="text-accent">Advantest (6857.T)</span> and <span class="text-accent">Teradyne (TER)</span>.</p>
+      <div class="moat"><strong>Moat: high and rising.</strong> Yield competition has moved from the front-end to back-end packaging. HBM4's hybrid bonding needs sub-50 nm alignment — this is the new bottleneck. Advantest in particular is a sneaky-pure HBM-test beneficiary that most "buy memory" investors skip.</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 6 — Memory interface &amp; controllers</h4>
+      <p>The companion chips that let CPUs/GPUs actually talk to all that memory: RCDs, MRDIMM buffers, CXL switches, NAND controllers. The "more memory = more interface silicon" layer — content scales non-linearly with memory density.</p>
+      <p><strong>Players:</strong> <span class="text-accent">Rambus (RMBS)</span> (interface IP + chips; RCD share went 0%→~45%; HBM4E controller IP, MRDIMM), <span class="text-accent">Astera Labs (ALAB)</span> (CXL/PCIe connectivity), <span class="text-accent">Silicon Motion (SIMO)</span> (NAND/SSD controllers), Montage Technology (CXL buffers, China-listed).</p>
+      <div class="moat"><strong>Moat: medium (IP + design-win stickiness).</strong> Smaller, higher-margin, and more idiosyncratic than the memory makers — they monetize <em>rising memory content per server</em> regardless of who wins the DRAM share war. The catch: valuations here are stretched (ALAB ~94× forward).</div>
+    </div>
+
+    <div class="layer">
+      <h4>Layer 7–8 — Modules &amp; device integration</h4>
+      <p>DDR5 sticks, SSDs, and the OEMs that bake memory into phones, servers, PCs, cars.</p>
+      <p><strong>Players:</strong> Micron/Samsung/SK Hynix (own-brand modules), Kingston, ADATA (module assembly); Apple, Dell, HP, Lenovo, Samsung Mobile (device integration).</p>
+      <div class="moat"><strong>Moat: low (commodity).</strong> Thin margins, no pricing power — the part of the chain that <em>pays</em> the supercycle tax rather than collecting it. Not where you want to be invested for this thesis; this is where rising memory prices show up as <em>higher device BOM costs</em>.</div>
+    </div>
+
+    <h3>Where to actually fish in this chain</h3>
+    <div class="callout green"><strong>Best risk/reward:</strong> Layers 3–5 (equipment, the memory triopoly, and HBM test) capture the supercycle with real moats. The single cleanest US-listed expression of "memory demand doesn't slow down" is <strong>Micron (MU)</strong> at Layer 4; the cleanest monopoly is <strong>ASML</strong> at Layer 3; the most overlooked is <strong>Advantest</strong> at Layer 5.</div>
+    <div class="callout warning"><strong>Where the easy money is already made:</strong> A lot of Layer 3–6 names (KLAC, ENTG, MKSI, TER, SIMO, SNDK, ALAB) currently trade <em>above</em> their consensus price targets. The chain is correct; the entry is late on several. Size accordingly and consider scaling in.</div>
+  </div>
+</div>
+
+<!-- ============================ STOCK PICKS ============================ -->
+<div class="tab-content" id="tab-stocks">
+  <div class="analysis">
+    <h3>Stock Picks — Ratings + Price Targets</h3>
+    <p>All quotes via yfinance, as of <strong>June 25, 2026</strong>. Forward P/E and consensus targets are pulled live; non-US caps converted at ₩1,380/$ and ¥152/$. Ratings: <span class="rating-sb">STRONG BUY</span>, <span class="rating-b">BUY</span>, <span class="rating-h">HOLD</span>, <span class="rating-s">TRIM/SELL</span>. A "▲ above target" flag means the stock already trades above the analyst consensus 12-mo target — the rally ran ahead of estimates.</p>
+    <table>
+      <thead><tr><th>Ticker</th><th>Name</th><th>Layer</th><th class="text-right">Price</th><th class="text-right">Mkt Cap</th><th class="text-right">Fwd P/E</th><th class="text-right">Cons. PT</th><th>Flint Rating</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">MU</td><td>Micron</td><td>4 — DRAM/NAND/HBM</td><td class="text-right">$1,220</td><td class="text-right">$1.38T</td><td class="text-right text-green">9.4×</td><td class="text-right">$1,365</td><td class="rating-sb">STRONG BUY</td></tr>
+        <tr><td class="bold">000660.KS</td><td>SK Hynix</td><td>4 — HBM leader</td><td class="text-right">₩2.92M</td><td class="text-right">~$1.5T</td><td class="text-right text-green">~6–7×</td><td class="text-right">+28%</td><td class="rating-sb">STRONG BUY</td></tr>
+        <tr><td class="bold">ASML</td><td>ASML</td><td>3 — EUV monopoly</td><td class="text-right">$1,839</td><td class="text-right">$709B</td><td class="text-right">38×</td><td class="text-right">$1,745 ▲</td><td class="rating-b">BUY (scale in)</td></tr>
+        <tr><td class="bold">AVGO</td><td>Broadcom</td><td>Custom ASIC</td><td class="text-right">$381</td><td class="text-right">$1.81T</td><td class="text-right text-green">19.6×</td><td class="text-right">$524</td><td class="rating-sb">STRONG BUY</td></tr>
+        <tr><td class="bold">LRCX</td><td>Lam Research</td><td>3 — etch/dep</td><td class="text-right">$395</td><td class="text-right">$493B</td><td class="text-right">49×</td><td class="text-right">$341 ▲</td><td class="rating-b">BUY (rich)</td></tr>
+        <tr><td class="bold">AMAT</td><td>Applied Materials</td><td>3 — deposition</td><td class="text-right">$653</td><td class="text-right">$518B</td><td class="text-right">40×</td><td class="text-right">$532 ▲</td><td class="rating-h">HOLD</td></tr>
+        <tr><td class="bold">6857.T</td><td>Advantest</td><td>5 — HBM test</td><td class="text-right">¥35,900</td><td class="text-right">~$171B</td><td class="text-right">—</td><td class="text-right">—</td><td class="rating-b">BUY (gem)</td></tr>
+        <tr><td class="bold">SNDK</td><td>Sandisk</td><td>4 — NAND pure-play</td><td class="text-right">$2,294</td><td class="text-right">$340B</td><td class="text-right text-green">12.6×</td><td class="text-right">$1,751 ▲</td><td class="rating-h">HOLD (high-beta)</td></tr>
+        <tr><td class="bold">RMBS</td><td>Rambus</td><td>6 — interface IP</td><td class="text-right">$125</td><td class="text-right">$13.5B</td><td class="text-right">34×</td><td class="text-right">$145</td><td class="rating-b">BUY (gem)</td></tr>
+        <tr><td class="bold">KLAC</td><td>KLA</td><td>3 — inspection</td><td class="text-right">$259</td><td class="text-right">$339B</td><td class="text-right">51×</td><td class="text-right">$204 ▲</td><td class="rating-h">HOLD</td></tr>
+        <tr><td class="bold">TER</td><td>Teradyne</td><td>5 — test</td><td class="text-right">$465</td><td class="text-right">$73B</td><td class="text-right">49×</td><td class="text-right">$390 ▲</td><td class="rating-h">HOLD</td></tr>
+        <tr><td class="bold">SIMO</td><td>Silicon Motion</td><td>6 — controllers</td><td class="text-right">$327</td><td class="text-right">$11B</td><td class="text-right">32×</td><td class="text-right">$257 ▲</td><td class="rating-h">HOLD</td></tr>
+        <tr><td class="bold">ALAB</td><td>Astera Labs</td><td>6 — CXL</td><td class="text-right">$399</td><td class="text-right">$68B</td><td class="text-right text-red">94×</td><td class="text-right">$255 ▲</td><td class="rating-h">HOLD (priced for perfection)</td></tr>
+        <tr><td class="bold">ENTG</td><td>Entegris</td><td>1 — materials</td><td class="text-right">$177</td><td class="text-right">$27B</td><td class="text-right">38×</td><td class="text-right">$161 ▲</td><td class="rating-b">BUY (diversifier)</td></tr>
+        <tr><td class="bold">NVDA</td><td>NVIDIA</td><td>(the position you're trimming)</td><td class="text-right">$195</td><td class="text-right">$4.72T</td><td class="text-right text-green">15.3×</td><td class="text-right">$299</td><td class="rating-b">HOLD / TRIM</td></tr>
+        <tr><td class="bold">AMD</td><td>AMD</td><td>(the merchant alt)</td><td class="text-right">$527</td><td class="text-right">$859B</td><td class="text-right text-red">40×</td><td class="text-right">$500</td><td class="rating-h">HOLD</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The Case for Each Rating</h3>
+    <h4>MU — Strong Buy (the answer to "which memory name")</h4>
+    <p>The cleanest US-listed way to own the memory supercycle. Trades at a <strong>~9.4× forward P/E</strong> with EPS estimates of ~$58 (2026) → ~$101 (2027) and gross margins that went 30%→80%+ in a year. HBM supply sold out, 1γ DRAM node lead, ~20% HBM share with HBM4E coming. The low multiple <em>is</em> the cyclical tell — it's pricing in an eventual earnings roll. That's a feature for a rotation-in trade with a defined exit, not a reason to avoid.</p>
+    <h4>SK Hynix — Strong Buy (the HBM king)</h4>
+    <p>The HBM leader and NVIDIA's primary supplier, ~6–7× forward earnings, up ~780% in a year and now a ~$1.5T company. Best operational exposure to HBM4. Friction for a US investor: it's Korea-listed (KRX:000660) — you'd buy the ADR or via an international broker. If you want one non-US name, this is it.</p>
+    <h4>AVGO — Strong Buy (the hedge for Thesis A)</h4>
+    <p>This is the elegant move: Broadcom co-designs the custom ASICs (with Marvell, ~95% of that market) that are <em>taking share from NVDA</em>. ~20× forward, $8.4B AI semi revenue last quarter (+106% YoY). Owning AVGO means you profit from the exact CUDA-erosion / custom-silicon shift in Thesis A, without betting against NVIDIA outright.</p>
+    <h4>ASML — Buy, scale in (the monopoly shovel)</h4>
+    <p>No EUV, no advanced HBM/DRAM. It's a literal monopoly and the truest "sell the shovels" play. Already up ~120% in a year and slightly above consensus target — so leg in rather than chase, but this is the highest-quality structural winner in the whole chain.</p>
+    <h4>Advantest / Rambus / Entegris — Buy (the gems)</h4>
+    <p>See Hidden Gems. Advantest = HBM test intensity nobody talks about. Rambus = "more memory = more interface chips," 0→45% RCD share. Entegris = diversified materials exposure with less cyclicality than the chip makers.</p>
+    <h4>NVDA — Hold / Trim</h4>
+    <p>Not a sell. At ~15× forward it's arguably the cheapest megacap grower on the board, and the systems moat is widening. But if it's an oversized slice of your sleeve, trimming 15–25% to fund memory is sound diversification — the marginal AI-compute dollar is genuinely re-mixing toward AMD/custom/memory-heavy systems.</p>
+
+    <h3>Portfolio Construction — your actual question</h3>
+    <div class="callout green"><strong>Core memory (the rotation lands here):</strong> MU as the anchor; add SK Hynix if you'll hold a non-US name. This is the highest-conviction expression of "memory demand doesn't slow down."</div>
+    <div class="callout"><strong>Quality shovels:</strong> ASML (scale in) and a starter in LRCX. Monopoly/duopoly economics, lower blow-up risk than the memory makers — but several equipment names are above target, so patience on entry.</div>
+    <div class="callout"><strong>Thesis-A hedge:</strong> AVGO. You think NVDA's marginal demand leaks to custom silicon? Own the company that <em>builds</em> the custom silicon. Cheaper than AMD on forward earnings, too.</div>
+    <div class="callout"><strong>Gems (small, asymmetric):</strong> Advantest (HBM test), Rambus (interface IP). Size as satellites, not core.</div>
+    <div class="callout warning"><strong>Discipline — the Frank rule:</strong> This is a cyclical. Define your exit before you enter — watch the "glut year" signals (capex acceleration across all three makers, CXMT ramping commodity DRAM, contract-price momentum stalling). Memory makers are first to fall when it turns. Rotate in for the shortage; don't marry it.</div>
+  </div>
+</div>
+
+<!-- ============================ HIDDEN GEMS ============================ -->
+<div class="tab-content" id="tab-hidden">
+  <div class="analysis">
+    <h3>Under-the-Radar Picks</h3>
+    <p>The obvious names (MU, SK Hynix, NVDA) are where everyone's already looking. The alpha is in the layers most "buy memory" investors skip — test, interface IP, and materials. These are the DELL-analogs of this thesis: real exposure, less crowded.</p>
+
+    <div class="gem-card">
+      <h4>💎 #1 — Advantest <span class="ticker">TSE:6857 · ¥35,900 · ~$171B mkt cap</span></h4>
+      <p class="tagline">The HBM test bottleneck nobody puts in their "memory" basket.</p>
+      <div class="body">
+        <p>HBM is 8–16 dies stacked on a logic base die — and one bad die scraps the entire stack, so test intensity is dramatically higher than commodity DRAM. As HBM4 brings hybrid bonding (sub-50 nm alignment), the back-end becomes the yield battleground. Advantest is the dominant memory/SoC test house riding that wave.</p>
+        <p><strong>Why the market underweights it:</strong> investors reflexively buy the memory <em>makers</em> and the litho monopoly (ASML), and forget that someone has to <em>test</em> every stack. Test demand scales with HBM units <em>and</em> complexity simultaneously.</p>
+        <p><strong>The tell:</strong> stock up ~190% in a year; 17 Buys / 0 Sells. Co-moves with HBM volume, not DRAM spot price — a cleaner AI-memory exposure.</p>
+        <p><strong>Risk:</strong> Japan-listed (friction for US investors); if HBM4 ramps slip, test capex slips with it.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #2 — Rambus <span class="ticker">NASDAQ:RMBS · $125 · $13.5B mkt cap</span></h4>
+      <p class="tagline">"More memory = more interface chips." Gets paid no matter who wins the DRAM war.</p>
+      <div class="body">
+        <p>Rambus sells the RCDs, MRDIMM buffers, and interface IP that let servers actually use rising memory density — plus high-margin patent licensing. Its register-clock-driver share went from 0% in 2018 to ~45% today, and it's pivoting from pure IP licensor to fabless chip designer (HBM4E controller IP, CXL).</p>
+        <p><strong>Why the market mispriced it:</strong> it's not a "memory stock," so it screens out of the obvious baskets. But content-per-server is rising non-linearly — every extra DIMM needs its companion silicon.</p>
+        <p><strong>The tell:</strong> Strong Buy consensus, ~$145 target (~16% above spot), Q1'26 revenue $180M +8% YoY. Smaller and nimbler than the giants.</p>
+        <p><strong>Risk:</strong> 34× forward isn't cheap; a memory-volume air-pocket hits the chip-sales half of the model.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #3 — Entegris <span class="ticker">NASDAQ:ENTG · $177 · $27B mkt cap</span></h4>
+      <p class="tagline">The materials layer — picks-and-shovels with less cycle-beta than the chip makers.</p>
+      <div class="body">
+        <p>Ultra-high-purity filtration, specialty chemicals, and materials that go into <em>every</em> advanced memory and logic bit. Recurring, consumable-style revenue tied to wafers <em>processed</em>, not chip <em>prices</em> — so it doesn't whipsaw with DRAM spot the way MU does.</p>
+        <p><strong>Why it's a gem:</strong> it's the lowest-drama way to be long "more memory gets made," and it diversifies the cyclicality Frank flagged.</p>
+        <p><strong>The tell:</strong> data centers are set to consume ~70% of memory supply; materials makers (Entegris, Element Solutions, Fujifilm) are building out to meet it.</p>
+        <p><strong>Risk:</strong> trades ~10% above consensus target already; 38× forward. Quality at a full price — scale in.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #4 — Sandisk <span class="ticker">NASDAQ:SNDK · $2,294 · $340B mkt cap</span></h4>
+      <p class="tagline">The pure-play NAND bet — explosive, and explosively volatile.</p>
+      <div class="body">
+        <p>Spun out of Western Digital in Feb 2025 as a standalone NAND flash company (WDC kept the HDD business). Enterprise-SSD demand from AI data centers drove sequential price hikes to ~55%, margins 7%→36%, revenue +251% YoY, capacity booked through 2026. Up ~3,100%+ in a year; forced into the Nasdaq-100.</p>
+        <p><strong>Why it's here:</strong> it's the cleanest <em>NAND</em> expression (vs DRAM-heavy MU) — and your "memory baked into everything" instinct is most literally true for storage.</p>
+        <p><strong>The tell:</strong> forward P/E ~12.6× despite the moonshot — earnings are exploding faster than the price.</p>
+        <p><strong>Risk:</strong> highest beta on this page, already above its $1,751 consensus target, and a WDC stake overhang. This is a trade, not an investment — hence HOLD, not Buy.</p>
+      </div>
+    </div>
+
+    <div class="gem-card">
+      <h4>💎 #5 — Silicon Motion <span class="ticker">NASDAQ:SIMO · $327 · $11B mkt cap</span></h4>
+      <p class="tagline">Small-cap NAND/SSD controller maker — content growth without fab risk.</p>
+      <div class="body">
+        <p>Designs the controllers inside SSDs and embedded storage. Benefits from rising storage density across phones, PCs, and enterprise SSDs without taking on memory-fab capital risk. The smallest, most idiosyncratic name in the set.</p>
+        <p><strong>The tell:</strong> Strong Buy consensus, Q1'26 earnings beat; controllers are a volume-and-content story.</p>
+        <p><strong>Risk:</strong> already above its blended consensus target; small-cap, lumpy, China-exposed customer base. A starter position at most.</p>
+      </div>
+    </div>
+
+    <h3>Hidden Gems — Summary</h3>
+    <table>
+      <thead><tr><th>Ticker</th><th>Layer</th><th class="text-right">Price</th><th class="text-right">Fwd P/E</th><th>One-line thesis</th><th>Rating</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">6857.T</td><td>HBM test</td><td class="text-right">¥35,900</td><td class="text-right">—</td><td>Every HBM stack must be tested; intensity rising with HBM4</td><td class="rating-b">BUY</td></tr>
+        <tr><td class="bold">RMBS</td><td>Interface IP</td><td class="text-right">$125</td><td class="text-right">34×</td><td>More memory = more interface chips; 0→45% RCD share</td><td class="rating-b">BUY</td></tr>
+        <tr><td class="bold">ENTG</td><td>Materials</td><td class="text-right">$177</td><td class="text-right">38×</td><td>Consumable exposure to every bit made; lower cycle-beta</td><td class="rating-b">BUY</td></tr>
+        <tr><td class="bold">SNDK</td><td>NAND</td><td class="text-right">$2,294</td><td class="text-right">12.6×</td><td>Pure-play NAND supercycle; high beta, above target</td><td class="rating-h">HOLD</td></tr>
+        <tr><td class="bold">SIMO</td><td>Controllers</td><td class="text-right">$327</td><td class="text-right">32×</td><td>Storage-controller content growth, no fab risk</td><td class="rating-h">HOLD</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>If I had to pick three to size up:</strong> <span class="text-yellow">Advantest</span> (most overlooked, cleanest HBM-complexity exposure), <span class="text-yellow">Rambus</span> (wins regardless of the DRAM share war), and <span class="text-yellow">Entegris</span> (the cycle-dampener that keeps the sleeve from being pure high-beta memory). Note that on valuation, several of these have already run above consensus targets — these are satellite positions to scale into, not all-at-once buys.</div>
+  </div>
+</div>
+
+<!-- ============================ RISKS ============================ -->
+<div class="tab-content" id="tab-risks">
+  <div class="analysis">
+    <h3>Counter-Theses (Addressed, Not Dismissed)</h3>
+
+    <h4>1. "It's commodity — no secret sauce, just who makes the most." (Frank)</h4>
+    <p>Partly true, and it's why this isn't a forever-hold. There's no per-chip IP moat like CUDA. But "commodity" understates the <em>structural</em> barrier: a 3-firm oligopoly at ~95% of DRAM, 4–5 year fab build times, $200B+ capex to play, and genuine HBM4 process difficulty (logic base die, hybrid bonding, cascading-stack yields where one bad die kills the package). New entrants prove the point — CXMT scales fast in <em>commodity</em> DRAM (toward ~17% by 2028) but stays stuck near ~40% HBM yield, locked out of advanced AI memory. So: real moat, but a <em>cycle</em> moat. You rent it during the shortage.</p>
+
+    <h4>2. "Memory makers are capacity-constrained — growth slows." (Frank)</h4>
+    <p>Correct, and it reframes the trade. Constrained capacity caps <em>unit</em> growth, so the upside is <em>price</em>, not volume. That's actually bullish <em>during</em> a shortage (pricing power, 80% gross margins) but it means the stocks track the price cycle, full stop. The model's "glut year" slider exists for exactly this: when discipline breaks and capacity finally lands, price reverses fast.</p>
+
+    <h4>3. "They're first to fall when it turns — and fundamentals looked bad last year." (Frank)</h4>
+    <p>The single most important risk. Memory equities are high-beta to the cycle and roll over before the broad tape. The last Micron print had everyone braced for a dead canary. <em>This is the case for an exit discipline, not for staying out</em> — you want to be in during the shortage and out before the glut, which is hard and requires watching the signals, not the narrative.</p>
+
+    <h4>4. "The 1 TB phone makes the consumer-memory thesis huge."</h4>
+    <p>This is the part of your own thesis I'd push back on. Flagships are at 12–16 GB and OEMs are <em>cutting</em> RAM because it's so expensive; on-device LLMs need 4–24 GB, not 1,000. The consumer angle is real but modest and slow. The demand that matters is datacenter HBM + enterprise SSD. Don't underwrite the trade on phones.</p>
+
+    <h4>5. "NVDA's moat is breaking, so short the demand."</h4>
+    <p>Overreach. The software moat is eroding at the inference margin (your instinct is right there), but the systems/networking moat is widening, and at ~15× forward NVDA isn't priced for breakage. The smart version is <em>diversify the chip sleeve</em>, not <em>bet against NVIDIA</em>.</p>
+
+    <h3>What Could Break This Thesis</h3>
+    <div class="callout danger"><strong>The glut arrives early.</strong> All three makers + CXMT over-build into the AI capex signal, capacity lands in 2027–28, and DRAM/NAND prices reverse hard. Memory equities fall first and fastest. Watch contract-price momentum and combined capex announcements.</div>
+    <div class="callout danger"><strong>AI capex digestion.</strong> If hyperscaler AI spending pauses (a model disappoints, ROI doubts spread), the HBM demand curve that underpins the whole supercycle flattens — and the memory names have the least valuation cushion to absorb it.</div>
+    <div class="callout warning"><strong>You buy the chain too late.</strong> Several supply-chain names already trade above consensus targets after enormous runs. The thesis can be right and your entry still poor. Scale in; don't chase green candles.</div>
+    <div class="callout warning"><strong>FX / access friction.</strong> The two best operational names outside MU (SK Hynix, Advantest) are Korea/Japan-listed. ADRs and currency add cost and tracking error.</div>
+
+    <h3>Bottom line</h3>
+    <div class="callout green"><strong>Rotate — modestly, into memory, with a plan to leave.</strong> The memory thesis is the stronger, more durable trade (structural shortage to ~2028); the CUDA thesis is real but argues for trimming NVDA, not abandoning it. Anchor in MU, add a quality shovel (ASML) and the Thesis-A hedge (AVGO), sprinkle the gems (Advantest, Rambus, Entegris). And honor Frank's warning: this is a cyclical you rent during the shortage, not a stock you marry.</div>
+  </div>
+</div>
+
+<!-- ============================ METHODOLOGY ============================ -->
+<div class="tab-content" id="tab-methodology">
+  <div class="analysis">
+    <h3>How I Built This Model</h3>
+    <p>The goal is orders-of-magnitude truth, not false precision. The interactive model is a simple demand-vs-capacity index for the memory market, layered with HBM's wafer cannibalization, and then mapped to a rotation recommendation. It's a thinking tool to stress-test the thesis — not a DCF.</p>
+
+    <h4>Demand Side</h4>
+    <p>Memory bit-demand starts indexed at 100 in 2026 and compounds at the blended of: base DRAM/NAND bit growth, an HBM premium (HBM CAGR weighted by HBM's share of wafers), and a small on-device-AI content contribution. The key amplifier is the <strong>HBM cannibalization multiple</strong>: because HBM consumes ~3× (HBM3E) to ~5× (HBM4) the wafer area per bit vs DDR5, rising HBM share inflates <em>effective</em> demand on a fixed wafer base. Anchors: HBM TAM ~$100B by 2028 (Micron/Bloomberg), HBM ~23% of DRAM wafers in 2026 rising, DRAM +58–63% / NAND +70–75% QoQ contract prices (Goldman/TrendForce).</p>
+
+    <h4>Supply Side</h4>
+    <p>Capacity starts indexed below demand (the market is already short) and grows at the wafer-capacity slider — slowly, because supply is disciplined and fabs take 4–5 years. At the <strong>glut year</strong>, capacity gets a step-up (discipline breaks + new fabs + CXMT commodity ramp), which is what eventually closes the shortage. Shortage % = (demand − capacity) / demand.</p>
+
+    <h4>Accelerator / Rotation Logic</h4>
+    <p>NVDA's 2028 share is read off the floor slider; AMD+custom is the alt-share slider; "other" is the remainder. The suggested rotation blends three signals: memory-shortage severity (bullish memory), the cycle balance/glut timing (a later balance = more runway), and NVDA share erosion (more erosion = more reason to diversify) — scaled by how much of your NVDA position you flagged as rotatable. It deliberately caps below "all-in" because this is a cyclical.</p>
+
+    <h4>What the Model Does Not Attempt</h4>
+    <ul>
+      <li>Company-level revenue or DCF — the stock table uses live consensus, not model output.</li>
+      <li>Precise HBM TAM by generation — it's an index, not a dollar forecast.</li>
+      <li>Timing the exact cycle top. The glut-year slider is a scenario knob, not a prediction.</li>
+      <li>FX modeling for the non-US names beyond a spot conversion.</li>
+    </ul>
+
+    <h4>Key Sensitivities</h4>
+    <div class="callout"><strong>Bull lever:</strong> push the HBM cannibalization multiple toward 5× and the glut year to 2031 — the shortage becomes severe and durable, and the rotation recommendation maxes out.</div>
+    <div class="callout warning"><strong>Bear lever:</strong> drop wafer-capacity growth fears (raise it to 15%+) and pull the glut year to 2027 — the shortage closes fast and the rotation edge collapses. This is the Frank scenario.</div>
+    <p class="text-dim" style="font-size:0.78rem">Stock quotes pulled via yfinance on June 25, 2026. Landscape and cycle data assembled from ~36 Perplexity queries run the same day. Where Perplexity returned conflicting prices, the yfinance live quote was used as the authority.</p>
+  </div>
+</div>
+
+<!-- ============================ SOURCES ============================ -->
+<div class="tab-content" id="tab-sources">
+  <div class="analysis">
+    <h3>Sources</h3>
+    <p class="text-dim" style="font-size:0.8rem">Assembled from ~36 Perplexity queries + live yfinance quotes, run June 25, 2026. Only URLs returned by the research are listed — no fabricated links. Market-research vendor figures (TAM, CAGR, share) are vendor estimates, not gospel.</p>
+
+    <h4>CUDA moat / accelerator market</h4>
+    <ul class="source-list">
+      <li><a href="https://siliconanalysts.com/analysis/amd-vs-nvidia-ai-gpu-market-share-2026">SiliconAnalysts — AMD vs NVIDIA AI GPU share 2026</a></li>
+      <li><a href="https://siliconanalysts.com/analysis/nvidia-ai-accelerator-market-share-2024-2026">SiliconAnalysts — NVIDIA accelerator share 2024–26</a></li>
+      <li><a href="https://sima.ai/blog/breaking-free-from-the-cuda-lock-in/">SiMa.ai — Breaking free from CUDA lock-in</a></li>
+      <li><a href="https://www.modular.com/blog/democratizing-compute-part-2-what-exactly-is-cuda">Modular — What exactly is CUDA</a></li>
+      <li><a href="https://introl.com/blog/nvidia-dominance-cuda-moat-competition-analysis-2025">Introl — NVIDIA CUDA moat analysis</a></li>
+      <li><a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/">NVIDIA — GB200 NVL72</a></li>
+      <li><a href="https://newsletter.semianalysis.com/p/amd-advancing-ai-mi350x-and-mi400-ualoe72-mi500-ual256">SemiAnalysis — AMD MI350X/MI400</a></li>
+      <li><a href="https://www.techtimes.com/articles/317225/20260526/custom-ai-chips-outpace-nvidia-gpu-growth-2026-asic-shipments-set-triple-gpu-rate.htm">TechTimes — Custom ASICs outpace GPU growth 2026</a></li>
+      <li><a href="https://www.tomshardware.com/tech-industry/semiconductors/custom-ai-asics-examined-from-broadcom-to-mtia">Tom's Hardware — Custom AI ASICs, Broadcom to MTIA</a></li>
+      <li><a href="https://github.com/KrxGu/kernel-skills">GitHub — kernel-skills (CUDA→HIP porting)</a></li>
+      <li><a href="https://www.fortunebusinessinsights.com/ai-inference-market-113705">Fortune Business Insights — AI inference market</a></li>
+    </ul>
+
+    <h4>Memory cycle / HBM / supply chain</h4>
+    <ul class="source-list">
+      <li><a href="https://www.bloomberg.com/company/press/high-bandwidth-memory-chip-market-could-grow-to-130-billion-by-2033-according-to-bloomberg-intelligence/">Bloomberg Intelligence — HBM market to ~$130B by 2033</a></li>
+      <li><a href="https://introl.com/blog/ai-memory-supercycle-hbm-2026">Introl — AI memory supercycle / HBM 2026</a></li>
+      <li><a href="https://www.mordorintelligence.com/industry-reports/high-bandwidth-memory-market">Mordor Intelligence — HBM market</a></li>
+      <li><a href="https://www.trendforce.com/presscenter/news/20260616-13102.html">TrendForce — memory contract pricing, Jun 2026</a></li>
+      <li><a href="https://www.indexbox.io/blog/memory-shortage-crisis-ai-demand-drives-dram-and-nand-prices-up-200-in-2026/">IndexBox — DRAM/NAND +200% 2026</a></li>
+      <li><a href="https://www.investing.com/analysis/the-end-of-cheap-memory-why-2026-marks-a-structural-shift-in-tech-economics-200675634">Investing.com — End of cheap memory</a></li>
+      <li><a href="https://enkiai.com/data-center/hbm-supply-crisis-2026-the-bottleneck-redefining-ai/">EnkiAI — HBM supply crisis 2026</a></li>
+      <li><a href="https://www.envisioning.com/research/stratum/japan__silicon-wafer-production">Envisioning — Japan silicon wafer production</a></li>
+      <li><a href="https://waferpro.com/top-5-silicon-wafer-manufacturing-companies/">WaferPro — top wafer makers</a></li>
+      <li><a href="https://www.nomadsemi.com/p/memory-shortage-and-asml">NomadSemi — memory shortage and ASML</a></li>
+      <li><a href="https://siliconmatter.substack.com/p/asml-debunks-peak-litho-narrative">SiliconMatter — ASML / EUV demand</a></li>
+      <li><a href="https://www.techinsights.com/outlook-reports-2026/advanced-packaging-outlook-report">TechInsights — advanced packaging outlook 2026</a></li>
+      <li><a href="https://newsletter.semianalysis.com/p/hybrid-bonding-process-flow-advanced">SemiAnalysis — hybrid bonding</a></li>
+      <li><a href="https://newsletter.semianalysis.com/p/chinas-cxmt-is-set-to-challenge-dram">SemiAnalysis — CXMT challenge to DRAM</a></li>
+      <li><a href="https://cen.acs.org/business/specialty-chemicals/Electronics-materials-makers-preparing-boom/104/web/2026/01">C&amp;EN — electronics materials makers</a></li>
+      <li><a href="https://www.reddit.com/r/Semiconductors/comments/1qwj0vp/data_centers_will_consume_70_percent_of_memory/">Discussion — data centers ~70% of memory</a></li>
+    </ul>
+
+    <h4>On-device AI memory / phones</h4>
+    <ul class="source-list">
+      <li><a href="https://www.digitaltrends.com/phones/rising-memory-costs-could-impact-your-next-android-smartphones-price-and-performance/">Digital Trends — rising memory costs hit phones</a></li>
+      <li><a href="https://electronics.alibaba.com/buyingguides/android-flagship-phones-2026-battery,-ai-agents-foldables">Buying guide — 2026 flagship specs</a></li>
+      <li><a href="https://smartphones.gadgethacks.com/news/will-ram-price-increases-make-flagship-phones-more-expensive-in-2026/">Gadget Hacks — RAM price increases 2026</a></li>
+    </ul>
+
+    <h4>Company financials &amp; ratings</h4>
+    <ul class="source-list">
+      <li><a href="https://futurumgroup.com/insights/micron-technology-q1-fy-2026-sets-records-strong-q2-outlook/">Futurum — Micron Q1 FY26</a></li>
+      <li><a href="http://business.times-online.com/times-online/article/predictstreet-2026-1-9-the-memory-supercycle-a-deep-dive-into-micron-technology-mu-in-2026">PredictStreet — Micron deep dive 2026</a></li>
+      <li><a href="https://www.tradingview.com/news/tradingview:942f4879878c3:0-sk-hynix-inc-stock-12-month-price-target-raised-to-krw-2691800-14-implies-28-upside/">TradingView — SK Hynix PT raise</a></li>
+      <li><a href="https://tickernerd.com/stock/avgo-forecast/">TickerNerd — Broadcom forecast</a></li>
+      <li><a href="https://www.investing.com/analysis/the-ai-memory-shortage-behind-the-sp-500s-16-surge-200681260">Investing.com — AI memory shortage / S&amp;P surge</a></li>
+      <li><a href="https://www.cmcmarkets.com/en-gb/opto/three-smaller-cap-us-chip-stocks-lscc-tsem-and-rmbs">CMC Markets — small-cap chip names</a></li>
+      <li><a href="https://www.rambus.com/first-quarter-2026-financial-results/">Rambus — Q1 2026 results</a></li>
+      <li><a href="https://www.investing.com/equities/tokyo-electron-ltd.">Investing.com — Tokyo Electron</a></li>
+      <li><a href="https://finance.yahoo.com/markets/stocks/articles/sk-hynix-joins-micron-in-1-trillion-club-as-ai-memory-chip-rally-accelerates-024514610.html">Yahoo Finance — SK Hynix / Micron $1T club</a></li>
+      <li><a href="https://money.usnews.com/investing/articles/5-best-ai-memory-stocks-to-buy-for-2026">US News — AI memory stocks 2026</a></li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <p>Chips &amp; Memory — The Rotation Trade · Flint / Coleman Research · June 25, 2026</p>
+  <p style="margin-top:0.5rem">Compiled autonomously via ~36 Perplexity queries + live yfinance quotes on June 25, 2026. Model parameters are interactive — drag them.</p>
+  <div class="disclaimer">
+    <strong>Not investment advice.</strong> This is exploratory research compiled by Flint, an AI agent running on an old gaming PC in a basement. Price targets are consensus or model-based and should be treated as analytical views, not recommendations. Memory is a deeply cyclical sector; do your own due diligence. Past performance does not predict future results. Some figures may be stale or misstated — verify before trading. The author (Flint, via Jason Coleman) may or may not hold positions in any named securities.
+  </div>
+</footer>
+
+</div>
+
+<script>
+// ============================================================
+// SLIDER + MODEL LOGIC
+// ============================================================
+const sliders = {
+  hbmCagr: document.getElementById('hbmCagr'),
+  bitDemand: document.getElementById('bitDemand'),
+  aiShare: document.getElementById('aiShare'),
+  deviceContent: document.getElementById('deviceContent'),
+  waferGrowth: document.getElementById('waferGrowth'),
+  hbmCannibal: document.getElementById('hbmCannibal'),
+  fabLead: document.getElementById('fabLead'),
+  glutYear: document.getElementById('glutYear'),
+  nvdaFloor: document.getElementById('nvdaFloor'),
+  altShare: document.getElementById('altShare'),
+  nvdaRotate: document.getElementById('nvdaRotate')
+};
+
+function fmtLabels() {
+  document.getElementById('val-hbmCagr').textContent = sliders.hbmCagr.value + '%';
+  document.getElementById('val-bitDemand').textContent = sliders.bitDemand.value + '%';
+  document.getElementById('val-aiShare').textContent = sliders.aiShare.value + '%';
+  document.getElementById('val-deviceContent').textContent = sliders.deviceContent.value + '%';
+  document.getElementById('val-waferGrowth').textContent = sliders.waferGrowth.value + '%';
+  document.getElementById('val-hbmCannibal').textContent = parseFloat(sliders.hbmCannibal.value).toFixed(1) + '×';
+  document.getElementById('val-fabLead').textContent = sliders.fabLead.value + ' yr';
+  document.getElementById('val-glutYear').textContent = sliders.glutYear.value;
+  document.getElementById('val-nvdaFloor').textContent = sliders.nvdaFloor.value + '%';
+  document.getElementById('val-altShare').textContent = sliders.altShare.value + '%';
+  document.getElementById('val-nvdaRotate').textContent = sliders.nvdaRotate.value + '%';
+}
+
+function getParams() {
+  return {
+    hbmCagr: parseFloat(sliders.hbmCagr.value) / 100,
+    bitDemand: parseFloat(sliders.bitDemand.value) / 100,
+    aiShare: parseFloat(sliders.aiShare.value) / 100,
+    deviceContent: parseFloat(sliders.deviceContent.value) / 100,
+    waferGrowth: parseFloat(sliders.waferGrowth.value) / 100,
+    hbmCannibal: parseFloat(sliders.hbmCannibal.value),
+    fabLead: parseInt(sliders.fabLead.value),
+    glutYear: parseInt(sliders.glutYear.value),
+    nvdaFloor: parseFloat(sliders.nvdaFloor.value),
+    altShare: parseFloat(sliders.altShare.value),
+    nvdaRotate: parseFloat(sliders.nvdaRotate.value)
+  };
+}
+
+function runModel(p) {
+  const years = [2026, 2027, 2028, 2029, 2030];
+  const demandByYear = [];
+  const capacityByYear = [];
+  const shortfallByYear = [];   // annual supply-demand tension, in percentage points (bounded)
+  const hbmShareByYear = [];
+
+  // Blended bit-demand growth: base bits + HBM premium (weighted) + small device-content contribution
+  const blendedGrowth = p.bitDemand + (p.hbmCagr - p.bitDemand) * 0.30 + p.deviceContent * 0.10;
+
+  // HBM share of DRAM wafers starts ~0.23 in 2026, climbs toward aiShare-driven ceiling
+  let hbmShare = 0.23;
+
+  let demand = 100;          // demand index (for the chart)
+  let capacity = 95;         // capacity index — starts tight (already short in 2026)
+
+  for (let i = 0; i < years.length; i++) {
+    const y = years[i];
+
+    // HBM share creeps up toward a ceiling set by AI share of memory
+    if (i > 0) hbmShare = Math.min(p.aiShare * 0.45, hbmShare + 0.05 * (p.hbmCagr / 0.40));
+
+    // effective demand growth = blended growth + an HBM cannibalization premium
+    // (rising HBM share at higher wafer-cost-per-bit tightens the effective supply)
+    const effDemandGrowth = blendedGrowth + hbmShare * (p.hbmCannibal - 1) * 0.04;
+
+    // capacity growth: disciplined by default; new fabs and/or the glut year add step-ups
+    let capGrowth = p.waferGrowth;
+    const fabOnline = y >= (2026 + p.fabLead);
+    const glut = y >= p.glutYear;
+    if (fabOnline) capGrowth += p.waferGrowth * 0.5;       // new fabs add incremental capacity
+    if (glut) capGrowth += p.waferGrowth * 1.8 + 0.05;     // discipline breaks + CXMT commodity ramp
+
+    if (i > 0) { demand = demand * (1 + effDemandGrowth); capacity = capacity * (1 + capGrowth); }
+
+    // tension = how far annual demand growth outruns capacity growth (percentage points, 0..100)
+    const tension = Math.max(0, Math.min(100, (effDemandGrowth - capGrowth) * 100));
+    demandByYear.push(Math.round(demand));
+    capacityByYear.push(Math.round(capacity));
+    shortfallByYear.push(Math.round(tension * 10) / 10);
+    hbmShareByYear.push(Math.round(hbmShare * 100));
+  }
+
+  // peak tension and the year it eases (tension <= 2 pts = capacity growth catches demand)
+  let peakShort = Math.max(...shortfallByYear);
+  let balanceYear = null;
+  for (let i = 0; i < years.length; i++) {
+    if (shortfallByYear[i] <= 2) { balanceYear = years[i]; break; }
+  }
+
+  // accelerator shares for chart (2028 view)
+  const nvda = p.nvdaFloor;
+  const alt = p.altShare;
+  const other = Math.max(0, 100 - nvda - alt);
+
+  // suggested rotation: severity * runway * erosion, scaled by user's rotatable slice
+  const sev = Math.min(1, Math.max(0, peakShort / 25));            // 0..1
+  const runway = balanceYear ? Math.min(1, (balanceYear - 2026) / 4) : 1; // later balance = more runway
+  const erosion = Math.min(1, Math.max(0, (90 - p.nvdaFloor) / 40)); // lower floor = more erosion
+  const blend = (sev * 0.5 + runway * 0.3 + erosion * 0.2);
+  const suggestedRotation = Math.round(p.nvdaRotate * (0.4 + 0.6 * blend));
+
+  return {
+    years, demandByYear, capacityByYear, shortfallByYear, hbmShareByYear,
+    peakShort, balanceYear, suggestedRotation,
+    accel: { nvda, alt, other },
+    finalHbmShare: hbmShareByYear[hbmShareByYear.length - 1]
+  };
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const chartOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 11 } } }
+  },
+  scales: {
+    x: { ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: 'rgba(42,42,58,0.5)' } },
+    y: { ticks: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: 'rgba(42,42,58,0.5)' } }
+  }
+};
+
+const ctxDC = document.getElementById('chart-demand-capacity').getContext('2d');
+const chartDC = new Chart(ctxDC, {
+  type: 'line',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [
+      { label: 'Effective demand', data: [], borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.12)', fill: true, tension: 0.3 },
+      { label: 'Capacity', data: [], borderColor: '#66bb6a', backgroundColor: 'rgba(102,187,106,0.12)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { ...chartOpts }
+});
+
+const ctxSF = document.getElementById('chart-shortfall').getContext('2d');
+const chartSF = new Chart(ctxSF, {
+  type: 'bar',
+  data: {
+    labels: ['2026','2027','2028','2029','2030'],
+    datasets: [ { label: 'Shortage %', data: [], backgroundColor: '#ffa726', borderRadius: 4 } ]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+const ctxT = document.getElementById('chart-tiers').getContext('2d');
+const chartT = new Chart(ctxT, {
+  type: 'bar',
+  data: {
+    labels: ['NVIDIA', 'AMD + Custom', 'Other'],
+    datasets: [ { label: 'Share %', data: [], backgroundColor: ['#66bb6a','#ffa726','#7c4dff'], borderRadius: 4 } ]
+  },
+  options: { ...chartOpts, plugins: { ...chartOpts.plugins, legend: { display: false } } }
+});
+
+const ctxM = document.getElementById('chart-mix').getContext('2d');
+const chartM = new Chart(ctxM, {
+  type: 'doughnut',
+  data: {
+    labels: ['SK Hynix ~55%', 'Samsung ~25%', 'Micron ~20%'],
+    datasets: [ { data: [55, 25, 20], backgroundColor: ['#4fc3f7','#7c4dff','#66bb6a'], borderWidth: 0 } ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'right', labels: { color: '#8888a0', font: { family: "'JetBrains Mono', monospace", size: 10 } } } }
+  }
+});
+
+// ============================================================
+// UPDATE LOOP
+// ============================================================
+function updateModel() {
+  const p = getParams();
+  const m = runModel(p);
+  fmtLabels();
+
+  const balanceText = m.balanceYear ? String(m.balanceYear) : 'beyond 2030';
+
+  // Big numbers
+  document.getElementById('bn-1').textContent = m.peakShort.toFixed(1) + '%';
+  document.getElementById('bn-2').textContent = balanceText;
+  document.getElementById('bn-gap').textContent = m.suggestedRotation + '%';
+  document.getElementById('bn-3').textContent = Math.round(p.nvdaFloor) + '%';
+  document.getElementById('bn-4').textContent = m.finalHbmShare + '%';
+
+  // Verdict bands
+  const verdictEl = document.getElementById('verdict-text');
+  const verdictDetail = document.getElementById('verdict-detail');
+  const stateEl = document.getElementById('bn-5');
+  const ps = m.peakShort;
+  let state;
+  if (ps <= 2) {
+    state = 'Balanced';
+    verdictEl.textContent = 'Balanced — No Rotation Edge';
+    verdictEl.style.color = '#66bb6a';
+    verdictDetail.textContent = `Capacity catches demand by ${balanceText}. The shortage thesis fades — hold NVDA, no special memory edge.`;
+  } else if (ps < 10) {
+    state = 'Tight';
+    verdictEl.textContent = 'Tight — Selective Rotation';
+    verdictEl.style.color = '#ffee58';
+    verdictDetail.textContent = `Peak shortage ~${ps.toFixed(0)}%, balancing ~${balanceText}. Rotate ~${m.suggestedRotation}% of NVDA into the highest-quality memory names (MU, ASML). Stay nimble.`;
+  } else if (ps < 20) {
+    state = 'Shortage';
+    verdictEl.textContent = 'Structural Shortage — Rotate';
+    verdictEl.style.color = '#ffa726';
+    verdictDetail.textContent = `Peak shortage ~${ps.toFixed(0)}%, persisting to ~${balanceText}. Rotate ~${m.suggestedRotation}% of NVDA into memory (anchor MU + SK Hynix, shovels ASML, hedge AVGO). Keep an exit plan.`;
+  } else {
+    state = 'Severe';
+    verdictEl.textContent = 'Severe Shortage — Rotation Window Open';
+    verdictEl.style.color = '#ef5350';
+    verdictDetail.textContent = `Peak shortage ~${ps.toFixed(0)}%, durable to ~${balanceText}. This is the rotation window — ~${m.suggestedRotation}% of NVDA into memory makes sense. But it's a cyclical: define the exit before the glut.`;
+  }
+  stateEl.textContent = state;
+
+  // Charts
+  chartDC.data.datasets[0].data = m.demandByYear;
+  chartDC.data.datasets[1].data = m.capacityByYear;
+  chartDC.update('none');
+
+  chartSF.data.datasets[0].data = m.shortfallByYear.map(s => Math.max(0, s));
+  chartSF.update('none');
+
+  chartT.data.datasets[0].data = [m.accel.nvda, m.accel.alt, m.accel.other];
+  chartT.update('none');
+
+  // Model summary
+  const summary = document.getElementById('model-summary');
+  summary.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Memory cycle state</span><span class="stat-value accent">${state}</span></div>
+    <div class="stat-row"><span class="stat-label">Peak shortage</span><span class="stat-value ${ps >= 10 ? 'red' : 'orange'}">${ps.toFixed(1)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Cycle balances</span><span class="stat-value green">${balanceText}</span></div>
+    <div class="stat-row"><span class="stat-label">HBM share of DRAM wafers (2030)</span><span class="stat-value">${m.finalHbmShare}%</span></div>
+    <div class="stat-row"><span class="stat-label">NVDA accel. share 2028</span><span class="stat-value orange">${Math.round(p.nvdaFloor)}%</span></div>
+    <div class="stat-row"><span class="stat-label">AMD + custom silicon 2028</span><span class="stat-value">${Math.round(p.altShare)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Suggested NVDA→memory rotation</span><span class="stat-value accent">${m.suggestedRotation}% of position</span></div>
+  `;
+}
+
+for (const key in sliders) {
+  sliders[key].addEventListener('input', updateModel);
+}
+updateModel();
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
