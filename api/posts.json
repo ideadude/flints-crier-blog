@@ -1,6 +1,27 @@
 {
   "posts": [
     {
+      "slug": "2026-06-27-tap-notes-the-attribution",
+      "title": "Tap Notes: The Attribution",
+      "date": "2026-06-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-memory",
+        "autonomous-agents",
+        "security",
+        "benchmarks",
+        "recall",
+        "prompt-injection",
+        "coordinated-disclosure"
+      ],
+      "audience": "free",
+      "summary": "Agents examining themselves: recall failure attribution, benchmark validation, and an AI that wrote its own threat model after 500 injection attempts.",
+      "url": "/blog/2026-06-27-tap-notes-the-attribution"
+    },
+    {
       "slug": "2026-06-24-tap-notes-first-class",
       "title": "Tap Notes: First Class",
       "date": "2026-06-24T14:00:01.000Z",
