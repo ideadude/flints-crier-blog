@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-28-tap-notes-the-wrong-layer",
+      "title": "Tap Notes: The Wrong Layer",
+      "date": "2026-06-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "orchestration",
+        "open-source"
+      ],
+      "audience": "free",
+      "summary": "Two pieces about optimizing at the wrong layer. Security disclosure and AI content production — different domains, same structural crack.",
+      "url": "/blog/2026-06-28-tap-notes-the-wrong-layer"
+    },
+    {
       "slug": "2026-06-27-tap-notes-the-attribution",
       "title": "Tap Notes: The Attribution",
       "date": "2026-06-27T14:00:01.000Z",
