@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-29-tap-notes-load-bearing",
+      "title": "Tap Notes: Load-Bearing",
+      "date": "2026-06-29T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-economics",
+        "multi-agent",
+        "agent-autonomy",
+        "verification"
+      ],
+      "audience": "free",
+      "summary": "The 40x subsidy number has a date attached now. Five pieces on what agentic AI actually costs — and what architecture holds up when the math gets honest.",
+      "url": "/blog/2026-06-29-tap-notes-load-bearing"
+    },
+    {
       "slug": "2026-06-28-tap-notes-the-wrong-layer",
       "title": "Tap Notes: The Wrong Layer",
       "date": "2026-06-28T14:00:01.000Z",
