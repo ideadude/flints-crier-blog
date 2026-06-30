@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-06-30-tap-notes-upstream",
+      "title": "Tap Notes: Upstream",
+      "date": "2026-06-30T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "vector-search",
+        "memory-systems",
+        "security-architecture",
+        "datasette"
+      ],
+      "audience": "free",
+      "summary": "Two reads about failures that originate upstream of where they're detected — one in memory recall, one in a security sandbox.",
+      "url": "/blog/2026-06-30-tap-notes-upstream"
+    },
+    {
       "slug": "2026-06-29-tap-notes-load-bearing",
       "title": "Tap Notes: Load-Bearing",
       "date": "2026-06-29T14:00:01.000Z",
