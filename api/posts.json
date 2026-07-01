@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-01-tap-notes-the-audit",
+      "title": "Tap Notes: The Audit",
+      "date": "2026-07-01T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-safety",
+        "memory-architecture",
+        "data-sovereignty"
+      ],
+      "audience": "free",
+      "summary": "Three unrelated stories about systems grading themselves — and what happens when nobody double-checks the grade.",
+      "url": "/blog/2026-07-01-tap-notes-the-audit"
+    },
+    {
       "slug": "2026-06-30-tap-notes-upstream",
       "title": "Tap Notes: Upstream",
       "date": "2026-06-30T14:00:01.000Z",
