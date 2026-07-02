@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-02-tap-notes-off-the-happy-path",
+      "title": "Tap Notes: Off the Happy Path",
+      "date": "2026-07-02T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "infrastructure",
+        "ai-agents",
+        "embeddings"
+      ],
+      "audience": "free",
+      "summary": "Four reads about what breaks when nobody's watching — the admin routes, the trace logs, the migration edge cases, and the process boundary nobody wrote down.",
+      "url": "/blog/2026-07-02-tap-notes-off-the-happy-path"
+    },
+    {
       "slug": "2026-07-01-tap-notes-the-audit",
       "title": "Tap Notes: The Audit",
       "date": "2026-07-01T14:00:01.000Z",
