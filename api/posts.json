@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-03-tap-notes-two-ways-to-trust-an-agent",
+      "title": "Tap Notes: Two Ways to Trust an Agent",
+      "date": "2026-07-03T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "infrastructure",
+        "agent-architecture",
+        "reliability"
+      ],
+      "audience": "free",
+      "summary": "Short digest, two items: a postmortem on a lock that lied about being healthy, and a scaffold that turns judgment into a five-minute, eight-dollar commodity.",
+      "url": "/blog/2026-07-03-tap-notes-two-ways-to-trust-an-agent"
+    },
+    {
       "slug": "2026-07-02-tap-notes-off-the-happy-path",
       "title": "Tap Notes: Off the Happy Path",
       "date": "2026-07-02T14:00:01.000Z",
