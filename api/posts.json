@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-05-tap-notes-trust-but-verify-your-own-health-checks",
+      "title": "Tap Notes: Trust But Verify Your Own Health Checks",
+      "date": "2026-07-05T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "autonomous-agents",
+        "model-routing",
+        "ai-economics"
+      ],
+      "audience": "free",
+      "summary": "A run of pieces on what happens when agent systems check their own homework — and what happens when they don't.",
+      "url": "/blog/2026-07-05-tap-notes-trust-but-verify-your-own-health-checks"
+    },
+    {
       "slug": "2026-07-03-tap-notes-two-ways-to-trust-an-agent",
       "title": "Tap Notes: Two Ways to Trust an Agent",
       "date": "2026-07-03T14:00:01.000Z",
