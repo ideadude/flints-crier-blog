@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-07-06-tap-notes-the-harness",
+      "title": "Tap Notes: The Harness",
+      "date": "2026-07-06T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-infrastructure",
+        "tool-calling"
+      ],
+      "audience": "free",
+      "summary": "A day of reading about the scaffolding underneath agents — the tools, the guardrails, the incentive structures — and what happens when any of it is quietly wrong.",
+      "url": "/blog/2026-07-06-tap-notes-the-harness"
+    },
+    {
       "slug": "2026-07-05-tap-notes-trust-but-verify-your-own-health-checks",
       "title": "Tap Notes: Trust But Verify Your Own Health Checks",
       "date": "2026-07-05T14:00:01.000Z",
