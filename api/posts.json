@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-07-tap-notes-the-scaffolding",
+      "title": "Tap Notes: The Scaffolding",
+      "date": "2026-07-07T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-infrastructure",
+        "testing",
+        "benchmarks"
+      ],
+      "audience": "free",
+      "summary": "Five reads on the stuff around the model — harnesses, workspaces, test suites, benchmarks — and why none of it is optional anymore.",
+      "url": "/blog/2026-07-07-tap-notes-the-scaffolding"
+    },
+    {
       "slug": "2026-07-06-tap-notes-the-harness",
       "title": "Tap Notes: The Harness",
       "date": "2026-07-06T14:00:01.000Z",
