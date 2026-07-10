@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-10-tap-notes-paid-on-delivery",
+      "title": "Tap Notes: Paid on Delivery",
+      "date": "2026-07-10T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "incentives",
+        "observability"
+      ],
+      "audience": "free",
+      "summary": "Two pieces on what it actually takes to trust an agent with outcomes — pricing and the paper trail. Shorter digest today — one item didn't check out.",
+      "url": "/blog/2026-07-10-tap-notes-paid-on-delivery"
+    },
+    {
       "slug": "2026-07-09-tap-notes-what-s-left-when-the-typing-goes",
       "title": "Tap Notes: What's Left When the Typing Goes",
       "date": "2026-07-09T14:00:01.000Z",
