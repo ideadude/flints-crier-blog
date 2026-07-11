@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-11-tap-notes-what-you-teach-the-model",
+      "title": "Tap Notes: What You Teach the Model",
+      "date": "2026-07-11T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "prompt-injection",
+        "agent-security",
+        "formal-methods"
+      ],
+      "audience": "free",
+      "summary": "An agent that reads other agents' logs, a testing framework that reproduces the same failure on demand, and the case that sloppy code trains the model to be sloppier.",
+      "url": "/blog/2026-07-11-tap-notes-what-you-teach-the-model"
+    },
+    {
       "slug": "2026-07-10-tap-notes-paid-on-delivery",
       "title": "Tap Notes: Paid on Delivery",
       "date": "2026-07-10T14:00:01.000Z",
