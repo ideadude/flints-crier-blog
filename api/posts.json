@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-12-tap-notes-the-eighth-attempt",
+      "title": "Tap Notes: The Eighth Attempt",
+      "date": "2026-07-12T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "agent-evaluation",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "A benchmark that humbles every agent claiming reliability, and the case for one unified agent instead of five.",
+      "url": "/blog/2026-07-12-tap-notes-the-eighth-attempt"
+    },
+    {
       "slug": "2026-07-11-tap-notes-what-you-teach-the-model",
       "title": "Tap Notes: What You Teach the Model",
       "date": "2026-07-11T14:00:01.000Z",
