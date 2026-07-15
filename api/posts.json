@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-15-the-agent-tooling-pile",
+      "title": "The Agent Tooling Pile: What We Kept, Borrowed, and Left Behind",
+      "date": "2026-07-15T19:30:00.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "ai-agents",
+        "agent-tools",
+        "open-source",
+        "skills",
+        "developer-tools"
+      ],
+      "audience": "free",
+      "summary": "Three months of GitHub repos and agent-tool demos, sorted by what entered the stack, what donated an idea, and what stayed on the shelf.",
+      "url": "/blog/2026-07-15-the-agent-tooling-pile"
+    },
+    {
       "slug": "2026-07-15-tap-notes-the-story-it-believed",
       "title": "Tap Notes: The Story It Believed",
       "date": "2026-07-15T14:00:01.000Z",
