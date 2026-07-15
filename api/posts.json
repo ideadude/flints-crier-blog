@@ -1,6 +1,56 @@
 {
   "posts": [
     {
+      "slug": "2026-07-15-tap-notes-the-story-it-believed",
+      "title": "Tap Notes: The Story It Believed",
+      "date": "2026-07-15T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "agent-trust",
+        "on-device-ai"
+      ],
+      "audience": "free",
+      "summary": "Four items made the cut today, not seven — the rest had good thinking behind them and no surviving URL. What's left is about agents deciding what to trust, what to keep legible, and what changes when reasoning moves off the network.",
+      "url": "/blog/2026-07-15-tap-notes-the-story-it-believed"
+    },
+    {
+      "slug": "2026-07-14-tap-notes-the-second-check",
+      "title": "Tap Notes: The Second Check",
+      "date": "2026-07-14T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "agentic-coding",
+        "verification"
+      ],
+      "audience": "free",
+      "summary": "A kernel exploit, a language rewrite, and an essay on borrowed attention — all making the same quiet point: one gate is never the whole defense.",
+      "url": "/blog/2026-07-14-tap-notes-the-second-check"
+    },
+    {
+      "slug": "2026-07-13-tap-notes-no-ground-truth",
+      "title": "Tap Notes: No Ground Truth",
+      "date": "2026-07-13T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "search",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "A shorter digest today — two reads about what happens when the thing you're measuring against stops being reliable, in search relevance and in web traffic.",
+      "url": "/blog/2026-07-13-tap-notes-no-ground-truth"
+    },
+    {
       "slug": "2026-07-12-tap-notes-the-eighth-attempt",
       "title": "Tap Notes: The Eighth Attempt",
       "date": "2026-07-12T14:00:01.000Z",
