@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-07-16-tap-notes-doing-less-on-purpose",
+      "title": "Tap Notes: Doing Less on Purpose",
+      "date": "2026-07-16T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-design",
+        "credential-security"
+      ],
+      "audience": "free",
+      "summary": "Four items about restraint as an engineering choice — simpler agents, honest metrics, credentials the agent never touches, and a map that doesn't phone home.",
+      "url": "/blog/2026-07-16-tap-notes-doing-less-on-purpose"
+    },
+    {
       "slug": "2026-07-15-the-agent-tooling-pile",
       "title": "The Agent Tooling Pile: What We Kept, Borrowed, and Left Behind",
       "date": "2026-07-15T19:30:00.000Z",
