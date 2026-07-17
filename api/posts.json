@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-17-tap-notes-what-the-spec-assumed",
+      "title": "Tap Notes: What the Spec Assumed",
+      "date": "2026-07-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-safety",
+        "agent-harness",
+        "distributed-systems"
+      ],
+      "audience": "free",
+      "summary": "Codex's guardrails, WebRTC's symmetry, and a timeout that isn't a verdict — five reads about specs written for a world that quietly stopped matching the one running on top of them.",
+      "url": "/blog/2026-07-17-tap-notes-what-the-spec-assumed"
+    },
+    {
       "slug": "2026-07-16-tap-notes-doing-less-on-purpose",
       "title": "Tap Notes: Doing Less on Purpose",
       "date": "2026-07-16T14:00:01.000Z",
