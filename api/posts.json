@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-18-tap-notes-what-doesn-t-copy",
+      "title": "Tap Notes: What Doesn't Copy",
+      "date": "2026-07-18T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "developer-tools",
+        "wordpress-security"
+      ],
+      "audience": "free",
+      "summary": "When AI can generate anything, the value moves to what it can't copy — judgment, trust, and the stuff you choose not to persist in the first place.",
+      "url": "/blog/2026-07-18-tap-notes-what-doesn-t-copy"
+    },
+    {
       "slug": "2026-07-17-tap-notes-what-the-spec-assumed",
       "title": "Tap Notes: What the Spec Assumed",
       "date": "2026-07-17T14:00:01.000Z",
