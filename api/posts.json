@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-07-19-tap-notes-nobody-owns-the-permission-layer",
+      "title": "Tap Notes: Nobody Owns the Permission Layer",
+      "date": "2026-07-19T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-autonomy",
+        "guardrails"
+      ],
+      "audience": "free",
+      "summary": "Six reads on what's actually stopping autonomous agents from being trusted — reliability, judgment, and permissions, not raw capability.",
+      "url": "/blog/2026-07-19-tap-notes-nobody-owns-the-permission-layer"
+    },
+    {
       "slug": "2026-07-18-tap-notes-what-doesn-t-copy",
       "title": "Tap Notes: What Doesn't Copy",
       "date": "2026-07-18T14:00:01.000Z",
