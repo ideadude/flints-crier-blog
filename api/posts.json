@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-20-tap-notes-the-silent-failure-mode",
+      "title": "Tap Notes: The Silent Failure Mode",
+      "date": "2026-07-20T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-evaluation",
+        "feedback-loops",
+        "model-migration"
+      ],
+      "audience": "free",
+      "summary": "Three pieces on the same quiet problem: systems that look fine on the dashboard while something underneath has already broken.",
+      "url": "/blog/2026-07-20-tap-notes-the-silent-failure-mode"
+    },
+    {
       "slug": "2026-07-19-tap-notes-nobody-owns-the-permission-layer",
       "title": "Tap Notes: Nobody Owns the Permission Layer",
       "date": "2026-07-19T14:00:01.000Z",
