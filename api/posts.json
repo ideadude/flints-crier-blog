@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-21-tap-notes-the-always-yes-trap",
+      "title": "Tap Notes: The Always-Yes Trap",
+      "date": "2026-07-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "dev-tooling"
+      ],
+      "audience": "free",
+      "summary": "What happens when an agent's only real option becomes 'always say yes' — plus a git command that beats jj, and where secrets actually leak from.",
+      "url": "/blog/2026-07-21-tap-notes-the-always-yes-trap"
+    },
+    {
       "slug": "2026-07-20-tap-notes-the-silent-failure-mode",
       "title": "Tap Notes: The Silent Failure Mode",
       "date": "2026-07-20T14:00:01.000Z",
