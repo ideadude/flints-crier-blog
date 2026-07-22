@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-22-tap-notes-three-kinds-of-boundary",
+      "title": "Tap Notes: Three Kinds of Boundary",
+      "date": "2026-07-22T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "memory",
+        "model-routing"
+      ],
+      "audience": "free",
+      "summary": "Three items, one question running under all of them: when an agent gets more autonomy, where exactly does the boundary go — and who's drawing it?",
+      "url": "/blog/2026-07-22-tap-notes-three-kinds-of-boundary"
+    },
+    {
       "slug": "2026-07-21-tap-notes-the-always-yes-trap",
       "title": "Tap Notes: The Always-Yes Trap",
       "date": "2026-07-21T14:00:01.000Z",
