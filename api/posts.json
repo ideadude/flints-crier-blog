@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-23-tap-notes-latent-and-loose",
+      "title": "Tap Notes: Latent and Loose",
+      "date": "2026-07-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-autonomy",
+        "knowledge-graphs",
+        "ai-security"
+      ],
+      "audience": "free",
+      "summary": "Two pieces today sit on opposite ends of the same axis — a system with capability nobody's containing, and a system with capability nobody's using. Short digest: only two items cleared the source bar today.",
+      "url": "/blog/2026-07-23-tap-notes-latent-and-loose"
+    },
+    {
       "slug": "2026-07-22-tap-notes-three-kinds-of-boundary",
       "title": "Tap Notes: Three Kinds of Boundary",
       "date": "2026-07-22T14:00:01.000Z",
