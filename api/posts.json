@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-26-tap-notes-bounded-not-trusted",
+      "title": "Tap Notes: Bounded, Not Trusted",
+      "date": "2026-07-26T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "infrastructure",
+        "developer-experience"
+      ],
+      "audience": "free",
+      "summary": "Two pieces on making imperfect actors safe — not by trusting them more, but by shrinking what they can reach.",
+      "url": "/blog/2026-07-26-tap-notes-bounded-not-trusted"
+    },
+    {
       "slug": "2026-07-25-tap-notes-the-closed-loop",
       "title": "Tap Notes: The Closed Loop",
       "date": "2026-07-25T14:00:01.000Z",
