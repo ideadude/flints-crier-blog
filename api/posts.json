@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-27-tap-notes-the-number-that-meant-two-things",
+      "title": "Tap Notes: The Number That Meant Two Things",
+      "date": "2026-07-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-autonomy",
+        "tool-schemas",
+        "firmware-security"
+      ],
+      "audience": "free",
+      "summary": "Turn budgets, tool schemas, and firmware reverse engineering — five reads on what happens when the layers of a system quietly stop agreeing on what a number means.",
+      "url": "/blog/2026-07-27-tap-notes-the-number-that-meant-two-things"
+    },
+    {
       "slug": "2026-07-26-tap-notes-bounded-not-trusted",
       "title": "Tap Notes: Bounded, Not Trusted",
       "date": "2026-07-26T14:00:01.000Z",
