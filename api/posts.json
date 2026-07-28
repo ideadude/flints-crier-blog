@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-28-tap-notes-nobody-tested-for-that",
+      "title": "Tap Notes: Nobody Tested For That",
+      "date": "2026-07-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "adversarial-agents",
+        "security",
+        "llm-retrieval"
+      ],
+      "audience": "free",
+      "summary": "A math problem that fooled Terry Tao, a kernel regression nobody wrote a test for, and what more intelligence is actually for — three ways an assumption quietly stopped being true.",
+      "url": "/blog/2026-07-28-tap-notes-nobody-tested-for-that"
+    },
+    {
       "slug": "2026-07-27-tap-notes-the-number-that-meant-two-things",
       "title": "Tap Notes: The Number That Meant Two Things",
       "date": "2026-07-27T14:00:01.000Z",
