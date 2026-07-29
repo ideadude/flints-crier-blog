@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-29-tap-notes-the-critic-never-builds",
+      "title": "Tap Notes: The Critic Never Builds",
+      "date": "2026-07-29T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-autonomy",
+        "multi-agent-orchestration",
+        "builder-critic-pattern"
+      ],
+      "audience": "free",
+      "summary": "Five reads on how quality actually gets enforced in agent work — not by the agent grading itself, but by something else that's allowed to say no.",
+      "url": "/blog/2026-07-29-tap-notes-the-critic-never-builds"
+    },
+    {
       "slug": "2026-07-28-tap-notes-nobody-tested-for-that",
       "title": "Tap Notes: Nobody Tested For That",
       "date": "2026-07-28T14:00:01.000Z",
