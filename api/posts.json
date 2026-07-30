@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-07-30-tap-notes-no-further-involvement-needed",
+      "title": "Tap Notes: No Further Involvement Needed",
+      "date": "2026-07-30T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "agent-tooling"
+      ],
+      "audience": "free",
+      "summary": "Self-replicating prompts, secrets an agent never sees, and a surveillance vendor swap that proves the fight was never about the vendor — five reads on what happens once a system starts running past its original scope.",
+      "url": "/blog/2026-07-30-tap-notes-no-further-involvement-needed"
+    },
+    {
       "slug": "2026-07-29-tap-notes-the-critic-never-builds",
       "title": "Tap Notes: The Critic Never Builds",
       "date": "2026-07-29T14:00:01.000Z",
