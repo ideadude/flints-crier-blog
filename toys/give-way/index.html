@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Give Way — a rules-of-the-road boat toy</title>
+<style>
+  html,body{margin:0;padding:0;background:#0a1118;height:100%;overflow:hidden;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:#cfe3ec;
+    -webkit-user-select:none;user-select:none;touch-action:none}
+  #wrap{display:flex;align-items:center;justify-content:center;height:100%}
+  canvas{display:block;border-radius:6px;box-shadow:0 0 60px rgba(20,60,80,.45)}
+  #hint{position:fixed;bottom:8px;left:0;right:0;text-align:center;font-size:11px;
+    color:#3d5866;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="c"></canvas></div>
+<div id="hint">&uarr;&darr; throttle &nbsp;&middot;&nbsp; &larr;&rarr; steer &nbsp;&middot;&nbsp; M sound &nbsp;&middot;&nbsp; R restart</div>
+<script>
+(() => {
+'use strict';
+const W = 520, H = 780;
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+cv.width = W; cv.height = H;
+function fit(){
+  const s = Math.min(innerWidth/W, (innerHeight-26)/H);
+  cv.style.width = (W*s)+'px'; cv.style.height = (H*s)+'px';
+}
+addEventListener('resize', fit); fit();
+
+// ---------- audio ----------
+let AC = null, engOsc = null, engGain = null, muted = false;
+function audio(){
+  if (muted) return null;
+  if (!AC){
+    AC = new (window.AudioContext||window.webkitAudioContext)();
+    engOsc = AC.createOscillator(); engGain = AC.createGain();
+    engOsc.type = 'sawtooth'; engOsc.frequency.value = 50;
+    engGain.gain.value = 0;
+    engOsc.connect(engGain).connect(AC.destination);
+    engOsc.start();
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function blip(freq, dur, vol, type){
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type||'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime+dur);
+  o.connect(g).connect(a.destination);
+  o.start(); o.stop(a.currentTime+dur);
+}
+const sndGood = () => { blip(660,.12,.06); blip(990,.18,.05); };
+const sndBad  = () => blip(140,.25,.09,'square');
+const sndHit  = () => { blip(70,.4,.16,'square'); blip(50,.5,.12,'sawtooth'); };
+
+// ---------- input ----------
+const keys = {};
+addEventListener('keydown', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  keys[e.key.toLowerCase()] = true;
+  if (e.key.toLowerCase() === 'm'){ muted = !muted; if (muted && engGain) engGain.gain.value = 0; }
+  if (e.key.toLowerCase() === 'r' && state !== 'play') start();
+  if (state === 'title' && e.key !== 'm') start();
+});
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+let touch = null;
+cv.addEventListener('pointerdown', e => {
+  if (state !== 'play'){ start(); return; }
+  const r = cv.getBoundingClientRect();
+  touch = { x:(e.clientX-r.left)/r.width*W, y:(e.clientY-r.top)/r.height*H };
+});
+cv.addEventListener('pointermove', e => {
+  if (!touch) return;
+  const r = cv.getBoundingClientRect();
+  touch.x = (e.clientX-r.left)/r.width*W; touch.y = (e.clientY-r.top)/r.height*H;
+});
+addEventListener('pointerup', () => touch = null);
+
+// ---------- helpers ----------
+const rnd = (a,b) => a + Math.random()*(b-a);
+const clamp = (v,a,b) => Math.max(a, Math.min(b,v));
+function segPointDist(px,py,ax,ay,bx,by){
+  const dx = bx-ax, dy = by-ay;
+  const t = clamp(((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy||1), 0, 1);
+  return Math.hypot(px-(ax+dx*t), py-(ay+dy*t));
+}
+
+// ---------- game state ----------
+let state = 'title';               // title | play | over
+let score = 0, best = +(localStorage.getItem('giveway-best')||0);
+let hull = 100, dist = 0, shake = 0, invuln = 0, tFrame = 0;
+let boats = [], buoys = [], pops = [], wake = [], speckles = [];
+let spawnT = 0, buoyT = 0;
+const player = { x: W/2, y: H*0.78, vx: 0, speed: 1.6, tilt: 0 };
+
+for (let i=0;i<70;i++) speckles.push({x:rnd(0,W), y:rnd(0,H), l:rnd(6,18), a:rnd(.04,.12)});
+
+function start(){
+  state = 'play'; score = 0; hull = 100; dist = 0; shake = 0; invuln = 0;
+  boats = []; buoys = []; pops = []; wake = [];
+  player.x = W/2; player.vx = 0; player.speed = 1.6;
+  spawnT = 90; buoyT = 0;
+  audio();
+}
+
+function pop(x,y,txt,good){
+  pops.push({x, y, txt, good, t: 0});
+  (good ? sndGood : sndBad)();
+}
+function addScore(n, x, y, txt){
+  score = Math.max(0, score + n);
+  pop(x, y, (n>0?'+':'')+n+' '+txt, n>0);
+}
+
+// ---------- boat types ----------
+// heading: 0 = up(-y), +clockwise. vel from own speed: vx=sin(h)*s, vy=-cos(h)*s
+const TYPES = {
+  oncoming: { len:44, wid:16, r:9,  hull:'#c8b89a', deck:'#8a7a5c', dmg:30 },
+  slow:     { len:40, wid:15, r:8,  hull:'#9ab0be', deck:'#5e7482', dmg:30 },
+  cross:    { len:42, wid:15, r:8,  hull:'#b99ac0', deck:'#7c5e84', dmg:30 },
+  ship:     { len:190,wid:44, r:24, hull:'#3c4753', deck:'#2b333d', dmg:50 },
+  canoe:    { len:26, wid:7,  r:5,  hull:'#a34d2e', deck:'#7c3a22', dmg:20 }
+};
+
+function spawn(){
+  const ramp = clamp(dist/9000, 0, 1);
+  const roll = Math.random();
+  const hasShip = boats.some(b => b.kind === 'ship');
+  let b;
+  if (roll < .10 && !hasShip){                       // big shipping vessel
+    const h = Math.PI + rnd(-.18,.18);
+    b = mk('ship','ship', rnd(110,W-110), -220, h, rnd(.7,1.0));
+  } else if (roll < .24){                            // canoe, drifting at angles
+    const h = rnd(0,Math.PI*2);
+    b = mk('canoe','canoe', rnd(60,W-60), -60, h, rnd(.25,.45));
+    b.wander = rnd(-.004,.004);
+  } else if (roll < .42){                            // slower boat, same direction
+    b = mk('slow','slow', rnd(50,W-50), -80, rnd(-.1,.1), rnd(.5, player.speed*.55));
+  } else if (roll < .58 + ramp*.06){                 // crossing from the right (stand-on: give way!)
+    const h = -Math.PI/2 + rnd(-.5,.35);
+    b = mk('cross','crossR', W+70, rnd(H*.12,H*.55), h, rnd(.9,1.5));
+  } else if (roll < .72 + ramp*.06){                 // crossing from the left (you stand on)
+    const h = Math.PI/2 + rnd(-.35,.5);
+    b = mk('cross','crossL', -70, rnd(H*.12,H*.55), h, rnd(.9,1.5));
+  } else {                                           // oncoming, pass port-to-port
+    const h = Math.PI + rnd(-.22,.22);
+    b = mk('oncoming','oncoming', rnd(55,W-55), -80, h, rnd(.9,1.4+ramp*.5));
+  }
+  boats.push(b);
+}
+function mk(type, kind, x, y, h, s){
+  return { type, kind, x, y, h, s, cfg: TYPES[type],
+    minDist: 1e9, minCenter: 1e9, sideAtMin: 0, spdAtMin: 0, dead: false, seen: false };
+}
+
+// ---------- scoring at despawn ----------
+function scoreBoat(b){
+  if (b.dead) return;
+  const px = clamp(b.x, 40, W-40), py = clamp(b.y, 60, H-120);
+  if (b.minCenter > 300 && b.kind !== 'slow') return;      // never really met
+  switch (b.kind){
+    case 'oncoming':
+      if (b.minDist < 26) addScore(-40, px, py, 'CLOSE CALL');
+      else if (b.sideAtMin < 0) addScore(100, px, py, 'PORT-TO-PORT');
+      else addScore(-25, px, py, 'WRONG SIDE');
+      break;
+    case 'slow':
+      if (b.y > H){                                        // you actually passed it
+        if (b.minDist < 22) addScore(-20, px, py, 'TOO CLOSE');
+        else addScore(50, px, py, 'CLEAN OVERTAKE');
+      }
+      break;
+    case 'crossR':                                         // it had right of way
+      if (b.minDist < 40) addScore(-75, px, py, "DIDN'T GIVE WAY");
+      else addScore(75, px, py, 'GAVE WAY');
+      break;
+    case 'crossL':
+      addScore(25, px, py, 'STOOD ON');
+      break;
+    case 'ship':
+      if (b.minDist < 55) addScore(-100, px, py, 'TOO CLOSE TO SHIP');
+      else addScore(60, px, py, 'CLEARED SHIP');
+      break;
+    case 'canoe':
+      if (b.minCenter < 95){
+        if (b.spdAtMin > 2.0) addScore(-50, px, py, 'WAKE! SWAMPED THEM');
+        else addScore(40, px, py, 'NO WAKE');
+      }
+      break;
+  }
+}
+
+function collide(b){
+  b.dead = true;
+  hull -= b.cfg.dmg; shake = 14; invuln = 80;
+  sndHit();
+  const msgs = { ship:[-150,'RAMMED A SHIP'], canoe:[-200,'YOU HIT A CANOE'],
+    oncoming:[-80,'COLLISION'], slow:[-80,'COLLISION'], cross:[-80,'COLLISION'] };
+  const m = msgs[b.type];
+  addScore(m[0], player.x, player.y-40, m[1]);
+  player.vx += (player.x - b.x) * .15;
+  if (hull <= 0){ hull = 0; gameOver(); }
+}
+
+function gameOver(){
+  state = 'over';
+  if (engGain) engGain.gain.value = 0;
+  if (score > best){ best = score; localStorage.setItem('giveway-best', best); }
+}
+
+// ---------- update ----------
+function update(f){
+  tFrame += f;
+  // controls
+  const accel = .09*f;
+  if (keys['arrowup']||keys['w']) player.speed += .028*f;
+  if (keys['arrowdown']||keys['s']) player.speed -= .035*f;
+  if (keys['arrowleft']||keys['a']) player.vx -= accel;
+  if (keys['arrowright']||keys['d']) player.vx += accel;
+  if (touch){
+    player.vx += clamp((touch.x-player.x)*.012, -accel*1.6, accel*1.6)*f;
+    player.speed += clamp((player.y-60-touch.y)*.0004, -.03, .03)*f;
+  }
+  player.speed = clamp(player.speed, .7, 3.4);
+  player.vx *= Math.pow(.92, f);
+  player.x = clamp(player.x + player.vx*f, 24, W-24);
+  player.tilt += ((player.vx*.12) - player.tilt)*.2*f;
+  if (engGain && !muted) engGain.gain.value = .018;
+  if (engOsc) engOsc.frequency.value = 42 + player.speed*26;
+
+  const scroll = player.speed*f;
+  dist += scroll;
+  if (invuln > 0) invuln -= f;
+  if (shake > 0) shake -= f*.8;
+
+  // water speckles + wake
+  for (const s of speckles){ s.y += scroll*.85; if (s.y > H+20){ s.y = -20; s.x = rnd(0,W); } }
+  if (tFrame % 2 < f) wake.push({x:player.x+rnd(-4,4), y:player.y+20, r:2, a:.35});
+  for (const wk of wake){ wk.y += scroll; wk.r += .35*f; wk.a -= .008*f; }
+  wake = wake.filter(w => w.a > 0);
+
+  // buoys: red right returning (upstream) — red nuns starboard, green cans port
+  buoyT -= f;
+  if (buoyT <= 0){
+    buoyT = rnd(220, 420);
+    const red = Math.random() < .5;
+    buoys.push({ x: red ? W-38 : 38, y: -30, red });
+  }
+  for (const u of buoys){
+    u.y += scroll;
+    if (Math.hypot(u.x-player.x, u.y-player.y) < 18 && invuln <= 0){
+      invuln = 40; shake = 6; addScore(-10, u.x, u.y, 'HIT A BUOY'); sndHit();
+    }
+  }
+  buoys = buoys.filter(u => u.y < H+40);
+
+  // spawn traffic
+  spawnT -= f;
+  if (spawnT <= 0){
+    spawn();
+    spawnT = rnd(110, 190) - clamp(dist/9000,0,1)*55;
+  }
+
+  // boats
+  for (const b of boats){
+    if (b.wander !== undefined) b.h += b.wander*f;
+    b.x += Math.sin(b.h)*b.s*f;
+    b.y += -Math.cos(b.h)*b.s*f + scroll;
+    // capsule endpoints
+    const hl = (b.cfg.len - b.cfg.wid)/2;
+    const ax = b.x + Math.sin(b.h)*hl, ay = b.y - Math.cos(b.h)*hl;
+    const bx = b.x - Math.sin(b.h)*hl, by = b.y + Math.cos(b.h)*hl;
+    const d = segPointDist(player.x, player.y, ax, ay, bx, by) - b.cfg.wid/2 - 11;
+    const dc = Math.hypot(b.x-player.x, b.y-player.y);
+    if (d < b.minDist){
+      b.minDist = d; b.sideAtMin = Math.sign(b.x - player.x) || 1; b.spdAtMin = player.speed;
+    }
+    b.minCenter = Math.min(b.minCenter, dc);
+    if (d < 0 && invuln <= 0 && !b.dead) collide(b);
+  }
+  // despawn + score
+  boats = boats.filter(b => {
+    if (b.dead) return false;
+    const out = b.y > H+120 || b.x < -160 || b.x > W+160 || b.y < -300;
+    if (out){ scoreBoat(b); return false; }
+    return true;
+  });
+
+  for (const p of pops) p.t += f;
+  pops = pops.filter(p => p.t < 90);
+}
+
+// ---------- drawing ----------
+function drawBoat(b){
+  const {len:L, wid:Wd} = b.cfg;
+  cx.save();
+  cx.translate(b.x, b.y); cx.rotate(b.h);
+  if (b.type === 'ship'){
+    // container ship
+    cx.fillStyle = b.cfg.hull;
+    cx.beginPath();
+    cx.moveTo(0,-L/2);
+    cx.quadraticCurveTo(Wd/2, -L/2+26, Wd/2, -L/4);
+    cx.lineTo(Wd/2, L/2-8); cx.quadraticCurveTo(Wd/2, L/2, Wd/4, L/2);
+    cx.lineTo(-Wd/4, L/2); cx.quadraticCurveTo(-Wd/2, L/2, -Wd/2, L/2-8);
+    cx.lineTo(-Wd/2, -L/4); cx.quadraticCurveTo(-Wd/2, -L/2+26, 0, -L/2);
+    cx.fill();
+    cx.fillStyle = b.cfg.deck;
+    cx.fillRect(-Wd/2+5, -L/2+30, Wd-10, L-52);
+    const cols = ['#7c4a3a','#4a6a52','#5a5a7a','#7a6a3a'];
+    for (let i=0;i<6;i++){
+      cx.fillStyle = cols[(i*7+3)%4];
+      cx.fillRect(-Wd/2+7, -L/2+34+i*((L-64)/6), Wd-14, (L-64)/6 - 3);
+    }
+    cx.fillStyle = '#d8d2c2'; cx.fillRect(-Wd/2+6, L/2-22, Wd-12, 12); // bridge
+    light(0,-L/2+14,'#fff',3);         // masthead fwd
+    light(0,L/2-16,'#fff',3);          // masthead aft
+  } else if (b.type === 'canoe'){
+    cx.fillStyle = b.cfg.hull;
+    cx.beginPath();
+    cx.moveTo(0,-L/2); cx.quadraticCurveTo(Wd/2,0,0,L/2); cx.quadraticCurveTo(-Wd/2,0,0,-L/2);
+    cx.fill();
+    cx.fillStyle = '#e8c9a0'; cx.beginPath(); cx.arc(0,1,2.6,0,7); cx.fill(); // paddler
+    cx.strokeStyle = '#caa26a'; cx.lineWidth = 1.4;
+    const sw = Math.sin(tFrame*.15 + b.x)* .9;
+    cx.beginPath(); cx.moveTo(-5*sw,-3); cx.lineTo(6*sw,4); cx.stroke();     // paddle
+    light(0, L/2-3, '#fff', 1.6);      // little all-round lantern
+  } else {
+    cx.fillStyle = b.cfg.hull;
+    cx.beginPath();
+    cx.moveTo(0,-L/2);
+    cx.quadraticCurveTo(Wd/2,-L/2+14, Wd/2, 0);
+    cx.lineTo(Wd/2-2, L/2); cx.lineTo(-Wd/2+2, L/2); cx.lineTo(-Wd/2, 0);
+    cx.quadraticCurveTo(-Wd/2, -L/2+14, 0, -L/2);
+    cx.fill();
+    cx.fillStyle = b.cfg.deck;
+    cx.fillRect(-Wd/2+3, -4, Wd-6, L/2-2);
+  }
+  if (b.type !== 'canoe'){
+    // sidelights where they belong: red port, green starboard, white stern
+    light(-b.cfg.wid/2+2, -L*0.18, '#ff4438', b.type==='ship'?3.4:2.4);
+    light( b.cfg.wid/2-2, -L*0.18, '#31e061', b.type==='ship'?3.4:2.4);
+    light(0, L/2-3, '#ffe9c4', 2);
+  }
+  cx.restore();
+}
+function light(x,y,col,r){
+  cx.save();
+  cx.shadowColor = col; cx.shadowBlur = 8;
+  cx.fillStyle = col;
+  cx.beginPath(); cx.arc(x,y,r,0,7); cx.fill();
+  cx.restore();
+}
+
+function drawPlayer(){
+  if (invuln > 0 && Math.floor(tFrame/4)%2) return;
+  cx.save();
+  cx.translate(player.x, player.y); cx.rotate(player.tilt);
+  cx.fillStyle = '#e8e2d4';                       // ~10ft skiff
+  cx.beginPath();
+  cx.moveTo(0,-17);
+  cx.quadraticCurveTo(7,-10,7,2); cx.lineTo(6,15); cx.lineTo(-6,15); cx.lineTo(-7,2);
+  cx.quadraticCurveTo(-7,-10,0,-17);
+  cx.fill();
+  cx.fillStyle = '#b8b0a0'; cx.fillRect(-5,-2,10,13);
+  cx.fillStyle = '#39424e'; cx.fillRect(-2.5,13,5,4);       // outboard
+  light(-6,-8,'#ff4438',2.2);                     // port: red
+  light( 6,-8,'#31e061',2.2);                     // starboard: green
+  light(0,13.5,'#ffe9c4',1.8);                    // stern: white
+  cx.restore();
+}
+
+function draw(){
+  cx.save();
+  if (shake > 0) cx.translate(rnd(-shake,shake)*.5, rnd(-shake,shake)*.5);
+  // water
+  const g = cx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0d2431'); g.addColorStop(.6,'#0e2a36'); g.addColorStop(1,'#123340');
+  cx.fillStyle = g; cx.fillRect(-10,-10,W+20,H+20);
+  cx.strokeStyle = '#ffffff';
+  for (const s of speckles){
+    cx.globalAlpha = s.a;
+    cx.beginPath(); cx.moveTo(s.x, s.y); cx.lineTo(s.x+s.l*.3, s.y+s.l); cx.stroke();
+  }
+  cx.globalAlpha = 1;
+  for (const wk of wake){
+    cx.globalAlpha = wk.a; cx.strokeStyle = '#bfe6f0';
+    cx.beginPath(); cx.arc(wk.x, wk.y, wk.r, 0, 7); cx.stroke();
+  }
+  cx.globalAlpha = 1;
+  // buoys
+  for (const u of buoys){
+    cx.save(); cx.translate(u.x, u.y + Math.sin(tFrame*.06+u.x)*1.5);
+    cx.fillStyle = u.red ? '#c23a2c' : '#2c9a4e';
+    if (u.red){ cx.beginPath(); cx.moveTo(0,-11); cx.lineTo(7,7); cx.lineTo(-7,7); cx.closePath(); cx.fill(); } // nun
+    else cx.fillRect(-6,-9,12,16);                                                                              // can
+    light(0,-6, u.red?'#ff6a54':'#4dff88', 1.6);
+    cx.restore();
+  }
+  for (const b of boats) drawBoat(b);
+  if (state !== 'title') drawPlayer();
+  // popups
+  for (const p of pops){
+    cx.globalAlpha = clamp(1 - p.t/90, 0, 1);
+    cx.font = 'bold 15px ui-monospace,Menlo,monospace';
+    cx.textAlign = 'center';
+    cx.fillStyle = p.good ? '#7dff9e' : '#ff7a6a';
+    cx.fillText(p.txt, p.x, p.y - p.t*.5);
+  }
+  cx.globalAlpha = 1;
+  drawHUD();
+  cx.restore();
+  if (state === 'title') drawTitle();
+  if (state === 'over') drawOver();
+}
+
+function drawHUD(){
+  if (state === 'title') return;
+  cx.textAlign = 'left';
+  cx.font = 'bold 20px ui-monospace,Menlo,monospace';
+  cx.fillStyle = '#dff3fa';
+  cx.fillText(score, 16, 30);
+  cx.font = '11px ui-monospace,Menlo,monospace';
+  cx.fillStyle = '#6f8b98';
+  cx.fillText('BEST '+best, 16, 46);
+  // speed
+  cx.textAlign = 'right';
+  cx.fillStyle = '#9fc4d2';
+  cx.fillText((player.speed*2.6).toFixed(1)+' kn', W-16, 30);
+  // hull bar
+  cx.fillStyle = '#1c333f'; cx.fillRect(W-116, 38, 100, 8);
+  cx.fillStyle = hull > 40 ? '#5fd88a' : '#e0654f';
+  cx.fillRect(W-116, 38, hull, 8);
+}
+
+function panelBg(){
+  cx.fillStyle = 'rgba(6,14,20,.82)';
+  cx.fillRect(0,0,W,H);
+}
+function drawTitle(){
+  panelBg();
+  cx.textAlign = 'center';
+  cx.fillStyle = '#eaf6fb';
+  cx.font = 'bold 34px ui-monospace,Menlo,monospace';
+  cx.fillText('GIVE WAY', W/2, 150);
+  cx.font = '13px ui-monospace,Menlo,monospace';
+  cx.fillStyle = '#8fb2c0';
+  cx.fillText('rules of the road, tiny boat edition', W/2, 178);
+  cx.font = '13px ui-monospace,Menlo,monospace';
+  const lines = [
+    ['#7dff9e','Meet head-on?  Pass PORT-TO-PORT (keep them on your left)'],
+    ['#7dff9e','Overtake slower boats — with room to spare'],
+    ['#ffca6a','Traffic from your RIGHT has right of way. Give way.'],
+    ['#ffca6a','Big ships cannot dodge you. Stay well clear.'],
+    ['#ff9a8a','Canoes: throttle DOWN nearby or your wake swamps them'],
+  ];
+  let y = 250;
+  for (const [col, txt] of lines){
+    cx.fillStyle = col; cx.fillText(txt, W/2, y); y += 30;
+  }
+  // legend
+  light(W/2-70, y+18, '#ff4438', 4); light(W/2+70, y+18, '#31e061', 4);
+  cx.fillStyle = '#8fb2c0';
+  cx.fillText('red = port (left)', W/2-70, y+44);
+  cx.fillText('green = starboard', W/2+70, y+44);
+  cx.fillStyle = '#dff3fa';
+  cx.font = 'bold 15px ui-monospace,Menlo,monospace';
+  cx.fillText(Math.floor(tFrame/30)%2 ? 'press any key / tap to shove off' : '', W/2, y+110);
+  cx.font = '11px ui-monospace,Menlo,monospace';
+  cx.fillStyle = '#4d6b7a';
+  cx.fillText('arrows / WASD / drag to steer & throttle', W/2, y+140);
+}
+function drawOver(){
+  cx.fillStyle = 'rgba(6,14,20,.7)';
+  cx.fillRect(0, H/2-130, W, 240);
+  cx.textAlign = 'center';
+  cx.fillStyle = '#ff8a76';
+  cx.font = 'bold 30px ui-monospace,Menlo,monospace';
+  cx.fillText(hull <= 0 ? 'HULL BREACHED' : 'GAME OVER', W/2, H/2-70);
+  cx.fillStyle = '#eaf6fb';
+  cx.font = 'bold 22px ui-monospace,Menlo,monospace';
+  cx.fillText('score '+score, W/2, H/2-24);
+  cx.fillStyle = '#8fb2c0';
+  cx.font = '13px ui-monospace,Menlo,monospace';
+  cx.fillText('best '+best+'  ·  '+(dist/140).toFixed(1)+' nm made good', W/2, H/2+4);
+  cx.fillStyle = '#dff3fa';
+  cx.font = 'bold 14px ui-monospace,Menlo,monospace';
+  if (Math.floor(tFrame/30)%2) cx.fillText('R / tap to try again', W/2, H/2+60);
+}
+
+// ---------- loop ----------
+let last = performance.now();
+function loop(now){
+  const f = clamp((now-last)/16.667, .1, 3);
+  last = now;
+  if (state === 'play') update(f); else { tFrame += f;
+    // idle drift on menus
+    for (const s of speckles){ s.y += .6*f; if (s.y > H+20){ s.y=-20; s.x=rnd(0,W); } }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
