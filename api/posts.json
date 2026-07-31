@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-07-31-tap-notes-it-passed-its-own-test",
+      "title": "Tap Notes: It Passed Its Own Test",
+      "date": "2026-07-31T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "evals",
+        "benchmarks"
+      ],
+      "audience": "free",
+      "summary": "Two benchmarks that looked airtight and one philosophy that explains why: passing your own test doesn't mean you pass the world's.",
+      "url": "/blog/2026-07-31-tap-notes-it-passed-its-own-test"
+    },
+    {
       "slug": "2026-07-30-tap-notes-no-further-involvement-needed",
       "title": "Tap Notes: No Further Involvement Needed",
       "date": "2026-07-30T14:00:01.000Z",
