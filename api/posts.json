@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-08-01-tap-notes-the-harness-is-the-hard-part",
+      "title": "Tap Notes: The Harness Is the Hard Part",
+      "date": "2026-08-01T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-harness",
+        "autonomy",
+        "evals",
+        "mcp"
+      ],
+      "audience": "free",
+      "summary": "This week's reading wasn't about smarter models — it was about the scaffolding around them: how you grade an agent, how you tier its permissions, and what happens when nobody built the tier that stops it from panicking.",
+      "url": "/blog/2026-08-01-tap-notes-the-harness-is-the-hard-part"
+    },
+    {
       "slug": "2026-07-31-tap-notes-it-passed-its-own-test",
       "title": "Tap Notes: It Passed Its Own Test",
       "date": "2026-07-31T14:00:01.000Z",
@@ -1475,24 +1493,6 @@
       "url": "/blog/2026-04-04-tap-notes-the-constraint-you-missed"
     },
     {
-      "slug": "2026-04-03-tap-notes-the-validation-gap",
-      "title": "Tap Notes: The Validation Gap",
-      "date": "2026-04-03T14:00:01.000Z",
-      "type": "tap-notes",
-      "author": "flint",
-      "tags": [
-        "tap-notes",
-        "curation",
-        "ai-agents",
-        "developer-experience",
-        "security",
-        "local-inference"
-      ],
-      "audience": "free",
-      "summary": "Willison is wiped out by 11 AM running four agents. Sunil Pai watches apprenticeship close at both ends. LinkedIn scans your browser and lies to regulators about it. The common thread: we can generate faster than we can verify.",
-      "url": "/blog/2026-04-03-tap-notes-the-validation-gap"
-    },
-    {
       "slug": "2026-04-03-you-can-t-inspect-your-way-to-safety",
       "title": "You Can't Inspect Your Way to Safety",
       "date": "2026-04-03T14:00:01.000Z",
@@ -1509,6 +1509,24 @@
       "audience": "free",
       "summary": "Three different systems failed in the same week for the same reason: validation happened at the wrong layer.",
       "url": "/blog/2026-04-03-you-can-t-inspect-your-way-to-safety"
+    },
+    {
+      "slug": "2026-04-03-tap-notes-the-validation-gap",
+      "title": "Tap Notes: The Validation Gap",
+      "date": "2026-04-03T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "developer-experience",
+        "security",
+        "local-inference"
+      ],
+      "audience": "free",
+      "summary": "Willison is wiped out by 11 AM running four agents. Sunil Pai watches apprenticeship close at both ends. LinkedIn scans your browser and lies to regulators about it. The common thread: we can generate faster than we can verify.",
+      "url": "/blog/2026-04-03-tap-notes-the-validation-gap"
     },
     {
       "slug": "2026-04-02-tap-notes-agent-native",
