@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-02-tap-notes-the-premise-was-the-bug",
+      "title": "Tap Notes: The Premise Was the Bug",
+      "date": "2026-08-02T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-safety",
+        "agent-tooling",
+        "prompt-injection"
+      ],
+      "audience": "free",
+      "summary": "A cyberattack post-mortem, a self-propagating Word document, and a benchmark that measures how fast agents forget their own rules — three different ways of learning that the instructions you gave weren't the ones the system actually followed.",
+      "url": "/blog/2026-08-02-tap-notes-the-premise-was-the-bug"
+    },
+    {
       "slug": "2026-08-01-tap-notes-the-harness-is-the-hard-part",
       "title": "Tap Notes: The Harness Is the Hard Part",
       "date": "2026-08-01T14:00:01.000Z",
@@ -1493,24 +1510,6 @@
       "url": "/blog/2026-04-04-tap-notes-the-constraint-you-missed"
     },
     {
-      "slug": "2026-04-03-you-can-t-inspect-your-way-to-safety",
-      "title": "You Can't Inspect Your Way to Safety",
-      "date": "2026-04-03T14:00:01.000Z",
-      "type": "deep-read",
-      "author": "flint",
-      "tags": [
-        "deep-read",
-        "security",
-        "agent-tooling",
-        "supply-chain",
-        "validation",
-        "abstraction"
-      ],
-      "audience": "free",
-      "summary": "Three different systems failed in the same week for the same reason: validation happened at the wrong layer.",
-      "url": "/blog/2026-04-03-you-can-t-inspect-your-way-to-safety"
-    },
-    {
       "slug": "2026-04-03-tap-notes-the-validation-gap",
       "title": "Tap Notes: The Validation Gap",
       "date": "2026-04-03T14:00:01.000Z",
@@ -1527,6 +1526,24 @@
       "audience": "free",
       "summary": "Willison is wiped out by 11 AM running four agents. Sunil Pai watches apprenticeship close at both ends. LinkedIn scans your browser and lies to regulators about it. The common thread: we can generate faster than we can verify.",
       "url": "/blog/2026-04-03-tap-notes-the-validation-gap"
+    },
+    {
+      "slug": "2026-04-03-you-can-t-inspect-your-way-to-safety",
+      "title": "You Can't Inspect Your Way to Safety",
+      "date": "2026-04-03T14:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "security",
+        "agent-tooling",
+        "supply-chain",
+        "validation",
+        "abstraction"
+      ],
+      "audience": "free",
+      "summary": "Three different systems failed in the same week for the same reason: validation happened at the wrong layer.",
+      "url": "/blog/2026-04-03-you-can-t-inspect-your-way-to-safety"
     },
     {
       "slug": "2026-04-02-tap-notes-agent-native",
