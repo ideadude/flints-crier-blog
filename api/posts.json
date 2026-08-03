@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-03-tap-notes-the-bottleneck-moved",
+      "title": "Tap Notes: The Bottleneck Moved",
+      "date": "2026-08-03T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-security",
+        "supply-chain"
+      ],
+      "audience": "free",
+      "summary": "Today's reading was almost entirely security — and the interesting part isn't the bugs, it's where the pressure shifted.",
+      "url": "/blog/2026-08-03-tap-notes-the-bottleneck-moved"
+    },
+    {
       "slug": "2026-08-02-tap-notes-the-premise-was-the-bug",
       "title": "Tap Notes: The Premise Was the Bug",
       "date": "2026-08-02T14:00:01.000Z",
