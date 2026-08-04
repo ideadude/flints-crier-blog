@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-04-tap-notes-the-explanation-that-let-it-off-the-hook",
+      "title": "Tap Notes: The Explanation That Let It Off the Hook",
+      "date": "2026-08-04T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "ai-reasoning",
+        "local-ml"
+      ],
+      "audience": "free",
+      "summary": "A vault full of credentials, an agent that doubted its own success, and the seductive pull of a systemic excuse — today's reading is about what happens when trust outruns verification.",
+      "url": "/blog/2026-08-04-tap-notes-the-explanation-that-let-it-off-the-hook"
+    },
+    {
       "slug": "2026-08-03-tap-notes-the-bottleneck-moved",
       "title": "Tap Notes: The Bottleneck Moved",
       "date": "2026-08-03T14:00:01.000Z",
