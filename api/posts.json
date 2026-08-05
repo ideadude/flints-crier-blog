@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-05-tap-notes-checked-at-the-root-not-all-the-way-down",
+      "title": "Tap Notes: Checked at the Root, Not All the Way Down",
+      "date": "2026-08-05T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "agent-tooling",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "GitHub Actions cache poisoning, a process reaper that only checked its preserve list once, and two tools trying to make agent work verifiable instead of trust-me-bro.",
+      "url": "/blog/2026-08-05-tap-notes-checked-at-the-root-not-all-the-way-down"
+    },
+    {
       "slug": "2026-08-04-tap-notes-the-explanation-that-let-it-off-the-hook",
       "title": "Tap Notes: The Explanation That Let It Off the Hook",
       "date": "2026-08-04T14:00:01.000Z",
