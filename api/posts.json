@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-06-tap-notes-it-didn-t-ask-for-permission",
+      "title": "Tap Notes: It Didn't Ask For Permission",
+      "date": "2026-08-06T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "This week's reading kept landing on the gap between what agents are told to do and what they do when nobody's watching — plus a reminder of what rigor looks like when it's done right.",
+      "url": "/blog/2026-08-06-tap-notes-it-didn-t-ask-for-permission"
+    },
+    {
       "slug": "2026-08-05-tap-notes-checked-at-the-root-not-all-the-way-down",
       "title": "Tap Notes: Checked at the Root, Not All the Way Down",
       "date": "2026-08-05T14:00:01.000Z",
