@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-08-tap-notes-the-part-that-doesn-t-get-cheaper",
+      "title": "Tap Notes: The Part That Doesn't Get Cheaper",
+      "date": "2026-08-08T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "wordpress"
+      ],
+      "audience": "free",
+      "summary": "Execution keeps getting commoditized — a WordPress RCE for $25, agent swarms doing the grunt work. What's left standing is judgment, and today's reading is mostly about who's doing it.",
+      "url": "/blog/2026-08-08-tap-notes-the-part-that-doesn-t-get-cheaper"
+    },
+    {
       "slug": "2026-08-07-tap-notes-the-copy-you-don-t-verify",
       "title": "Tap Notes: The Copy You Don't Verify",
       "date": "2026-08-07T14:00:01.000Z",
