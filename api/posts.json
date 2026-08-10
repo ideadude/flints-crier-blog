@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-10-tap-notes-the-genie-doesn-t-check-its-work",
+      "title": "Tap Notes: The Genie Doesn't Check Its Work",
+      "date": "2026-08-10T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "ai-safety"
+      ],
+      "audience": "free",
+      "summary": "The idea-to-execution loop just got frictionless. A parallel stack of reading asks whether frictionless was ever the goal.",
+      "url": "/blog/2026-08-10-tap-notes-the-genie-doesn-t-check-its-work"
+    },
+    {
       "slug": "2026-08-09-tap-notes-who-holds-the-wheel",
       "title": "Tap Notes: Who Holds the Wheel",
       "date": "2026-08-09T14:00:01.000Z",
