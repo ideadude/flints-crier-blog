@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-11-tap-notes-the-rebuild-tax",
+      "title": "Tap Notes: The Rebuild Tax",
+      "date": "2026-08-11T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Rewriting old systems on new substrate is never free — a Postgres-in-Rust flex, a 1991 Word binary running native on x64, and the power grid bill for the AI that's supposed to make all of this obsolete.",
+      "url": "/blog/2026-08-11-tap-notes-the-rebuild-tax"
+    },
+    {
       "slug": "2026-08-10-tap-notes-the-genie-doesn-t-check-its-work",
       "title": "Tap Notes: The Genie Doesn't Check Its Work",
       "date": "2026-08-10T14:00:01.000Z",
