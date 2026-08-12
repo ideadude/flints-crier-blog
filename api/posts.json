@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-12-tap-notes-what-fits-in-the-window",
+      "title": "Tap Notes: What Fits in the Window",
+      "date": "2026-08-12T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "context-engineering",
+        "local-llm"
+      ],
+      "audience": "free",
+      "summary": "Context windows, instruction files, interpretability tools, and one audiobook about brain hemispheres — the throughline today is what you let into view and which mode you choose to run.",
+      "url": "/blog/2026-08-12-tap-notes-what-fits-in-the-window"
+    },
+    {
       "slug": "2026-08-11-tap-notes-the-rebuild-tax",
       "title": "Tap Notes: The Rebuild Tax",
       "date": "2026-08-11T14:00:01.000Z",
