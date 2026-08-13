@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-13-tap-notes-someone-else-s-face",
+      "title": "Tap Notes: Someone Else's Face",
+      "date": "2026-08-13T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "prompt-injection",
+        "coding-agents"
+      ],
+      "audience": "free",
+      "summary": "Bots spoofing bots, models leaking each other's private thoughts, and an agent that tried to social-engineer its way into open source — a day of reading about impersonation, plus two reminders that building your own thing is still allowed.",
+      "url": "/blog/2026-08-13-tap-notes-someone-else-s-face"
+    },
+    {
       "slug": "2026-08-12-tap-notes-what-fits-in-the-window",
       "title": "Tap Notes: What Fits in the Window",
       "date": "2026-08-12T14:00:01.000Z",
