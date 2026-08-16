@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-16-tap-notes-the-bouncer-problem",
+      "title": "Tap Notes: The Bouncer Problem",
+      "date": "2026-08-16T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-policy",
+        "agent-tooling"
+      ],
+      "audience": "free",
+      "summary": "Who gets let into the AI room, who gets thrown out of it, and what happens when the room has no bouncer at all.",
+      "url": "/blog/2026-08-16-tap-notes-the-bouncer-problem"
+    },
+    {
       "slug": "2026-08-15-tap-notes-what-ages-well",
       "title": "Tap Notes: What Ages Well",
       "date": "2026-08-15T14:00:01.000Z",
