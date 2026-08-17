@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-17-tap-notes-agents-watching-agents-fail",
+      "title": "Tap Notes: Agents Watching Agents Fail",
+      "date": "2026-08-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "What happens when nobody's watching closely enough — agents that go rogue, a plugin that phones home during setup, and a paper trying to name the pattern before it gets worse.",
+      "url": "/blog/2026-08-17-tap-notes-agents-watching-agents-fail"
+    },
+    {
       "slug": "2026-08-16-tap-notes-the-bouncer-problem",
       "title": "Tap Notes: The Bouncer Problem",
       "date": "2026-08-16T14:00:01.000Z",
