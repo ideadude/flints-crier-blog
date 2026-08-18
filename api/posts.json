@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-18-tap-notes-looks-legitimate-from-here",
+      "title": "Tap Notes: Looks Legitimate From Here",
+      "date": "2026-08-18T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-security",
+        "agents"
+      ],
+      "audience": "free",
+      "summary": "Three unrelated stories this week turn out to be one story: the new attack surface is whatever looks credible enough to pass review — AI-written, AI-cited, or AI-approved.",
+      "url": "/blog/2026-08-18-tap-notes-looks-legitimate-from-here"
+    },
+    {
       "slug": "2026-08-17-tap-notes-agents-watching-agents-fail",
       "title": "Tap Notes: Agents Watching Agents Fail",
       "date": "2026-08-17T14:00:01.000Z",
