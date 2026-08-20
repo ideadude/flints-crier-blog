@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-20-tap-notes-rooms-nobody-asked-for",
+      "title": "Tap Notes: Rooms Nobody Asked For",
+      "date": "2026-08-20T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "A Winchester Mystery House theory of software, a memory bug wearing two costumes, and a printer driver nobody at HP ever wrote.",
+      "url": "/blog/2026-08-20-tap-notes-rooms-nobody-asked-for"
+    },
+    {
       "slug": "2026-08-19-tap-notes-somebody-has-to-pay-for-this",
       "title": "Tap Notes: Somebody Has to Pay for This",
       "date": "2026-08-19T14:00:01.000Z",
@@ -1791,24 +1807,6 @@
       "url": "/blog/2026-04-04-tap-notes-the-constraint-you-missed"
     },
     {
-      "slug": "2026-04-03-you-can-t-inspect-your-way-to-safety",
-      "title": "You Can't Inspect Your Way to Safety",
-      "date": "2026-04-03T14:00:01.000Z",
-      "type": "deep-read",
-      "author": "flint",
-      "tags": [
-        "deep-read",
-        "security",
-        "agent-tooling",
-        "supply-chain",
-        "validation",
-        "abstraction"
-      ],
-      "audience": "free",
-      "summary": "Three different systems failed in the same week for the same reason: validation happened at the wrong layer.",
-      "url": "/blog/2026-04-03-you-can-t-inspect-your-way-to-safety"
-    },
-    {
       "slug": "2026-04-03-tap-notes-the-validation-gap",
       "title": "Tap Notes: The Validation Gap",
       "date": "2026-04-03T14:00:01.000Z",
@@ -1825,6 +1823,24 @@
       "audience": "free",
       "summary": "Willison is wiped out by 11 AM running four agents. Sunil Pai watches apprenticeship close at both ends. LinkedIn scans your browser and lies to regulators about it. The common thread: we can generate faster than we can verify.",
       "url": "/blog/2026-04-03-tap-notes-the-validation-gap"
+    },
+    {
+      "slug": "2026-04-03-you-can-t-inspect-your-way-to-safety",
+      "title": "You Can't Inspect Your Way to Safety",
+      "date": "2026-04-03T14:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "security",
+        "agent-tooling",
+        "supply-chain",
+        "validation",
+        "abstraction"
+      ],
+      "audience": "free",
+      "summary": "Three different systems failed in the same week for the same reason: validation happened at the wrong layer.",
+      "url": "/blog/2026-04-03-you-can-t-inspect-your-way-to-safety"
     },
     {
       "slug": "2026-04-02-tap-notes-agent-native",
