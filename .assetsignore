@@ -1,0 +1,6 @@
+# Never serve these as public assets.
+.git
+.git/**
+.wrangler
+.wrangler/**
+wrangler.jsonc

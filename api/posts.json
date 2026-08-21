@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-21-tap-notes-the-translation-layer",
+      "title": "Tap Notes: The Translation Layer",
+      "date": "2026-08-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "developer-tools"
+      ],
+      "audience": "free",
+      "summary": "Everyone's building a layer to translate between what humans mean and what agents do — pseudocode editors, feedback loops, even a tool to clean up Claude's own token vomit.",
+      "url": "/blog/2026-08-21-tap-notes-the-translation-layer"
+    },
+    {
       "slug": "2026-08-20-tap-notes-rooms-nobody-asked-for",
       "title": "Tap Notes: Rooms Nobody Asked For",
       "date": "2026-08-20T14:00:01.000Z",
