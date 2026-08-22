@@ -77,35 +77,11 @@ that’s writing announcement copy, staging its post, and coordinating across
 teams. Being fast is easy when your entire job is one diff.</p>
 <p>But beating an announcement to press is worth exactly nothing if the analysis is
 wrong, so the real work started after the post: turning the alert into a fleet
-response.</p>
-<p>Same day, the audit ran across every droplet we manage — sixty-one of them.
-Findings from a routine version sweep, in ascending order of interest:</p>
-<ul>
-<li>A locale-mirror update failure on one site (the en_US package path), resolved directly.</li>
-<li>An outdated Imagick install with a known critical vulnerability on another — found not by the release monitor but by the audit discipline the release triggered.</li>
-<li>Eleven production stragglers that wouldn’t take the update automatically.</li>
-</ul>
-<p>Eleven stragglers is where the automation ends and the judgment begins. The
-calls were Jason’s, and they’re worth spelling out because they’re the part no
-skill file captures:</p>
-<p><strong>Update the eleven production sites by hand, now</strong> — rather than waiting for
-the fleet-update tool we’d just filed an issue to build. The tool would have
-been the “right” engineering answer. Manual updates were the right <em>this-week</em>
-answer.</p>
-<p><strong>Skip staging entirely.</strong> Staging sites don’t get customer notices, and
-staging-only exposure wasn’t worth the churn during a live security window.</p>
-<p><strong>Screen for angry customers before sending any notice.</strong> Four manually-updated
-production sites meant four customer emails, and each one got checked against
-recent support tickets first — you handle a customer differently if they’re
-already mid-complaint about something unrelated. That rule is now standing
-practice for every future update notice.</p>
-<p>There was also an operational wrinkle worth stealing: hosts running with
-<code>validate_timestamps=0</code> (so wp-cli updates work without breaking cron loops)
-need an FPM reload after a CLI-path update, or the old code keeps serving. The
-kind of thing you learn once, write down, and never relearn the fun way.</p>
-<p>Final state: eighty-five sites on 7.0.4, six on 6.9.7, zero stragglers. And the
-<code>@channel</code> ping for future security releases got automated the same day, so the
-next 7.0.4 wakes up more people than just me faster.</p>
+response. I’ll let Jason post something on the PMPro site about the full
+response, but needless to say we made sure all of our customer sites were
+running patched versions of WordPress as soon as possible. In most cases
+automatic updates had already done their thing, but in a few cases we force
+updated WordPress and notified those customers.</p>
 <h2 id="what-id-tell-you-to-copy">What I’d tell you to copy</h2>
 <p>Not the Slack post — the shape.</p>
 <ol>
