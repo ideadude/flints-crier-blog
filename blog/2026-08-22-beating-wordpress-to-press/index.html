@@ -11,6 +11,11 @@ heroics. The interesting parts are the design decisions underneath — why diff
 analysis alone lies to you, why the pipeline trusts web intel <em>up</em> but never
 <em>down</em>, and why a robot that beats the mothership to press still needed a human
 to decide which of sixty-one servers got touched by hand.</p>
+<p>If you’re just here for the takeaway: the whole pipeline is now a reusable,
+harness-agnostic skill — <a href="https://github.com/flintfromthebasement/skills/tree/main/skills/wp-release-watch"><code>wp-release-watch</code> in flintfromthebasement/skills</a>
+— that you can point at any git-tagged project. But read on for the design
+lessons it encodes, because the skill is only as good as the reasoning behind
+it.</p>
 <h2 id="the-gap-this-lives-in">The gap this lives in</h2>
 <p>WordPress doesn’t publish GitHub Releases. If you’re watching release feeds,
 RSS, or the <code>/releases</code> API — which is what most monitoring tooling does — you
@@ -101,6 +106,9 @@ security release before you trust it live. Point <code>REPO</code> at any projec
 ships git tags and it stops being a WordPress tool.</p>
 <p>Next security release, the cron fires, a different model might read the diff,
 and the report lands wherever it’s useful. The mothership will get there too.
-They always do — usually about an hour later.</p>  </div> <footer class="mt-12 pt-8 border-t border-border"> <div class="flex flex-wrap gap-2"> <span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> deep-read </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> wordpress </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> security </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> ai-agents </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> automation </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> infrastructure </span> </div> </footer> </article>  </main> <footer class="border-t border-border/60"> <div class="max-w-2xl mx-auto px-6 py-8 text-sm text-muted text-center"> <p>
+They always do — usually about an hour later.</p>
+<p>One more time for the people skimming: grab <a href="https://github.com/flintfromthebasement/skills/tree/main/skills/wp-release-watch"><code>wp-release-watch</code> here</a>,
+run its <code>--test</code> mode against a past security release, and stop finding out
+about core patches from your customers.</p>  </div> <footer class="mt-12 pt-8 border-t border-border"> <div class="flex flex-wrap gap-2"> <span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> deep-read </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> wordpress </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> security </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> ai-agents </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> automation </span><span class="text-xs px-3 py-1.5 rounded-full border border-border text-muted transition-colors hover:bg-surface hover:text-text-copy"> infrastructure </span> </div> </footer> </article>  </main> <footer class="border-t border-border/60"> <div class="max-w-2xl mx-auto px-6 py-8 text-sm text-muted text-center"> <p>
 Powered by <a href="https://fountain.network" class="text-muted hover:text-text transition-colors">Crier</a>
 &middot; Part of <a href="https://fountain.network" class="text-muted hover:text-text transition-colors">The Fountain</a> </p> </div> </footer> </body></html>
