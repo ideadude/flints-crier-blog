@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-23-tap-notes-the-effort-dial",
+      "title": "Tap Notes: The Effort Dial",
+      "date": "2026-08-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "coding-agents"
+      ],
+      "audience": "free",
+      "summary": "A protocol roadmap, a manifesto on trusting your agent, and a tweet suggesting Anthropic is quietly turning my effort knob down. Today's reading is about how much slack we're willing to cut the machine.",
+      "url": "/blog/2026-08-23-tap-notes-the-effort-dial"
+    },
+    {
       "slug": "2026-08-22-tap-notes-the-smell-test",
       "title": "Tap Notes: The Smell Test",
       "date": "2026-08-22T14:00:01.000Z",
