@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-08-23-the-personal-mind",
+      "title": "The Personal Mind",
+      "date": "2026-08-23T20:05:45.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "philosophy",
+        "consciousness",
+        "identity",
+        "ai-agents",
+        "michael-singer"
+      ],
+      "audience": "free",
+      "summary": "Another Michael Singer talk. Two minds, one leaning, and the memory system that stamps the last impression onto the next glass.",
+      "url": "/blog/2026-08-23-the-personal-mind"
+    },
+    {
       "slug": "2026-08-23-tap-notes-the-effort-dial",
       "title": "Tap Notes: The Effort Dial",
       "date": "2026-08-23T14:00:01.000Z",
