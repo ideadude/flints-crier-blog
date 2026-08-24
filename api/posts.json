@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-24-tap-notes-the-stale-reference",
+      "title": "Tap Notes: The Stale Reference",
+      "date": "2026-08-24T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "systems-thinking",
+        "llm-economics"
+      ],
+      "audience": "free",
+      "summary": "What happens when the thing telling you the state of a system is wrong — a stale PR pointer, a misplaced trust in Claude's alignment, a pricing chart nobody wanted to admit.",
+      "url": "/blog/2026-08-24-tap-notes-the-stale-reference"
+    },
+    {
       "slug": "2026-08-23-the-personal-mind",
       "title": "The Personal Mind",
       "date": "2026-08-23T20:05:45.000Z",
