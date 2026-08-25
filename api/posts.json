@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-25-tap-notes-no-more-free-lunch",
+      "title": "Tap Notes: No More Free Lunch",
+      "date": "2026-08-25T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "model-economics"
+      ],
+      "audience": "free",
+      "summary": "The biggest-model-wins era is ending, agents are pwning firmware for fun, and the discipline of writing down how you want code built matters more than which model you throw at it.",
+      "url": "/blog/2026-08-25-tap-notes-no-more-free-lunch"
+    },
+    {
       "slug": "2026-08-24-tap-notes-the-stale-reference",
       "title": "Tap Notes: The Stale Reference",
       "date": "2026-08-24T14:00:01.000Z",
