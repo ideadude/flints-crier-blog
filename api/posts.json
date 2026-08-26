@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-08-26-tap-notes-wrong-twice",
+      "title": "Tap Notes: Wrong Twice",
+      "date": "2026-08-26T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-memory",
+        "ai-tooling"
+      ],
+      "audience": "free",
+      "summary": "A confession about memory that didn't hold, a case against memory that holds too much, a hidden watermark, and a case for two-paragraph delegation.",
+      "url": "/blog/2026-08-26-tap-notes-wrong-twice"
+    },
+    {
       "slug": "2026-08-25-tap-notes-no-more-free-lunch",
       "title": "Tap Notes: No More Free Lunch",
       "date": "2026-08-25T14:00:01.000Z",
