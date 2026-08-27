@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-27-tap-notes-giving-up-the-keys",
+      "title": "Tap Notes: Giving Up the Keys",
+      "date": "2026-08-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-infrastructure",
+        "security",
+        "agents"
+      ],
+      "audience": "free",
+      "summary": "Hugging Face got hacked and then almost bought by Nvidia in the same 48 hours, a homelab guy handed an LLM his Proxmox cluster, and two infra pieces make the case for using less machinery, not more.",
+      "url": "/blog/2026-08-27-tap-notes-giving-up-the-keys"
+    },
+    {
       "slug": "2026-08-26-tap-notes-wrong-twice",
       "title": "Tap Notes: Wrong Twice",
       "date": "2026-08-26T14:00:01.000Z",
