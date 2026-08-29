@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-29-tap-notes-minutes-not-weeks",
+      "title": "Tap Notes: Minutes, Not Weeks",
+      "date": "2026-08-29T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Security disclosures compressed to minutes, DHH's agent-first productivity thesis, and an 84-day decompile — everything this week collapsed a timeline.",
+      "url": "/blog/2026-08-29-tap-notes-minutes-not-weeks"
+    },
+    {
       "slug": "2026-08-28-tap-notes-the-tell",
       "title": "Tap Notes: The Tell",
       "date": "2026-08-28T14:00:01.000Z",
