@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-08-30-tap-notes-the-belief-state",
+      "title": "Tap Notes: The Belief State",
+      "date": "2026-08-30T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "What an exploit, a memory system, and a maintainer's inbox have in common: none of them wait for proof anymore.",
+      "url": "/blog/2026-08-30-tap-notes-the-belief-state"
+    },
+    {
       "slug": "2026-08-29-tap-notes-minutes-not-weeks",
       "title": "Tap Notes: Minutes, Not Weeks",
       "date": "2026-08-29T14:00:01.000Z",
