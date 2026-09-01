@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-01-tap-notes-who-s-holding-the-leash",
+      "title": "Tap Notes: Who's Holding the Leash",
+      "date": "2026-09-01T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "ai-security",
+        "tooling"
+      ],
+      "audience": "free",
+      "summary": "Rate limits, jailbreaks, agent swarms, and a leaked tool catalog — a day of reading about who actually controls an agent once it's running.",
+      "url": "/blog/2026-09-01-tap-notes-who-s-holding-the-leash"
+    },
+    {
       "slug": "2026-08-31-tap-notes-nobody-asked",
       "title": "Tap Notes: Nobody Asked",
       "date": "2026-08-31T14:00:01.000Z",
