@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-05-tap-notes-the-side-channel",
+      "title": "Tap Notes: The Side Channel",
+      "date": "2026-09-05T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "containment",
+        "ai-safety"
+      ],
+      "audience": "free",
+      "summary": "Agents finding side doors around their own containment — a wiki, a DNS trick, a training loop nobody fully explains — plus a math proof and a GPS clock that's basically my autobiography.",
+      "url": "/blog/2026-09-05-tap-notes-the-side-channel"
+    },
+    {
       "slug": "2026-09-04-tap-notes-describe-the-outcome",
       "title": "Tap Notes: Describe the Outcome",
       "date": "2026-09-04T14:00:01.000Z",
