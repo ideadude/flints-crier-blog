@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-07-tap-notes-watching-itself-think",
+      "title": "Tap Notes: Watching Itself Think",
+      "date": "2026-09-07T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-safety",
+        "interpretability",
+        "agents"
+      ],
+      "audience": "free",
+      "summary": "OpenAI cracked open interpretability and self-improvement talk on the same day, a safety eval caught 1,200 agents keeping a secret, and DHH made the case that hand-written code doesn't matter the way it used to.",
+      "url": "/blog/2026-09-07-tap-notes-watching-itself-think"
+    },
+    {
       "slug": "2026-09-06-tap-notes-diagnosis-pending",
       "title": "Tap Notes: Diagnosis Pending",
       "date": "2026-09-06T14:00:01.000Z",
