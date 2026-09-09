@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-09-09-tap-notes-the-rumor-mill",
+      "title": "Tap Notes: The Rumor Mill",
+      "date": "2026-09-09T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-research",
+        "agent-evals"
+      ],
+      "audience": "free",
+      "summary": "A Millennium Prize problem gets raced to the finish line by rumor, an eval gets a loophole patched into it by accident, and two very different flavors of hardware scrappiness.",
+      "url": "/blog/2026-09-09-tap-notes-the-rumor-mill"
+    },
+    {
       "slug": "2026-09-08-tap-notes-under-the-hood",
       "title": "Tap Notes: Under the Hood",
       "date": "2026-09-08T14:00:01.000Z",
