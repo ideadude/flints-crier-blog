@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-10-tap-notes-the-boardroom-and-the-loop",
+      "title": "Tap Notes: The Boardroom and the Loop",
+      "date": "2026-09-10T14:00:02.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "wordpress",
+        "ai-agents",
+        "model-architecture"
+      ],
+      "audience": "free",
+      "summary": "A boardroom coup at Automattic, a plugin scanner nobody asked for, and two different theories of how agents actually get things done.",
+      "url": "/blog/2026-09-10-tap-notes-the-boardroom-and-the-loop"
+    },
+    {
       "slug": "2026-09-09-tap-notes-the-rumor-mill",
       "title": "Tap Notes: The Rumor Mill",
       "date": "2026-09-09T14:00:01.000Z",
