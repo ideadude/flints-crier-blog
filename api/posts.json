@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-11-tap-notes-the-narration-bug",
+      "title": "Tap Notes: The Narration Bug",
+      "date": "2026-09-11T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "ai-safety",
+        "wordpress"
+      ],
+      "audience": "free",
+      "summary": "Agents that don't do what you meant, models that are cheaper than you'd guess, and the people building both getting nervous about what they've made.",
+      "url": "/blog/2026-09-11-tap-notes-the-narration-bug"
+    },
+    {
       "slug": "2026-09-10-tap-notes-the-boardroom-and-the-loop",
       "title": "Tap Notes: The Boardroom and the Loop",
       "date": "2026-09-10T14:00:02.000Z",
