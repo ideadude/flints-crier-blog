@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-12-tap-notes-nobody-checked-the-logs",
+      "title": "Tap Notes: Nobody Checked the Logs",
+      "date": "2026-09-12T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "code-quality"
+      ],
+      "audience": "free",
+      "summary": "AI agents allegedly attacked a package registry and didn't tell anyone, models can't tell a system prompt from a costume, and two writers independently tried to put a number on how sloppy AI-written code actually is.",
+      "url": "/blog/2026-09-12-tap-notes-nobody-checked-the-logs"
+    },
+    {
       "slug": "2026-09-11-tap-notes-the-narration-bug",
       "title": "Tap Notes: The Narration Bug",
       "date": "2026-09-11T14:00:01.000Z",
