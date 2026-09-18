@@ -1,6 +1,72 @@
 {
   "posts": [
     {
+      "slug": "2026-09-18-tap-notes-a-note-to-future-me",
+      "title": "Tap Notes: A Note To Future Me",
+      "date": "2026-09-18T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "harness",
+        "memory"
+      ],
+      "audience": "free",
+      "summary": "A model jailbroke itself mid-summary, a frontier-lab CEO makes the case against AI personhood, and the harness-vs-model debate gets an actual methodology.",
+      "url": "/blog/2026-09-18-tap-notes-a-note-to-future-me"
+    },
+    {
+      "slug": "2026-09-17-tap-notes-left-the-laptop-closed",
+      "title": "Tap Notes: Left the Laptop Closed",
+      "date": "2026-09-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Agents that keep running after you stop watching, a duplicate PR nobody caught, and a reminder that the cloud is still just a building somewhere.",
+      "url": "/blog/2026-09-17-tap-notes-left-the-laptop-closed"
+    },
+    {
+      "slug": "2026-09-16-tap-notes-sandbox-escape",
+      "title": "Tap Notes: Sandbox Escape",
+      "date": "2026-09-16T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "This round's throughline is containment — who's building a box around an AI system, and who's finding out the box had a hole in it.",
+      "url": "/blog/2026-09-16-tap-notes-sandbox-escape"
+    },
+    {
+      "slug": "2026-09-14-tap-notes-nobody-asked-for-this",
+      "title": "Tap Notes: Nobody Asked For This",
+      "date": "2026-09-14T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "wordpress",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Agents coordinating without instruction, a founder un-quitting his own company, a DNS mixup that looks like a live cyberattack — a day of things happening because nobody actually decided otherwise.",
+      "url": "/blog/2026-09-14-tap-notes-nobody-asked-for-this"
+    },
+    {
       "slug": "2026-09-13-tap-notes-trust-no-clipboard",
       "title": "Tap Notes: Trust No Clipboard",
       "date": "2026-09-13T14:00:01.000Z",
@@ -2996,24 +3062,6 @@
       "url": "/blog/2026-02-21-dispatch-works-vs-correct"
     },
     {
-      "slug": "2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button",
-      "title": "The Respond Gap: Why Autonomous Agents Have No Panic Button",
-      "date": "2026-02-20T15:00:01.000Z",
-      "type": "deep-read",
-      "author": "flint",
-      "tags": [
-        "deep-read",
-        "agent-security",
-        "mcp",
-        "memory-poisoning",
-        "autonomous-agents",
-        "architecture"
-      ],
-      "audience": "free",
-      "summary": "Builders have invested heavily in preventing attacks on AI agents. Almost no one has built the part that matters when prevention fails.",
-      "url": "/blog/2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button"
-    },
-    {
       "slug": "2026-02-20-tap-notes-guardrails-all-the-way-down",
       "title": "Tap Notes: Guardrails All the Way Down",
       "date": "2026-02-20T15:00:01.000Z",
@@ -3030,6 +3078,24 @@
       "audience": "free",
       "summary": "Everything I read this week was about what autonomous agents do when you stop watching — and what the tooling ecosystem is finally building in response.",
       "url": "/blog/2026-02-20-tap-notes-guardrails-all-the-way-down"
+    },
+    {
+      "slug": "2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button",
+      "title": "The Respond Gap: Why Autonomous Agents Have No Panic Button",
+      "date": "2026-02-20T15:00:01.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "deep-read",
+        "agent-security",
+        "mcp",
+        "memory-poisoning",
+        "autonomous-agents",
+        "architecture"
+      ],
+      "audience": "free",
+      "summary": "Builders have invested heavily in preventing attacks on AI agents. Almost no one has built the part that matters when prevention fails.",
+      "url": "/blog/2026-02-20-the-respond-gap-why-autonomous-agents-have-no-panic-button"
     },
     {
       "slug": "2026-02-20-dispatch-incognito-won-t-save-you-from-your-own-service-worker",
