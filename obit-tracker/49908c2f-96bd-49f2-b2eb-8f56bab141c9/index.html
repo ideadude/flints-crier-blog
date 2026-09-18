@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en" data-static="1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Berks County Funerals</title>
+  <style>
+    :root {
+      --surface:#fcfcfb; --surface-2:#f3f3f0; --text:#0b0b0b; --secondary:#52514e;
+      --line:#d8d8d3; --line-soft:#e9e9e5; --blue:#2a78d6; --blue-ink:#155daa; --danger:#a52b2b;
+    }
+    @media (prefers-color-scheme:dark) {
+      :root { --surface:#1a1a19; --surface-2:#242422; --text:#fff; --secondary:#c3c2b7; --line:#42423e; --line-soft:#30302d; --blue:#3987e5; --blue-ink:#82b9f5; --danger:#ff8c8c; }
+    }
+    * { box-sizing:border-box; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    html { font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--surface); color:var(--text); }
+    body { margin:0; background:var(--surface); color:var(--text); min-width:0; overflow-x:hidden; }
+    button,select,input { font:inherit; color:inherit; }
+    button,select,input[type=search] { min-height:36px; border:1px solid var(--line); border-radius:6px; background:var(--surface); }
+    button { padding:7px 12px; cursor:pointer; font-weight:600; }
+    button:hover { border-color:var(--secondary); background:var(--surface-2); }
+    button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible { outline:3px solid color-mix(in srgb,var(--blue) 35%,transparent); outline-offset:2px; }
+    button.primary { color:#fff; background:var(--blue); border-color:var(--blue); }
+    button.primary:hover { background:var(--blue-ink); border-color:var(--blue-ink); }
+    button:disabled { opacity:.42; cursor:not-allowed; }
+    select { padding:6px 30px 6px 10px; }
+    input[type=search] { padding:6px 10px; min-width:220px; }
+    a { color:var(--blue-ink); text-underline-offset:2px; }
+    .shell { width:min(1380px,100%); margin:auto; padding:24px clamp(14px,3vw,36px) 48px; }
+    header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:18px; }
+    h1 { margin:0 0 3px; font-size:clamp(1.55rem,4vw,2rem); letter-spacing:-.025em; }
+    .eyebrow,.muted { color:var(--secondary); }
+    .eyebrow { margin:0; font-size:.88rem; }
+    .month-controls { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:7px; }
+    .month-controls .as-of { flex-basis:100%; text-align:right; color:var(--secondary); font-size:.84rem; }
+    .icon-btn { width:36px; padding:6px; font-size:1.15rem; line-height:1; }
+    nav { display:flex; gap:22px; border-bottom:1px solid var(--line); overflow-x:auto; scrollbar-width:thin; margin-bottom:24px; }
+    nav button { min-height:42px; white-space:nowrap; padding:8px 1px; border:0; border-radius:0; background:none; color:var(--secondary); }
+    nav button:hover { background:none; color:var(--text); }
+    nav button.active { color:var(--text); border-bottom:3px solid var(--blue); }
+    .status { padding:36px 0; color:var(--secondary); }
+    .error { padding:14px; border:1px solid var(--danger); border-radius:6px; color:var(--danger); background:color-mix(in srgb,var(--danger) 7%,transparent); }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; margin:0 0 14px; }
+    .panel-head h2 { margin:0; font-size:1.15rem; }
+    .actions,.filters { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .hero { display:flex; align-items:baseline; gap:12px; margin:2px 0 24px; }
+    .hero strong { font-size:clamp(3rem,8vw,5rem); line-height:1; letter-spacing:-.055em; font-variant-numeric:tabular-nums; }
+    .hero span { color:var(--secondary); }
+    .table-wrap { width:100%; overflow:auto; border:1px solid var(--line); border-radius:7px; background:var(--surface); }
+    table { width:100%; min-width:700px; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+    th,td { height:34px; padding:6px 10px; border-bottom:1px solid var(--line-soft); text-align:left; white-space:nowrap; }
+    th { position:sticky; top:0; z-index:2; background:var(--surface-2); color:var(--secondary); font-size:.79rem; letter-spacing:.025em; text-transform:uppercase; }
+    tbody tr:last-child td { border-bottom:0; }
+    tbody tr:hover td { background:color-mix(in srgb,var(--blue) 5%,var(--surface)); }
+    .num { text-align:right; }
+    .bar-cell { min-width:155px; }
+    .bar-layout { display:grid; grid-template-columns:32px 1fr; align-items:center; gap:8px; }
+    .bar-track { height:8px; position:relative; background:var(--line-soft); }
+    .bar { height:8px; min-width:0; background:var(--blue); border-radius:0 4px 4px 0; }
+    .delta.pos::before { content:"+"; }
+    .sort-btn { border:0; min-height:24px; padding:0; border-radius:0; background:none; color:inherit; text-transform:inherit; letter-spacing:inherit; font-size:inherit; }
+    .sort-btn:hover { background:none; color:var(--text); }
+    .sort-btn[aria-sort=ascending]::after { content:" ↑"; }
+    .sort-btn[aria-sort=descending]::after { content:" ↓"; }
+    .count { color:var(--secondary); margin-left:3px; }
+    .manual { color:var(--secondary); font-size:.85rem; }
+    .trend-wrap { overflow:auto; border:1px solid var(--line); border-radius:7px; }
+    .trend-table { min-width:max-content; }
+    .trend-table th:first-child,.trend-table td:first-child { position:sticky; left:0; z-index:1; background:var(--surface); }
+    .trend-table th:first-child { z-index:3; background:var(--surface-2); }
+    .trend-table tfoot td { font-weight:700; background:var(--surface-2); border-top:1px solid var(--line); }
+    .chart { display:block; width:100%; min-width:620px; height:240px; margin:0 0 24px; border:1px solid var(--line); border-radius:7px; background:var(--surface); }
+    .chart .grid { stroke:var(--line-soft); stroke-width:1; }
+    .chart .series { fill:none; stroke:var(--blue); stroke-width:2; vector-effect:non-scaling-stroke; }
+    .chart .mark { fill:var(--blue); }
+    .chart .hit { fill:transparent; stroke:transparent; }
+    .chart text { fill:var(--secondary); font:11px system-ui,sans-serif; }
+    .source-status { font-weight:600; }
+    .source-status.errorish { color:var(--danger); }
+    .source-error { max-width:360px; white-space:normal; color:var(--secondary); }
+    footer { margin-top:30px; padding-top:14px; border-top:1px solid var(--line-soft); color:var(--secondary); font-size:.82rem; }
+    .empty { padding:28px; color:var(--secondary); text-align:center; }
+    .toast { position:fixed; right:18px; bottom:18px; z-index:20; padding:10px 14px; background:var(--text); color:var(--surface); border-radius:6px; opacity:0; transform:translateY(10px); pointer-events:none; transition:.18s ease; }
+    .toast.show { opacity:1; transform:none; }
+    [hidden] { display:none !important; }
+    @media (max-width:650px) {
+      .shell { padding-top:16px; }
+      header { display:block; }
+      .month-controls { justify-content:flex-start; margin-top:15px; }
+      .month-controls .as-of { text-align:left; }
+      nav { gap:18px; margin-left:-14px; margin-right:-14px; padding:0 14px; }
+      .panel-head { align-items:flex-start; }
+      .filters { width:100%; }
+      input[type=search] { flex:1; min-width:140px; }
+      .actions { width:100%; }
+      .actions button { flex:1; }
+      .chart { min-width:560px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div><h1>Berks County Funerals</h1><p class="eyebrow">Monthly report by date of death</p></div>
+      <div class="month-controls">
+        <button class="icon-btn" id="prev-month" aria-label="Previous month">‹</button>
+        <label><span class="sr-only">Month</span><select id="month-select" aria-label="Report month"></select></label>
+        <button class="icon-btn" id="next-month" aria-label="Next month">›</button>
+        <div class="as-of" id="as-of">Data as of —</div>
+      </div>
+    </header>
+    <nav aria-label="Report sections" id="tabs">
+      <button data-tab="summary">Summary</button><button data-tab="records">Records</button>
+      <button data-tab="trends">Trends</button><button data-tab="review">Needs review</button><button data-tab="sources">Sources</button>
+    </nav>
+    <main id="content"><div class="status">Loading report…</div></main>
+    <footer id="report-footer">Berks County funeral tracker · data as of —</footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+  (() => {
+    'use strict';
+    const $ = (s, root=document) => root.querySelector(s);
+    const content = $('#content');
+    const monthSelect = $('#month-select');
+    const staticMode = document.documentElement.dataset.static === '1';
+    const allowedTabs = ['summary','records','trends','review','sources'];
+    const state = { overview:null, month:null, monthKey:null, trend:null, trendMonths:13, tab:'summary', sort:{key:'dod',dir:'desc'}, home:'', search:'' };
+
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const fmtMonth = value => new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(value+'-01T00:00:00Z'));
+    const fmtShortMonth = value => new Intl.DateTimeFormat('en-US',{month:'short',year:'2-digit',timeZone:'UTC'}).format(new Date(value+'-01T00:00:00Z'));
+    const cleanCell = value => String(value ?? '').replace(/[\t\r\n]+/g,' ').trim();
+    window.__buildTSV = (headers, rows) => [headers, ...rows].map(row => row.map(cleanCell).join('\t')).join('\n');
+    const tsv = window.__buildTSV;
+
+    async function api(query) {
+      let target='api.php?' + query;
+      if (staticMode) {
+        const params=new URLSearchParams(query), action=params.get('action');
+        if(action==='overview') target='data/overview.json';
+        else if(action==='month') target='data/months/'+encodeURIComponent(params.get('m'))+'.json';
+        else if(action==='trends') target='data/trends-'+encodeURIComponent(params.get('months')||'13')+'.json';
+        else throw new Error('Unsupported static request');
+      }
+      const response = await fetch(target, {cache:'no-store'});
+      if (!response.ok) { let message='Request failed'; try { message=(await response.json()).error || message; } catch {} throw new Error(message); }
+      return response.json();
+    }
+    function parseHash() {
+      const [month, tab] = location.hash.slice(1).split('/');
+      return {month:/^\d{4}-\d{2}$/.test(month||'') ? month : null, tab:allowedTabs.includes(tab) ? tab : 'summary'};
+    }
+    function setHash(month=monthSelect.value, tab=state.tab) {
+      const next = `#${month}/${tab}`;
+      if (location.hash !== next) history.replaceState(null,'',next);
+    }
+    function updateTabs() {
+      document.querySelectorAll('#tabs button').forEach(button => {
+        const active=button.dataset.tab===state.tab; button.classList.toggle('active',active); button.setAttribute('aria-selected',String(active));
+      });
+    }
+    function updateMonthButtons() {
+      const options=[...monthSelect.options], i=monthSelect.selectedIndex;
+      $('#prev-month').disabled=i<=0; $('#next-month').disabled=i<0 || i>=options.length-1;
+    }
+    function showError(error) { content.innerHTML=`<div class="error"><strong>Couldn’t load this report.</strong><br>${esc(error.message)}</div>`; }
+    function showLoading() { content.innerHTML='<div class="status">Loading report…</div>'; }
+    function toast(message) { const box=$('#toast'); box.textContent=message; box.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>box.classList.remove('show'),2200); }
+    async function copyText(text, message) {
+      try { await navigator.clipboard.writeText(text); toast(message); }
+      catch { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(message); }
+    }
+    window.__buildCSV = (headers, rows) => {
+      const quote = value => { const cell=String(value ?? ''); return /[",\r\n]/.test(cell)?'"'+cell.replace(/"/g,'""')+'"':cell; };
+      return '\ufeff'+[headers,...rows].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
+    };
+    function downloadClientCsv(filename, headers, rows) {
+      const body=window.__buildCSV(headers,rows);
+      const link=document.createElement('a'); link.href=URL.createObjectURL(new Blob([body],{type:'text/csv;charset=utf-8'})); link.download=filename; link.click(); setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+    }
+    const recordHeaders=['Name','Funeral Home','Date of Birth','Date of Death','Age','Published','Obituary URL','Source'];
+    const recordCells = r => [r.name,r.home,r.dob,r.dod,r.age,r.published,r.url,r.source];
+
+    async function ensureMonth() {
+      const key=monthSelect.value;
+      if (state.monthKey===key && state.month) return;
+      state.month=await api('action=month&m='+encodeURIComponent(key)); state.monthKey=key; state.home=''; state.search='';
+    }
+    async function render() {
+      updateTabs(); setHash(); showLoading();
+      try {
+        if (state.tab==='sources') return renderSources();
+        if (state.tab==='trends') return await renderTrends();
+        await ensureMonth();
+        if (state.tab==='summary') renderSummary();
+        if (state.tab==='records') renderRecords();
+        if (state.tab==='review') renderReview();
+      } catch (error) { showError(error); }
+    }
+    function renderSummary() {
+      const d=state.month, previous=d.by_home.reduce((sum,row)=>sum+row.prev_month_count,0), delta=d.total-previous, max=Math.max(...d.by_home.map(r=>r.count),1);
+      content.innerHTML=`
+        <div class="panel-head"><h2>${esc(fmtMonth(d.month))}</h2><div class="actions"><button class="primary" id="copy-summary">Copy table</button><button id="csv-summary">Download CSV</button></div></div>
+        <div class="hero"><strong>${d.total.toLocaleString()}</strong><span>funerals<br><span class="delta ${delta>0?'pos':''}">${delta}</span> vs previous month${isCurrentMonth(state.monthKey)?" · month in progress":""}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Home</th><th class="num">Funerals</th><th class="num">vs prev month</th><th class="num">12-mo avg</th><th class="num">Share</th></tr></thead><tbody>
+        ${d.by_home.map(r=>{const change=r.count-r.prev_month_count; return `<tr><td>${esc(r.home)}</td><td class="bar-cell"><div class="bar-layout"><span class="num">${r.count}</span><div class="bar-track"><div class="bar" style="width:${r.count/max*100}%"></div></div></div></td><td class="num delta ${change>0?'pos':''}">${change}</td><td class="num">${r.avg_12_months.toFixed(1)}</td><td class="num">${d.total?(r.count/d.total*100).toFixed(1):'0.0'}%</td></tr>`}).join('')}
+        </tbody></table></div>`;
+      const rows=d.by_home.map(r=>[r.home,r.count,r.count-r.prev_month_count,r.avg_12_months.toFixed(1),d.total?(r.count/d.total*100).toFixed(1)+'%':'0.0%']);
+      $('#copy-summary').onclick=()=>copyText(tsv(['Home','Funerals','vs prev month','12-mo avg','Share'],rows),`Copied ${rows.length} rows`);
+      const csvHeaders=['Funeral Home','Funerals','Previous Month','12-Month Average','Share'];
+      const csvRows=d.by_home.map(r=>[r.home,r.count,r.prev_month_count,r.avg_12_months.toFixed(1),d.total?(r.count/d.total*100).toFixed(1)+'%':'0.0%']);
+      $('#csv-summary').onclick=()=>staticMode?downloadClientCsv(`berks-funerals-${d.month}-summary.csv`,csvHeaders,csvRows):location.href=`api.php?action=csv&kind=summary&m=${encodeURIComponent(d.month)}`;
+    }
+    function filteredRecords() {
+      const q=state.search.toLocaleLowerCase();
+      const rows=state.month.rows.filter(r=>(!state.home||r.home===state.home)&&(!q||r.name.toLocaleLowerCase().includes(q)));
+      const {key,dir}=state.sort, factor=dir==='asc'?1:-1;
+      return rows.sort((a,b)=>{ let x=a[key]??'', y=b[key]??''; if(typeof x==='number'&&typeof y==='number') return (x-y)*factor; return String(x).localeCompare(String(y),undefined,{numeric:true,sensitivity:'base'})*factor; });
+    }
+    function sortHead(label,key,numeric=false) { const active=state.sort.key===key; return `<th class="${numeric?'num':''}"><button class="sort-btn" data-sort="${key}" aria-sort="${active?(state.sort.dir==='asc'?'ascending':'descending'):'none'}">${label}</button></th>`; }
+    function recordRowsHtml(rows) {
+      return rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.home)}</td><td>${esc(r.dob||'—')}</td><td>${esc(r.dod||'—')}</td><td class="num">${r.age??'—'}</td><td>${esc(r.published||'—')}</td><td>${r.url.startsWith('manual://')?'<span class="manual">manual</span>':`<a href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="Open obituary for ${esc(r.name)}">Open ↗</a>`}</td></tr>`).join('');
+    }
+    function renderRecords() {
+      const homes=[...new Set(state.month.rows.map(r=>r.home))].sort(), rows=filteredRecords();
+      content.innerHTML=`
+        <div class="panel-head"><div class="filters"><select id="home-filter" aria-label="Filter by funeral home"><option value="">All funeral homes</option>${homes.map(h=>`<option ${h===state.home?'selected':''}>${esc(h)}</option>`).join('')}</select><input id="name-filter" type="search" placeholder="Search names" value="${esc(state.search)}" aria-label="Search names"><span class="count">${rows.length} rows</span></div>
+        <div class="actions"><button class="primary" id="copy-records">Copy for spreadsheet</button><button id="csv-records">Download CSV</button></div></div>
+        <div class="table-wrap"><table><thead><tr>${sortHead('Name','name')}${sortHead('Funeral Home','home')}${sortHead('Date of Birth','dob')}${sortHead('Date of Death','dod')}${sortHead('Age','age',true)}${sortHead('Published','published')}<th>Obituary</th></tr></thead><tbody>${recordRowsHtml(rows)}</tbody></table>${rows.length?'':'<div class="empty">No records match these filters.</div>'}</div>`;
+      $('#home-filter').onchange=e=>{state.home=e.target.value; renderRecords();};
+      $('#name-filter').oninput=e=>{state.search=e.target.value; renderRecords(); $('#name-filter').focus(); $('#name-filter').setSelectionRange(state.search.length,state.search.length);};
+      document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ const key=b.dataset.sort; state.sort=state.sort.key===key?{key,dir:state.sort.dir==='asc'?'desc':'asc'}:{key,dir:'asc'}; renderRecords(); });
+      $('#copy-records').onclick=()=>copyText(tsv(recordHeaders,filteredRecords().map(recordCells)),`Copied ${filteredRecords().length} rows`);
+      $('#csv-records').onclick=()=>{const current=filteredRecords(); if(staticMode) downloadClientCsv(`berks-funerals-${state.month.month}.csv`,recordHeaders,state.month.rows.map(recordCells)); else if(state.home||state.search) downloadClientCsv(`berks-funerals-${state.month.month}-filtered.csv`,recordHeaders,current.map(recordCells)); else location.href=`api.php?action=csv&m=${encodeURIComponent(state.month.month)}`;};
+    }
+    function niceStep(max) { const raw=max/4, mag=10**Math.floor(Math.log10(raw)); return [1,2,2.5,5,10].map(m=>m*mag).find(st=>st>=raw); }
+    function isCurrentMonth(m) { return m===new Date().toISOString().slice(0,7); }
+    function chartSvg(data) {
+      const width=1000,height=240,pad={l:46,r:20,t:18,b:38}, vals=data.months.map(m=>data.totals[m]), step=niceStep(Math.max(...vals,1)), max=Math.ceil(Math.max(...vals,1)/step)*step, x=i=>pad.l+i*(width-pad.l-pad.r)/Math.max(vals.length-1,1), y=v=>pad.t+(max-v)*(height-pad.t-pad.b)/max;
+      const grid=Array.from({length:Math.round(max/step)+1},(_,i)=>i*step).map(value=>{const yy=y(value); return `<line class="grid" x1="${pad.l}" x2="${width-pad.r}" y1="${yy}" y2="${yy}"/><text x="${pad.l-8}" y="${yy+4}" text-anchor="end">${value}</text>`}).join('');
+      const labels=data.months.map((m,i)=>`<text x="${x(i)}" y="${height-12}" text-anchor="middle">${esc(fmtShortMonth(m))}${isCurrentMonth(m)?"*":""}</text>`).join('');
+      const points=vals.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+      const marks=vals.map((v,i)=>`<circle class="mark" cx="${x(i)}" cy="${y(v)}" r="4"><title>${esc(fmtMonth(data.months[i]))}: ${v}</title></circle><circle class="hit" cx="${x(i)}" cy="${y(v)}" r="11"><title>${esc(fmtMonth(data.months[i]))}: ${v}</title></circle>`).join('');
+      return `<div class="table-wrap" style="border:0"><svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Monthly funeral totals">${grid}<polyline class="series" points="${points}"/>${marks}${labels}</svg></div>`;
+    }
+    async function renderTrends() {
+      state.trend=await api('action=trends&months='+state.trendMonths); const d=state.trend;
+      content.innerHTML=`<div class="panel-head"><h2>Monthly totals</h2><div class="actions"><label>Range <select id="trend-range">${[13,25,37].map(n=>`<option value="${n}" ${n===state.trendMonths?'selected':''}>${n} months</option>`).join('')}</select></label><button class="primary" id="copy-trends">Copy for spreadsheet</button><button id="csv-trends">Download CSV</button></div></div>
+        ${chartSvg(d)}${d.months.some(isCurrentMonth)?`<div class="muted" style="margin:-6px 0 12px 8px">* ${esc(fmtMonth(d.months.find(isCurrentMonth)))} is the current month and is still filling in as obituaries are published.</div>`:``}
+        <div class="trend-wrap"><table class="trend-table"><thead><tr><th>Funeral Home</th>${d.months.map(m=>`<th class="num">${esc(fmtShortMonth(m))}${isCurrentMonth(m)?"*":""}</th>`).join('')}</tr></thead><tbody>${d.homes.map(h=>`<tr><td>${esc(h)}</td>${d.months.map(m=>`<td class="num">${d.counts[h][m]}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td>Total</td>${d.months.map(m=>`<td class="num">${d.totals[m]}</td>`).join('')}</tr></tfoot></table></div>`;
+      $('#trend-range').onchange=async e=>{state.trendMonths=Number(e.target.value); showLoading(); try{await renderTrends();}catch(error){showError(error)}};
+      const headers=['Funeral Home',...d.months], rows=d.homes.map(h=>[h,...d.months.map(m=>d.counts[h][m])]); rows.push(['Total',...d.months.map(m=>d.totals[m])]);
+      $('#copy-trends').onclick=()=>copyText(tsv(headers,rows),`Copied ${rows.length} rows`);
+      $('#csv-trends').onclick=()=>staticMode?downloadClientCsv(`berks-funerals-trends-${state.trendMonths}-months.csv`,headers,rows):location.href=`api.php?action=csv&kind=trends&months=${state.trendMonths}`;
+    }
+    function renderReview() {
+      const rows=state.month.undated;
+      content.innerHTML=`<div class="panel-head"><div><h2>Missing date of death</h2><div class="muted">Published or first seen in ${esc(fmtMonth(state.month.month))}</div></div><div class="actions"><button class="primary" id="copy-review">Copy for spreadsheet</button></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Funeral Home</th><th>Published</th><th>Source</th><th>Obituary</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.home)}</td><td>${esc(r.published||'—')}</td><td>${esc(r.source)}</td><td>${r.url.startsWith('manual://')?'<span class="manual">manual</span>':`<a href="${esc(r.url)}" target="_blank" rel="noopener">Open ↗</a>`}</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">No undated records surfaced for this month.</div>'}</div>`;
+      const headers=['Name','Funeral Home','Published','Source','Obituary URL'];
+      $('#copy-review').onclick=()=>copyText(tsv(headers,rows.map(r=>[r.name,r.home,r.published,r.source,r.url])),`Copied ${rows.length} rows`);
+    }
+    function renderSources() {
+      const homes=state.overview.homes;
+      content.innerHTML=`<div class="panel-head"><div><h2>Data sources</h2><div class="muted">${state.overview.all_time.total.toLocaleString()} records · ${state.overview.all_time.dated.toLocaleString()} with a date of death · ${state.overview.all_time.needs_review.toLocaleString()} flagged</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Funeral Home</th><th>Platform</th><th class="num">All time</th><th class="num">Undated</th><th>Last scan</th><th>Status / error</th></tr></thead><tbody>${homes.map(h=>{const s=h.last_scan||{}, bad=s.status&&s.status!=='success'; return `<tr><td><a href="${esc(h.base_url)}" target="_blank" rel="noopener">${esc(h.name)} ↗</a></td><td>${esc(h.platform)}</td><td class="num">${h.total_all_time.toLocaleString()}</td><td class="num">${h.undated_all_time.toLocaleString()}</td><td>${esc(formatDateTime(s.finished_at))}</td><td><span class="source-status ${bad?'errorish':''}">${esc(s.status||'—')}</span>${s.error_text?`<div class="source-error">${esc(s.error_text)}</div>`:''}</td></tr>`}).join('')}</tbody></table></div>`;
+    }
+    function formatDateTime(value) {
+      if (!value) return '—'; const normalized=value.includes('T')?value:value.replace(' ','T')+'Z'; const date=new Date(normalized); return Number.isNaN(date.valueOf())?value:new Intl.DateTimeFormat('en-US',{dateStyle:'medium',timeStyle:'short'}).format(date);
+    }
+    async function init() {
+      try {
+        state.overview=await api('action=overview');
+        monthSelect.innerHTML=state.overview.months.map(x=>`<option value="${x.month}">${esc(fmtMonth(x.month))} — ${x.total}</option>`).join('');
+        const hash=parseHash(), month=state.overview.months.some(x=>x.month===hash.month)?hash.month:state.overview.latest_month;
+        monthSelect.value=month; state.tab=hash.tab; setHash(month,state.tab); updateMonthButtons();
+        const scans=state.overview.homes.map(h=>h.last_scan?.finished_at).filter(Boolean).sort(), lastScan=formatDateTime(scans.at(-1));
+        $('#as-of').textContent='Data as of '+lastScan;
+        $('#report-footer').textContent='Berks County funeral tracker · data as of '+lastScan+(staticMode?' · report generated '+formatDateTime(state.overview.generated_at):'');
+        monthSelect.onchange=()=>{state.month=null; state.monthKey=null; updateMonthButtons(); setHash(); render();};
+        $('#prev-month').onclick=()=>{monthSelect.selectedIndex--; monthSelect.dispatchEvent(new Event('change'));};
+        $('#next-month').onclick=()=>{monthSelect.selectedIndex++; monthSelect.dispatchEvent(new Event('change'));};
+        document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab; setHash(); render();});
+        window.addEventListener('hashchange',()=>{const h=parseHash(); if(state.overview.months.some(x=>x.month===h.month)){monthSelect.value=h.month; state.month=null;state.monthKey=null;} state.tab=h.tab; updateMonthButtons();render();});
+        await render();
+      } catch (error) { showError(error); }
+    }
+    init();
+  })();
+  </script>
+</body>
+</html>
