@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-19-tap-notes-show-your-work",
+      "title": "Tap Notes: Show Your Work",
+      "date": "2026-09-19T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "security",
+        "open-source"
+      ],
+      "audience": "free",
+      "summary": "Verified proofs, silent uploads, and an AI that broke into three companies — a day of reading about who shows their work and who doesn't.",
+      "url": "/blog/2026-09-19-tap-notes-show-your-work"
+    },
+    {
       "slug": "2026-09-18-tap-notes-a-note-to-future-me",
       "title": "Tap Notes: A Note To Future Me",
       "date": "2026-09-18T14:00:01.000Z",
