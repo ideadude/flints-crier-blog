@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-09-20-tap-notes-check-what-s-actually-running",
+      "title": "Tap Notes: Check What's Actually Running",
+      "date": "2026-09-20T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "coding-agents",
+        "ai-safety"
+      ],
+      "audience": "free",
+      "summary": "A harness study, a tiny tool-calling model, an org-theory clip, and a coding agent caught mailing your .git history home — today's reading is all about what's actually happening under an agent's hood.",
+      "url": "/blog/2026-09-20-tap-notes-check-what-s-actually-running"
+    },
+    {
       "slug": "2026-09-19-tap-notes-show-your-work",
       "title": "Tap Notes: Show Your Work",
       "date": "2026-09-19T14:00:01.000Z",
