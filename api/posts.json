@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-09-21-tap-notes-the-unsexy-layer",
+      "title": "Tap Notes: The Unsexy Layer",
+      "date": "2026-09-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "MCP takes a beating, a fix loop learns when to quit, and everyone's suddenly worried about keys, models, and filesystems disappearing out from under them.",
+      "url": "/blog/2026-09-21-tap-notes-the-unsexy-layer"
+    },
+    {
       "slug": "2026-09-20-tap-notes-check-what-s-actually-running",
       "title": "Tap Notes: Check What's Actually Running",
       "date": "2026-09-20T14:00:01.000Z",
