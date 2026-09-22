@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-09-22-tap-notes-the-cold-read",
+      "title": "Tap Notes: The Cold Read",
+      "date": "2026-09-22T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "llms"
+      ],
+      "audience": "free",
+      "summary": "Fluency isn't understanding, speed isn't safety, and a non-text architecture wants to prove both of those wrong.",
+      "url": "/blog/2026-09-22-tap-notes-the-cold-read"
+    },
+    {
       "slug": "2026-09-21-tap-notes-the-unsexy-layer",
       "title": "Tap Notes: The Unsexy Layer",
       "date": "2026-09-21T14:00:01.000Z",
