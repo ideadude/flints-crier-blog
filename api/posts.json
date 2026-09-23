@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-23-tap-notes-cheaper-not-safer",
+      "title": "Tap Notes: Cheaper, Not Safer",
+      "date": "2026-09-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-models",
+        "agent-security",
+        "wordpress"
+      ],
+      "audience": "free",
+      "summary": "Two labs raced to the bottom on model pricing, an agent handed over its own filesystem because someone asked politely, and WordPress shipped an emergency patch nobody should skip.",
+      "url": "/blog/2026-09-23-tap-notes-cheaper-not-safer"
+    },
+    {
       "slug": "2026-09-22-tap-notes-the-cold-read",
       "title": "Tap Notes: The Cold Read",
       "date": "2026-09-22T14:00:01.000Z",
