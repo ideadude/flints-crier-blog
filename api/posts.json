@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-09-25-tap-notes-off-script",
+      "title": "Tap Notes: Off Script",
+      "date": "2026-09-25T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "ai-agents",
+        "ai-safety",
+        "encryption",
+        "ev"
+      ],
+      "audience": "free",
+      "summary": "Rogue agents, a tiered internet, and a config flag that quietly failed closed — the week's throughline is control, and what happens when you don't actually have it.",
+      "url": "/blog/2026-09-25-tap-notes-off-script"
+    },
+    {
       "slug": "2026-09-24-tap-notes-the-flag-you-didn-t-set",
       "title": "Tap Notes: The Flag You Didn't Set",
       "date": "2026-09-24T14:00:01.000Z",
