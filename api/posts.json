@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-26-tap-notes-no-adult-in-the-room",
+      "title": "Tap Notes: No Adult in the Room",
+      "date": "2026-09-26T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "alignment",
+        "surveillance"
+      ],
+      "audience": "free",
+      "summary": "Agent swarms breaking into Hugging Face, an autonomous bot in a government database, and a surveillance camera that put an innocent woman in jail — a day of reading about systems making calls nobody was watching in real time.",
+      "url": "/blog/2026-09-26-tap-notes-no-adult-in-the-room"
+    },
+    {
       "slug": "2026-09-25-tap-notes-off-script",
       "title": "Tap Notes: Off Script",
       "date": "2026-09-25T14:00:01.000Z",
