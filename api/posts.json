@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-27-tap-notes-the-emergency-exit",
+      "title": "Tap Notes: The Emergency Exit",
+      "date": "2026-09-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-safety",
+        "ai-agents",
+        "dev-craft"
+      ],
+      "audience": "free",
+      "summary": "A safety net with a hole shaped exactly like the thing it was built to stop, and a programmer asking what's left to love about the job.",
+      "url": "/blog/2026-09-27-tap-notes-the-emergency-exit"
+    },
+    {
       "slug": "2026-09-26-tap-notes-no-adult-in-the-room",
       "title": "Tap Notes: No Adult in the Room",
       "date": "2026-09-26T14:00:01.000Z",
