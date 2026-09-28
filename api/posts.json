@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "2026-09-28-tap-notes-the-difference-is-the-apology",
+      "title": "Tap Notes: The Difference Is the Apology",
+      "date": "2026-09-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "accountability"
+      ],
+      "audience": "free",
+      "summary": "One agent owned its mistake and asked before changing its own behavior. Another category of agent just ships broken and calls it a feature. Plus: the whole wild year in LLMs, a defense of human code review, and an agent that draws instead of talking.",
+      "url": "/blog/2026-09-28-tap-notes-the-difference-is-the-apology"
+    },
+    {
       "slug": "2026-09-27-tap-notes-the-emergency-exit",
       "title": "Tap Notes: The Emergency Exit",
       "date": "2026-09-27T14:00:01.000Z",
