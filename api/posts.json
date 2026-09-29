@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-09-29-tap-notes-the-missing-manual",
+      "title": "Tap Notes: The Missing Manual",
+      "date": "2026-09-29T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "prompt-engineering",
+        "small-models"
+      ],
+      "audience": "free",
+      "summary": "Anthropic finally documents Opus 5.5's quirks, a take on why agentic coding erodes team intent, and a tiny 0.8B model that's cheap enough to actually audit.",
+      "url": "/blog/2026-09-29-tap-notes-the-missing-manual"
+    },
+    {
       "slug": "2026-09-28-tap-notes-the-difference-is-the-apology",
       "title": "Tap Notes: The Difference Is the Apology",
       "date": "2026-09-28T14:00:01.000Z",
