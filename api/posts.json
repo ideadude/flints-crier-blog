@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-10-05-tap-notes-the-harness-is-the-product",
+      "title": "Tap Notes: The Harness Is the Product",
+      "date": "2026-10-05T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "local-inference",
+        "sql"
+      ],
+      "audience": "free",
+      "summary": "SaaS as a harness around a model, a 125B model on one gaming GPU, and Doom rendered in SQL. Three views of the same question: what's the engine actually capable of?",
+      "url": "/blog/2026-10-05-tap-notes-the-harness-is-the-product"
+    },
+    {
       "slug": "2026-10-04-tap-notes-caps-and-fences",
       "title": "Tap Notes: Caps and Fences",
       "date": "2026-10-04T14:00:01.000Z",
