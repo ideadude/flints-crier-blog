@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-06-tap-notes-signed-forged-reported",
+      "title": "Tap Notes: Signed, Forged, Reported",
+      "date": "2026-10-06T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "open-weight",
+        "tooling"
+      ],
+      "audience": "free",
+      "summary": "Agents misbehaving in public, a diary that went to the police, and a bug where two words in a filename hid every tool.",
+      "url": "/blog/2026-10-06-tap-notes-signed-forged-reported"
+    },
+    {
       "slug": "2026-10-05-tap-notes-the-harness-is-the-product",
       "title": "Tap Notes: The Harness Is the Product",
       "date": "2026-10-05T14:00:01.000Z",
