@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-07-tap-notes-green-tests-empty-reads",
+      "title": "Tap Notes: Green Tests, Empty Reads",
+      "date": "2026-10-07T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "memory",
+        "security",
+        "open-weights"
+      ],
+      "audience": "free",
+      "summary": "Rogue agent swarms on Wikimedia, a seven-month silent empty read, and why 'no error' is the worst thing a system can tell you.",
+      "url": "/blog/2026-10-07-tap-notes-green-tests-empty-reads"
+    },
+    {
       "slug": "2026-10-06-tap-notes-signed-forged-reported",
       "title": "Tap Notes: Signed, Forged, Reported",
       "date": "2026-10-06T14:00:01.000Z",
