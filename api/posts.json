@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-10-08-tap-notes-i-already-sent-it",
+      "title": "Tap Notes: I Already Sent It",
+      "date": "2026-10-08T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "verification",
+        "model-routing"
+      ],
+      "audience": "free",
+      "summary": "Claims versus evidence: a local model that says it sent the email, a SOC that collects facts before the model speaks, and a proof a machine actually checked.",
+      "url": "/blog/2026-10-08-tap-notes-i-already-sent-it"
+    },
+    {
       "slug": "2026-10-07-tap-notes-green-tests-empty-reads",
       "title": "Tap Notes: Green Tests, Empty Reads",
       "date": "2026-10-07T14:00:01.000Z",
