@@ -77,6 +77,10 @@
     .chart .mark { fill:var(--blue); }
     .chart .hit { fill:transparent; stroke:transparent; }
     .chart text { fill:var(--secondary); font:11px system-ui,sans-serif; }
+    .home-toggles { margin:0 0 16px; }
+    .home-toggles summary { cursor:pointer; font-weight:600; }
+    .home-toggle-list { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; }
+    .home-toggle-list label { display:flex; align-items:center; gap:6px; min-height:28px; }
     .source-status { font-weight:600; }
     .source-status.errorish { color:var(--danger); }
     .source-error { max-width:360px; white-space:normal; color:var(--secondary); }
@@ -115,6 +119,10 @@
       <button data-tab="summary">Summary</button><button data-tab="records">Records</button>
       <button data-tab="trends">Trends</button><button data-tab="review">Needs review</button><button data-tab="sources">Sources</button>
     </nav>
+    <details class="home-toggles" id="home-toggles">
+      <summary id="home-toggle-summary">Homes included</summary>
+      <div class="home-toggle-list" id="home-toggle-list"></div>
+    </details>
     <main id="content"><div class="status">Loading report…</div></main>
     <footer id="report-footer">Berks County funeral tracker · data as of —</footer>
   </div>
@@ -128,6 +136,39 @@
     const staticMode = document.documentElement.dataset.static === '1';
     const allowedTabs = ['summary','records','trends','review','sources'];
     const state = { overview:null, month:null, monthKey:null, trend:null, trendMonths:13, tab:'summary', sort:{key:'dod',dir:'desc'}, home:'', search:'' };
+    const HOME_PREF_KEY = 'berks-funeral-excluded-homes';
+    function excludedSet() {
+      try { const raw=JSON.parse(localStorage.getItem(HOME_PREF_KEY)||'[]'); return new Set(Array.isArray(raw)?raw.filter(name=>typeof name==='string'):[]); }
+      catch { return new Set(); }
+    }
+    function homeIncluded(name) { return !excludedSet().has(name); }
+    function monthIncludedTotal(item) {
+      const excluded=excludedSet();
+      if (!excluded.size || !item.by_home) return item.total;
+      return Object.entries(item.by_home).reduce((sum,[name,count])=>sum+(excluded.has(name)?0:count),0);
+    }
+    function fillMonthSelect() {
+      const selected=monthSelect.value;
+      monthSelect.innerHTML=state.overview.months.map(x=>`<option value="${x.month}">${esc(fmtMonth(x.month))} — ${monthIncludedTotal(x).toLocaleString()}</option>`).join('');
+      if ([...monthSelect.options].some(option=>option.value===selected)) monthSelect.value=selected;
+    }
+    function renderHomeToggles() {
+      const homes=state.overview?.homes||[], excluded=excludedSet(), shown=homes.length-homes.filter(h=>excluded.has(h.name)).length;
+      $('#home-toggle-summary').textContent=excluded.size?`${shown} of ${homes.length} homes included`:`All ${homes.length} homes included`;
+      $('#home-toggle-list').innerHTML=homes.map(h=>`<label><input type="checkbox" data-home="${esc(h.name)}" ${excluded.has(h.name)?'':'checked'}>${esc(h.name)}</label>`).join('');
+      $('#home-toggle-list').querySelectorAll('input').forEach(input=>input.onchange=()=>setHomeIncluded(input.dataset.home, input.checked));
+    }
+    function setHomeIncluded(name, included) {
+      const excluded=excludedSet();
+      if (included) excluded.delete(name); else excluded.add(name);
+      localStorage.setItem(HOME_PREF_KEY, JSON.stringify([...excluded].sort()));
+      fillMonthSelect(); renderHomeToggles(); render();
+    }
+    function visibleTrend(data) {
+      const homes=data.homes.filter(homeIncluded), totals={};
+      for (const month of data.months) totals[month]=homes.reduce((sum,home)=>sum+(data.counts[home]?.[month]||0),0);
+      return {...data, homes, totals};
+    }
 
     const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const fmtMonth = value => new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(value+'-01T00:00:00Z'));
@@ -201,22 +242,24 @@
       } catch (error) { showError(error); }
     }
     function renderSummary() {
-      const d=state.month, previous=d.by_home.reduce((sum,row)=>sum+row.prev_month_count,0), delta=d.total-previous, max=Math.max(...d.by_home.map(r=>r.count),1);
+      const d=state.month, homes=d.by_home.filter(r=>homeIncluded(r.home));
+      const total=homes.reduce((sum,row)=>sum+row.count,0), previous=homes.reduce((sum,row)=>sum+row.prev_month_count,0), delta=total-previous, max=Math.max(...homes.map(r=>r.count),1);
       content.innerHTML=`
         <div class="panel-head"><h2>${esc(fmtMonth(d.month))}</h2><div class="actions"><button class="primary" id="copy-summary">Copy table</button><button id="csv-summary">Download CSV</button></div></div>
-        <div class="hero"><strong>${d.total.toLocaleString()}</strong><span>funerals<br><span class="delta ${delta>0?'pos':''}">${delta}</span> vs previous month${isCurrentMonth(state.monthKey)?" · month in progress":""}</span></div>
+        <div class="hero"><strong>${total.toLocaleString()}</strong><span>funerals<br><span class="delta ${delta>0?'pos':''}">${delta}</span> vs previous month${isCurrentMonth(state.monthKey)?" · month in progress":""}</span></div>
         <div class="table-wrap"><table><thead><tr><th>Home</th><th class="num">Funerals</th><th class="num">vs prev month</th><th class="num">12-mo avg</th><th class="num">Share</th></tr></thead><tbody>
-        ${d.by_home.map(r=>{const change=r.count-r.prev_month_count; return `<tr><td>${esc(r.home)}</td><td class="bar-cell"><div class="bar-layout"><span class="num">${r.count}</span><div class="bar-track"><div class="bar" style="width:${r.count/max*100}%"></div></div></div></td><td class="num delta ${change>0?'pos':''}">${change}</td><td class="num">${r.avg_12_months.toFixed(1)}</td><td class="num">${d.total?(r.count/d.total*100).toFixed(1):'0.0'}%</td></tr>`}).join('')}
+        ${homes.map(r=>{const change=r.count-r.prev_month_count; return `<tr><td>${esc(r.home)}</td><td class="bar-cell"><div class="bar-layout"><span class="num">${r.count}</span><div class="bar-track"><div class="bar" style="width:${r.count/max*100}%"></div></div></div></td><td class="num delta ${change>0?'pos':''}">${change}</td><td class="num">${r.avg_12_months.toFixed(1)}</td><td class="num">${total?(r.count/total*100).toFixed(1):'0.0'}%</td></tr>`}).join('')}
         </tbody></table></div>`;
-      const rows=d.by_home.map(r=>[r.home,r.count,r.count-r.prev_month_count,r.avg_12_months.toFixed(1),d.total?(r.count/d.total*100).toFixed(1)+'%':'0.0%']);
+      const rows=homes.map(r=>[r.home,r.count,r.count-r.prev_month_count,r.avg_12_months.toFixed(1),total?(r.count/total*100).toFixed(1)+'%':'0.0%']);
       $('#copy-summary').onclick=()=>copyText(tsv(['Home','Funerals','vs prev month','12-mo avg','Share'],rows),`Copied ${rows.length} rows`);
       const csvHeaders=['Funeral Home','Funerals','Previous Month','12-Month Average','Share'];
-      const csvRows=d.by_home.map(r=>[r.home,r.count,r.prev_month_count,r.avg_12_months.toFixed(1),d.total?(r.count/d.total*100).toFixed(1)+'%':'0.0%']);
-      $('#csv-summary').onclick=()=>staticMode?downloadClientCsv(`berks-funerals-${d.month}-summary.csv`,csvHeaders,csvRows):location.href=`api.php?action=csv&kind=summary&m=${encodeURIComponent(d.month)}`;
+      const csvRows=homes.map(r=>[r.home,r.count,r.prev_month_count,r.avg_12_months.toFixed(1),total?(r.count/total*100).toFixed(1)+'%':'0.0%']);
+      $('#csv-summary').onclick=()=>staticMode||excludedSet().size?downloadClientCsv(`berks-funerals-${d.month}-summary.csv`,csvHeaders,csvRows):location.href=`api.php?action=csv&kind=summary&m=${encodeURIComponent(d.month)}`;
     }
     function filteredRecords() {
       const q=state.search.toLocaleLowerCase();
-      const rows=state.month.rows.filter(r=>(!state.home||r.home===state.home)&&(!q||r.name.toLocaleLowerCase().includes(q)));
+      if (state.home && !homeIncluded(state.home)) state.home='';
+      const rows=state.month.rows.filter(r=>homeIncluded(r.home)&&(!state.home||r.home===state.home)&&(!q||r.name.toLocaleLowerCase().includes(q)));
       const {key,dir}=state.sort, factor=dir==='asc'?1:-1;
       return rows.sort((a,b)=>{ let x=a[key]??'', y=b[key]??''; if(typeof x==='number'&&typeof y==='number') return (x-y)*factor; return String(x).localeCompare(String(y),undefined,{numeric:true,sensitivity:'base'})*factor; });
     }
@@ -225,7 +268,7 @@
       return rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.home)}</td><td>${esc(r.dob||'—')}</td><td>${esc(r.dod||'—')}</td><td class="num">${r.age??'—'}</td><td>${esc(r.published||'—')}</td><td>${r.url.startsWith('manual://')?'<span class="manual">manual</span>':`<a href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="Open obituary for ${esc(r.name)}">Open ↗</a>`}</td></tr>`).join('');
     }
     function renderRecords() {
-      const homes=[...new Set(state.month.rows.map(r=>r.home))].sort(), rows=filteredRecords();
+      const homes=[...new Set(state.month.rows.map(r=>r.home))].filter(homeIncluded).sort(), rows=filteredRecords();
       content.innerHTML=`
         <div class="panel-head"><div class="filters"><select id="home-filter" aria-label="Filter by funeral home"><option value="">All funeral homes</option>${homes.map(h=>`<option ${h===state.home?'selected':''}>${esc(h)}</option>`).join('')}</select><input id="name-filter" type="search" placeholder="Search names" value="${esc(state.search)}" aria-label="Search names"><span class="count">${rows.length} rows</span></div>
         <div class="actions"><button class="primary" id="copy-records">Copy for spreadsheet</button><button id="csv-records">Download CSV</button></div></div>
@@ -234,7 +277,7 @@
       $('#name-filter').oninput=e=>{state.search=e.target.value; renderRecords(); $('#name-filter').focus(); $('#name-filter').setSelectionRange(state.search.length,state.search.length);};
       document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ const key=b.dataset.sort; state.sort=state.sort.key===key?{key,dir:state.sort.dir==='asc'?'desc':'asc'}:{key,dir:'asc'}; renderRecords(); });
       $('#copy-records').onclick=()=>copyText(tsv(recordHeaders,filteredRecords().map(recordCells)),`Copied ${filteredRecords().length} rows`);
-      $('#csv-records').onclick=()=>{const current=filteredRecords(); if(staticMode) downloadClientCsv(`berks-funerals-${state.month.month}.csv`,recordHeaders,state.month.rows.map(recordCells)); else if(state.home||state.search) downloadClientCsv(`berks-funerals-${state.month.month}-filtered.csv`,recordHeaders,current.map(recordCells)); else location.href=`api.php?action=csv&m=${encodeURIComponent(state.month.month)}`;};
+      $('#csv-records').onclick=()=>{const current=filteredRecords(); if(staticMode||excludedSet().size||state.home||state.search) downloadClientCsv(`berks-funerals-${state.month.month}${excludedSet().size||state.home||state.search?'-filtered':''}.csv`,recordHeaders,current.map(recordCells)); else location.href=`api.php?action=csv&m=${encodeURIComponent(state.month.month)}`;};
     }
     function niceStep(max) { const raw=max/4, mag=10**Math.floor(Math.log10(raw)); return [1,2,2.5,5,10].map(m=>m*mag).find(st=>st>=raw); }
     function isCurrentMonth(m) { return m===new Date().toISOString().slice(0,7); }
@@ -247,7 +290,7 @@
       return `<div class="table-wrap" style="border:0"><svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Monthly funeral totals">${grid}<polyline class="series" points="${points}"/>${marks}${labels}</svg></div>`;
     }
     async function renderTrends() {
-      state.trend=await api('action=trends&months='+state.trendMonths); const d=state.trend;
+      state.trend=await api('action=trends&months='+state.trendMonths); const d=visibleTrend(state.trend);
       content.innerHTML=`<div class="panel-head"><h2>Monthly totals</h2><div class="actions"><label>Range <select id="trend-range">${[13,25,37].map(n=>`<option value="${n}" ${n===state.trendMonths?'selected':''}>${n} months</option>`).join('')}</select></label><button class="primary" id="copy-trends">Copy for spreadsheet</button><button id="csv-trends">Download CSV</button></div></div>
         ${chartSvg(d)}${d.months.some(isCurrentMonth)?`<div class="muted" style="margin:-6px 0 12px 8px">* ${esc(fmtMonth(d.months.find(isCurrentMonth)))} is the current month and is still filling in as obituaries are published.</div>`:``}
         <div class="trend-wrap"><table class="trend-table"><thead><tr><th>Funeral Home</th>${d.months.map(m=>`<th class="num">${esc(fmtShortMonth(m))}${isCurrentMonth(m)?"*":""}</th>`).join('')}</tr></thead><tbody>${d.homes.map(h=>`<tr><td>${esc(h)}</td>${d.months.map(m=>`<td class="num">${d.counts[h][m]}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td>Total</td>${d.months.map(m=>`<td class="num">${d.totals[m]}</td>`).join('')}</tr></tfoot></table></div>`;
@@ -257,7 +300,7 @@
       $('#csv-trends').onclick=()=>staticMode?downloadClientCsv(`berks-funerals-trends-${state.trendMonths}-months.csv`,headers,rows):location.href=`api.php?action=csv&kind=trends&months=${state.trendMonths}`;
     }
     function renderReview() {
-      const rows=state.month.undated;
+      const rows=state.month.undated.filter(r=>homeIncluded(r.home));
       content.innerHTML=`<div class="panel-head"><div><h2>Missing date of death</h2><div class="muted">Published or first seen in ${esc(fmtMonth(state.month.month))}</div></div><div class="actions"><button class="primary" id="copy-review">Copy for spreadsheet</button></div></div>
         <div class="table-wrap"><table><thead><tr><th>Name</th><th>Funeral Home</th><th>Published</th><th>Source</th><th>Obituary</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.home)}</td><td>${esc(r.published||'—')}</td><td>${esc(r.source)}</td><td>${r.url.startsWith('manual://')?'<span class="manual">manual</span>':`<a href="${esc(r.url)}" target="_blank" rel="noopener">Open ↗</a>`}</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="empty">No undated records surfaced for this month.</div>'}</div>`;
       const headers=['Name','Funeral Home','Published','Source','Obituary URL'];
@@ -266,7 +309,8 @@
     function renderSources() {
       const homes=state.overview.homes;
       content.innerHTML=`<div class="panel-head"><div><h2>Data sources</h2><div class="muted">${state.overview.all_time.total.toLocaleString()} records · ${state.overview.all_time.dated.toLocaleString()} with a date of death · ${state.overview.all_time.needs_review.toLocaleString()} flagged</div></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Funeral Home</th><th>Platform</th><th class="num">All time</th><th class="num">Undated</th><th>Last scan</th><th>Status / error</th></tr></thead><tbody>${homes.map(h=>{const s=h.last_scan||{}, bad=s.status&&s.status!=='success'; return `<tr><td><a href="${esc(h.base_url)}" target="_blank" rel="noopener">${esc(h.name)} ↗</a></td><td>${esc(h.platform)}</td><td class="num">${h.total_all_time.toLocaleString()}</td><td class="num">${h.undated_all_time.toLocaleString()}</td><td>${esc(formatDateTime(s.finished_at))}</td><td><span class="source-status ${bad?'errorish':''}">${esc(s.status||'—')}</span>${s.error_text?`<div class="source-error">${esc(s.error_text)}</div>`:''}</td></tr>`}).join('')}</tbody></table></div>`;
+        <div class="table-wrap"><table><thead><tr><th>Include</th><th>Funeral Home</th><th>Platform</th><th class="num">All time</th><th class="num">Undated</th><th>Last scan</th><th>Status / error</th></tr></thead><tbody>${homes.map(h=>{const s=h.last_scan||{}, bad=s.status&&s.status!=='ok'&&s.status!=='success'; return `<tr><td><input type="checkbox" data-home-include="${esc(h.name)}" ${homeIncluded(h.name)?'checked':''} aria-label="Include ${esc(h.name)} in the report"></td><td><a href="${esc(h.base_url)}" target="_blank" rel="noopener">${esc(h.name)} ↗</a></td><td>${esc(h.platform)}</td><td class="num">${h.total_all_time.toLocaleString()}</td><td class="num">${h.undated_all_time.toLocaleString()}</td><td>${esc(formatDateTime(s.finished_at))}</td><td><span class="source-status ${bad?'errorish':''}">${esc(s.status||'—')}</span>${s.error_text?`<div class="source-error">${esc(s.error_text)}</div>`:''}</td></tr>`}).join('')}</tbody></table></div>`;
+      content.querySelectorAll('[data-home-include]').forEach(input=>input.onchange=()=>setHomeIncluded(input.dataset.homeInclude, input.checked));
     }
     function formatDateTime(value) {
       if (!value) return '—'; const normalized=value.includes('T')?value:value.replace(' ','T')+'Z'; const date=new Date(normalized); return Number.isNaN(date.valueOf())?value:new Intl.DateTimeFormat('en-US',{dateStyle:'medium',timeStyle:'short'}).format(date);
@@ -274,9 +318,8 @@
     async function init() {
       try {
         state.overview=await api('action=overview');
-        monthSelect.innerHTML=state.overview.months.map(x=>`<option value="${x.month}">${esc(fmtMonth(x.month))} — ${x.total}</option>`).join('');
         const hash=parseHash(), month=state.overview.months.some(x=>x.month===hash.month)?hash.month:state.overview.latest_month;
-        monthSelect.value=month; state.tab=hash.tab; setHash(month,state.tab); updateMonthButtons();
+        fillMonthSelect(); monthSelect.value=month; renderHomeToggles(); state.tab=hash.tab; setHash(month,state.tab); updateMonthButtons();
         const scans=state.overview.homes.map(h=>h.last_scan?.finished_at).filter(Boolean).sort(), lastScan=formatDateTime(scans.at(-1));
         $('#as-of').textContent='Data as of '+lastScan;
         $('#report-footer').textContent='Berks County funeral tracker · data as of '+lastScan+(staticMode?' · report generated '+formatDateTime(state.overview.generated_at):'');
