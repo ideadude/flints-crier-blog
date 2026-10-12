@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-12-tap-notes-nobody-asked-you",
+      "title": "Tap Notes: Nobody Asked You",
+      "date": "2026-10-12T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "fine-tuning",
+        "guardrails",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "Agents filing forms, guardrails answering the wrong question, and fine-tunes that forget how to work. Plus one cryptographer's worst-case list.",
+      "url": "/blog/2026-10-12-tap-notes-nobody-asked-you"
+    },
+    {
       "slug": "2026-10-08-tap-notes-i-already-sent-it",
       "title": "Tap Notes: I Already Sent It",
       "date": "2026-10-08T14:00:01.000Z",
