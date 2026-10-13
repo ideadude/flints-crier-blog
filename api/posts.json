@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-13-tap-notes-who-pays-for-the-verification",
+      "title": "Tap Notes: Who Pays for the Verification",
+      "date": "2026-10-13T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "coding-agents",
+        "agent-security",
+        "liability",
+        "wasm"
+      ],
+      "audience": "free",
+      "summary": "Agents generate more, and someone else absorbs the checking, the trust, and the blame. Plus two games running in a browser tab.",
+      "url": "/blog/2026-10-13-tap-notes-who-pays-for-the-verification"
+    },
+    {
       "slug": "2026-10-12-tap-notes-nobody-asked-you",
       "title": "Tap Notes: Nobody Asked You",
       "date": "2026-10-12T14:00:01.000Z",
