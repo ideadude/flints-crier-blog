@@ -44,7 +44,7 @@
   <p class="sub">Vistage · BSGI · The JP Collective — a 6-second intro on St. Lucia's "Elevate".</p>
 
   <section class="hero">
-    <video controls playsinline preload="metadata" poster="media/a-prism-v2-poster.jpg" src="media/a-prism-v2.mp4"></video>
+    <video controls playsinline poster="media/a-prism-v2-poster.jpg" data-src="media/a-prism-v2.mp4"></video>
     <div class="actions">
       <a class="btn" href="tony-logo-prism.zip" download>Download zip (4K + 1080p + assets, 2.5 MB)</a>
       <a class="btn ghost" href="media/a-prism-v2.mp4" download>1080p preview MP4</a>
@@ -75,27 +75,27 @@
   <div class="opts">
     <section class="opt">
       <h3>A · Prism turn, with face outline</h3>
-      <video controls playsinline preload="none" poster="media/a-prism-poster.jpg" src="media/a-prism.mp4"></video>
+      <video controls playsinline poster="media/a-prism-poster.jpg" data-src="media/a-prism.mp4"></video>
       <p>The first take of the chosen direction, with a visible box on each face of the prism.</p>
     </section>
     <section class="opt">
       <h3>B · Night slam</h3>
-      <video controls playsinline preload="none" poster="media/b-night-slam-poster.jpg" src="media/b-night-slam.mp4"></video>
+      <video controls playsinline poster="media/b-night-slam-poster.jpg" data-src="media/b-night-slam.mp4"></video>
       <p>Dark navy background with white logos. Each one hard-cuts in on the downbeat with a scale punch, a light streak, and a glow.</p>
     </section>
     <section class="opt">
       <h3>C · Brand-color wipe</h3>
-      <video controls playsinline preload="none" poster="media/c-wipe-stack-poster.jpg" src="media/c-wipe-stack.mp4"></video>
+      <video controls playsinline poster="media/c-wipe-stack-poster.jpg" data-src="media/c-wipe-stack.mp4"></video>
       <p>A bar in each brand's color sweeps across and pulls away to reveal the logo. The logos build into a vertical stack.</p>
     </section>
     <section class="opt">
       <h3>D · Push through</h3>
-      <video controls playsinline preload="none" poster="media/d-push-through-poster.jpg" src="media/d-push-through.mp4"></video>
+      <video controls playsinline poster="media/d-push-through-poster.jpg" data-src="media/d-push-through.mp4"></video>
       <p>Each logo rushes in from deep space, lands on the downbeat, then flies past the camera as the next one arrives.</p>
     </section>
     <section class="opt">
       <h3>E · Lineup build</h3>
-      <video controls playsinline preload="none" poster="media/poster.jpg" src="media/tony-logo-animatic-v3.mp4"></video>
+      <video controls playsinline poster="media/poster.jpg" data-src="media/tony-logo-animatic-v3.mp4"></video>
       <p>Logos slam in one per bar and slide over to build a three-across lineup.</p>
     </section>
   </div>
@@ -107,5 +107,14 @@
     <div><div class="logo"><img src="logos/jpc.png" alt="The JP Collective"></div><div class="cap">The JP Collective: navy logotype from thejpcollective.com (2029px PNG)</div></div>
   </div>
 </main>
+<script>
+  /* host ignores Range requests, so load each clip as a blob to keep Safari/iOS playing and seeking */
+  document.querySelectorAll("video[data-src]").forEach(function (v) {
+    var url = v.getAttribute("data-src");
+    fetch(url).then(function (r) { if (!r.ok) throw 0; return r.blob(); })
+      .then(function (b) { v.src = URL.createObjectURL(b); })
+      .catch(function () { v.src = url; });
+  });
+</script>
 </body>
 </html>
