@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-16-tap-notes-zero-clicks-zero-calls",
+      "title": "Tap Notes: Zero Clicks, Zero Calls",
+      "date": "2026-10-16T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "open-weight",
+        "fine-tuning"
+      ],
+      "audience": "free",
+      "summary": "Ads that infect phones, labs that skip the basics, and a LoRA that ignored its escalation tool 1,515 times.",
+      "url": "/blog/2026-10-16-tap-notes-zero-clicks-zero-calls"
+    },
+    {
       "slug": "2026-10-14-tap-notes-trust-the-hook-not-the-prompt",
       "title": "Tap Notes: Trust the Hook, Not the Prompt",
       "date": "2026-10-14T14:00:01.000Z",
