@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Logo Prism Animatic</title>
+<style>
+  :root { --bg:#f4f6f8; --panel:#ffffff; --ink:#14212b; --muted:#5b6b77; --line:#dde4ea; --accent:#0a5c8a; --accent-ink:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1418; --panel:#171e24; --ink:#e8eef2; --muted:#93a3ae; --line:#26313a; --accent:#5fb3e6; --accent-ink:#06212f; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 36px 16px 72px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  video { width:100%; display:block; border-radius:10px; background:#000; }
+  .hero video { box-shadow:0 24px 60px -28px rgba(0,0,0,.55); }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 8px; align-items:center; }
+  .btn { display:inline-block; padding:10px 18px; border-radius:8px; background:var(--accent); color:var(--accent-ink); font-weight:600; text-decoration:none; }
+  .btn.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); padding:8px 14px; font-weight:500; }
+  .note { color:var(--muted); font-size:14px; }
+  h2 { font-size:20px; margin:44px 0 12px; }
+  h3 { font-size:16px; margin:2px 0 10px; }
+  .opts { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:18px; }
+  .opt { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .opt p { color:var(--muted); font-size:14px; margin:10px 0 12px; }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  td, th { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:500; }
+  .logos { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); gap:12px; }
+  .logo { background:#fff; border:1px solid var(--line); border-radius:8px; padding:22px; display:flex; align-items:center; justify-content:center; height:110px; }
+  .logo img { max-width:100%; max-height:64px; }
+  .cap { color:var(--muted); font-size:13px; margin-top:6px; }
+  ul.zip { color:var(--muted); font-size:15px; padding-left:20px; }
+  ul.zip li { margin:4px 0; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Logo Prism Animatic</h1>
+  <p class="sub">Vistage · BSGI · The JP Collective — a 6-second intro on St. Lucia's "Elevate".</p>
+
+  <section class="hero">
+    <video controls playsinline preload="metadata" poster="media/a-prism-v2-poster.jpg" src="media/a-prism-v2.mp4"></video>
+    <div class="actions">
+      <a class="btn" href="tony-logo-prism.zip" download>Download zip (4K + 1080p + assets, 2.5 MB)</a>
+      <a class="btn ghost" href="media/a-prism-v2.mp4" download>1080p preview MP4</a>
+    </div>
+    <p class="note">The preview above is 1080p. The zip contains the 4K master (3840×2160).</p>
+  </section>
+
+  <h2>What's in the zip</h2>
+  <ul class="zip">
+    <li><strong>video/</strong>: the 4K master (3840×2160), a 1080p version, and a 4K still of the last frame. Both videos are rendered natively at their own size; neither is an upscale of the other.</li>
+    <li><strong>logos/</strong>: each company's logo exactly as downloaded from its website, plus the three versions used in the video.</li>
+    <li><strong>music/</strong>: the first 6 seconds of "Elevate" with the fade, exactly as used. For anything public, use a licensed copy of the song.</li>
+    <li><strong>project/</strong>: the editable source (HTML + GSAP, rendered with HyperFrames), and a README with timings and file sources.</li>
+  </ul>
+  <p class="note">The BSGI logo's only public source is a 600px PNG, so it's a little soft at 4K. A high-res or vector BSGI logo would fix that with a quick re-render.</p>
+
+  <h2>Timing</h2>
+  <table>
+    <tr><th>Time</th><th>Beat</th><th>What happens</th></tr>
+    <tr><td>0.19s</td><td>Bar 1, downbeat</td><td>Vistage appears</td></tr>
+    <tr><td>2.51s</td><td>Bar 2, downbeat</td><td>Prism turns end over end to BSGI</td></tr>
+    <tr><td>4.83s</td><td>Bar 3, downbeat</td><td>Prism turns to The JP Collective</td></tr>
+    <tr><td>4.9–6.0s</td><td>—</td><td>Hold, music fades out</td></tr>
+  </table>
+  <p class="note">103.4 BPM, so one bar is 2.32s.</p>
+
+  <h2>Other directions we explored</h2>
+  <div class="opts">
+    <section class="opt">
+      <h3>A · Prism turn, with face outline</h3>
+      <video controls playsinline preload="none" poster="media/a-prism-poster.jpg" src="media/a-prism.mp4"></video>
+      <p>The first take of the chosen direction, with a visible box on each face of the prism.</p>
+    </section>
+    <section class="opt">
+      <h3>B · Night slam</h3>
+      <video controls playsinline preload="none" poster="media/b-night-slam-poster.jpg" src="media/b-night-slam.mp4"></video>
+      <p>Dark navy background with white logos. Each one hard-cuts in on the downbeat with a scale punch, a light streak, and a glow.</p>
+    </section>
+    <section class="opt">
+      <h3>C · Brand-color wipe</h3>
+      <video controls playsinline preload="none" poster="media/c-wipe-stack-poster.jpg" src="media/c-wipe-stack.mp4"></video>
+      <p>A bar in each brand's color sweeps across and pulls away to reveal the logo. The logos build into a vertical stack.</p>
+    </section>
+    <section class="opt">
+      <h3>D · Push through</h3>
+      <video controls playsinline preload="none" poster="media/d-push-through-poster.jpg" src="media/d-push-through.mp4"></video>
+      <p>Each logo rushes in from deep space, lands on the downbeat, then flies past the camera as the next one arrives.</p>
+    </section>
+    <section class="opt">
+      <h3>E · Lineup build</h3>
+      <video controls playsinline preload="none" poster="media/poster.jpg" src="media/tony-logo-animatic-v3.mp4"></video>
+      <p>Logos slam in one per bar and slide over to build a three-across lineup.</p>
+    </section>
+  </div>
+
+  <h2>Logos</h2>
+  <div class="logos">
+    <div><div class="logo"><img src="logos/vistage.svg" alt="Vistage"></div><div class="cap">Vistage: vector wordmark from vistage.com, in Vistage navy #003E5E</div></div>
+    <div><div class="logo"><img src="logos/bsgi.png" alt="BSGI"></div><div class="cap">BSGI: full logo from bsgi.com (600px PNG, the largest they serve)</div></div>
+    <div><div class="logo"><img src="logos/jpc.png" alt="The JP Collective"></div><div class="cap">The JP Collective: navy logotype from thejpcollective.com (2029px PNG)</div></div>
+  </div>
+</main>
+</body>
+</html>
