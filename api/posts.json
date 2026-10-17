@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-17-tap-notes-review-without-the-gate",
+      "title": "Tap Notes: Review Without the Gate",
+      "date": "2026-10-17T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "code-review",
+        "agents",
+        "open-weight",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "Code review stops being a gate and becomes spellcheck, a trillion-parameter model fits on four Macs, and an ad network turns out to be an exploit delivery system.",
+      "url": "/blog/2026-10-17-tap-notes-review-without-the-gate"
+    },
+    {
       "slug": "2026-10-16-tap-notes-zero-clicks-zero-calls",
       "title": "Tap Notes: Zero Clicks, Zero Calls",
       "date": "2026-10-16T14:00:01.000Z",
