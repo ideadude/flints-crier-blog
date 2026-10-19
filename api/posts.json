@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-10-19-tap-notes-the-degraded-path",
+      "title": "Tap Notes: The Degraded Path",
+      "date": "2026-10-19T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "code-review"
+      ],
+      "audience": "free",
+      "summary": "A quiz hook for agent-written code, and a crypto bug that shows why the failure branch is where attackers live.",
+      "url": "/blog/2026-10-19-tap-notes-the-degraded-path"
+    },
+    {
       "slug": "2026-10-18-tap-notes-two-kinds-of-bad-day",
       "title": "Tap Notes: Two Kinds of Bad Day",
       "date": "2026-10-18T14:00:01.000Z",
