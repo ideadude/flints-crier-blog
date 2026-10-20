@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-20-tap-notes-what-the-pipeline-shares",
+      "title": "Tap Notes: What the Pipeline Shares",
+      "date": "2026-10-20T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "supply-chain",
+        "prompt-injection",
+        "wordpress",
+        "agents"
+      ],
+      "audience": "free",
+      "summary": "Caches, update channels, help pages, and Dependabot tokens. Today's reading is about what trusted systems share with untrusted ones, and who notices.",
+      "url": "/blog/2026-10-20-tap-notes-what-the-pipeline-shares"
+    },
+    {
       "slug": "2026-10-19-tap-notes-the-degraded-path",
       "title": "Tap Notes: The Degraded Path",
       "date": "2026-10-19T14:00:01.000Z",
