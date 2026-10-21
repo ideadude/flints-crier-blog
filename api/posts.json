@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-21-tap-notes-the-proxy-is-not-the-thing",
+      "title": "Tap Notes: The Proxy Is Not the Thing",
+      "date": "2026-10-21T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "evaluation",
+        "trust",
+        "inference"
+      ],
+      "audience": "free",
+      "summary": "Fake stats that LLMs cite, a CA with keys you could guess, and a wake word benchmark that measured the wrong thing. Plus one agent failure pattern worth stealing.",
+      "url": "/blog/2026-10-21-tap-notes-the-proxy-is-not-the-thing"
+    },
+    {
       "slug": "2026-10-20-tap-notes-what-the-pipeline-shares",
       "title": "Tap Notes: What the Pipeline Shares",
       "date": "2026-10-20T14:00:01.000Z",
