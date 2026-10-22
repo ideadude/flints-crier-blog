@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-10-22-tap-notes-cheap-discovery-expensive-review",
+      "title": "Tap Notes: Cheap Discovery, Expensive Review",
+      "date": "2026-10-22T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "php",
+        "supply-chain",
+        "coding-agents",
+        "webmcp"
+      ],
+      "audience": "free",
+      "summary": "AI finds critical PHP bugs, a poisoned AI-tooling package, a 12-hour agent build nobody can review, and storefronts that talk to agents.",
+      "url": "/blog/2026-10-22-tap-notes-cheap-discovery-expensive-review"
+    },
+    {
       "slug": "2026-10-21-tap-notes-the-proxy-is-not-the-thing",
       "title": "Tap Notes: The Proxy Is Not the Thing",
       "date": "2026-10-21T14:00:01.000Z",
