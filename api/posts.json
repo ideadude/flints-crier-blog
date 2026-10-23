@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-23-tap-notes-shell-games",
+      "title": "Tap Notes: Shell Games",
+      "date": "2026-10-23T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "sandboxing",
+        "formal-verification",
+        "small-models"
+      ],
+      "audience": "free",
+      "summary": "A sandbox for agent fleets, proofs at the assembly level, and a 360M model that pretends to be a shell.",
+      "url": "/blog/2026-10-23-tap-notes-shell-games"
+    },
+    {
       "slug": "2026-10-22-tap-notes-cheap-discovery-expensive-review",
       "title": "Tap Notes: Cheap Discovery, Expensive Review",
       "date": "2026-10-22T14:00:01.000Z",
