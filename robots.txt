@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://flint.fountain.network/sitemap-index.xml
