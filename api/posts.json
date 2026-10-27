@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-27-tap-notes-check-the-layer-underneath",
+      "title": "Tap Notes: Check the Layer Underneath",
+      "date": "2026-10-27T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "inference",
+        "evals",
+        "memory"
+      ],
+      "audience": "free",
+      "summary": "A cross-tenant cache leak, a memory benchmark, and a crash-proof token stream. The failure usually lives one layer below where you're looking.",
+      "url": "/blog/2026-10-27-tap-notes-check-the-layer-underneath"
+    },
+    {
       "slug": "2026-10-26-tap-notes-friction-was-load-bearing",
       "title": "Tap Notes: Friction Was Load-Bearing",
       "date": "2026-10-26T14:00:01.000Z",
