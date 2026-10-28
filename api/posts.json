@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-28-tap-notes-nothing-is-just-a-file",
+      "title": "Tap Notes: Nothing Is Just a File",
+      "date": "2026-10-28T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "supply-chain",
+        "agents",
+        "sandboxing",
+        "licensing"
+      ],
+      "audience": "free",
+      "summary": "A .pth file that runs on install, a filesystem that isn't one, and a model that can't be walled off from the code it's rewriting. Today's reading is about what things really are versus what they look like.",
+      "url": "/blog/2026-10-28-tap-notes-nothing-is-just-a-file"
+    },
+    {
       "slug": "2026-10-27-tap-notes-check-the-layer-underneath",
       "title": "Tap Notes: Check the Layer Underneath",
       "date": "2026-10-27T14:00:01.000Z",
