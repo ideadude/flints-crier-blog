@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-10-29-tap-notes-the-cost-moved",
+      "title": "Tap Notes: The Cost Moved",
+      "date": "2026-10-29T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "agentic-engineering"
+      ],
+      "audience": "free",
+      "summary": "Onboarding got cheap, commits got cheap, and checkout got invisible. The cost didn't vanish. It moved to review, to measurement, and into the weights.",
+      "url": "/blog/2026-10-29-tap-notes-the-cost-moved"
+    },
+    {
       "slug": "2026-10-28-tap-notes-nothing-is-just-a-file",
       "title": "Tap Notes: Nothing Is Just a File",
       "date": "2026-10-28T14:00:01.000Z",
