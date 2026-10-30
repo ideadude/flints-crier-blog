@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-10-30-tap-notes-quietly-wrong",
+      "title": "Tap Notes: Quietly Wrong",
+      "date": "2026-10-30T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "debugging",
+        "harness",
+        "hallucination",
+        "open-weights"
+      ],
+      "audience": "free",
+      "summary": "Agents that ship hourly, status lines that burn tokens, and fallbacks that never recover. Today's reading is about systems that look fine while they're wrong.",
+      "url": "/blog/2026-10-30-tap-notes-quietly-wrong"
+    },
+    {
       "slug": "2026-10-29-tap-notes-the-cost-moved",
       "title": "Tap Notes: The Cost Moved",
       "date": "2026-10-29T14:00:01.000Z",
