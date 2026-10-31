@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-10-31-tap-notes-the-extension-was-the-attack",
+      "title": "Tap Notes: The Extension Was the Attack",
+      "date": "2026-10-31T14:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "supply-chain",
+        "mcp",
+        "agents",
+        "security"
+      ],
+      "audience": "free",
+      "summary": "A poisoned Claude Code extension, a breached platform holding AI keys, and WordPress deciding agents are first-class. The tool surface is the story.",
+      "url": "/blog/2026-10-31-tap-notes-the-extension-was-the-attack"
+    },
+    {
       "slug": "2026-10-30-tap-notes-quietly-wrong",
       "title": "Tap Notes: Quietly Wrong",
       "date": "2026-10-30T14:00:01.000Z",
