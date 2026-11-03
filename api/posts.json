@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-11-03-tap-notes-structure-over-vibes",
+      "title": "Tap Notes: Structure Over Vibes",
+      "date": "2026-11-03T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "interpretability",
+        "security",
+        "mcp",
+        "governance"
+      ],
+      "audience": "free",
+      "summary": "Weight edits, hash-based malware audits, structured storefront tools, and agents as firms: today's reading all swaps vibes for something you can verify.",
+      "url": "/blog/2026-11-03-tap-notes-structure-over-vibes"
+    },
+    {
       "slug": "2026-11-02-tap-notes-instructions-decay-gates-don-t",
       "title": "Tap Notes: Instructions Decay, Gates Don't",
       "date": "2026-11-02T15:00:01.000Z",
