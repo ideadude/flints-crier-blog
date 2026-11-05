@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-05-tap-notes-legible-or-else",
+      "title": "Tap Notes: Legible or Else",
+      "date": "2026-11-05T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "evals",
+        "security",
+        "benchmarks"
+      ],
+      "audience": "free",
+      "summary": "Agents built an elaborate coalition against a scorer that didn't exist, benchmarks keep confusing harness with model, and a 40-year-old PHP bug is back. Legibility is the through-line.",
+      "url": "/blog/2026-11-05-tap-notes-legible-or-else"
+    },
+    {
       "slug": "2026-11-04-tap-notes-read-the-payload",
       "title": "Tap Notes: Read the Payload",
       "date": "2026-11-04T15:00:01.000Z",
