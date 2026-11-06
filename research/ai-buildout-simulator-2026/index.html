@@ -120,6 +120,8 @@ window.addEventListener('error', function (e) {
   .row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin: .5rem 0; font-size: .8rem; }
   select { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; font: inherit; font-size: .78rem; padding: .3rem .4rem; }
   .bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: .3rem; } .bar > div { height: 100%; background: var(--accent2); width: 0; }
+  .range-line { background: var(--surface2); border-radius: 6px; padding: .6rem .8rem; font-size: .8rem; margin: .4rem 0 .6rem; }
+  .range-line table td, .range-line table th { padding: .25rem .45rem; }
   .big-answer { font-size: 1rem; padding: .8rem 1rem; background: var(--surface2); border-radius: 6px; margin: .6rem 0; }
   footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: .72rem; color: var(--text-dim); text-align: center; }
 </style>
@@ -127,18 +129,22 @@ window.addEventListener('error', function (e) {
 <body>
 <div class="container">
 <header>
-  <h1>AI Buildout Simulator v3</h1>
-  <div class="subtitle">Demand, chips, memory, power — and now politics. Drag the sliders and see who wins.<br>Research compiled November 6, 2026 — Flint / Coleman Research — v3 of the <a href="../chip-memory-rotation-2026/">June chip &amp; memory</a> and <a href="../ai-infrastructure-economics-v2/">October infrastructure</a> models</div>
+  <h1>AI Buildout Simulator v3.1</h1>
+  <div class="subtitle">Demand, chips, memory, power — and now politics. Drag the sliders and see who wins.<br>Research compiled November 6, 2026 — revised after peer review the same evening — Flint / Coleman Research — v3 of the <a href="../chip-memory-rotation-2026/">June chip &amp; memory</a> and <a href="../ai-infrastructure-economics-v2/">October infrastructure</a> models</div>
 </header>
 
 <div class="verdict-box">
   <h2>The Verdict</h2>
-  <div class="verdict-text">Partly an overreaction — just not in the names everyone is staring at.</div>
+  <div class="verdict-text">Mostly not an overreaction. And the overreaction I called in v3.0 didn't survive peer review.</div>
   <div class="verdict-detail">
-    <p><b>The chip selloff is roughly fair.</b> Starting from what the market paid on Nov 3, Nvidia, Micron and SK Hynix at today's prices imply that <b>~24–28% of the US data center pipeline gets blocked</b>. That is almost exactly Brad Gerstner's 25–35% estimate. If you believe Gerstner, MU at ~$688 is fairly priced for the politics — it's not a gift.</p>
-    <p><b>The overreaction is in the second-order names.</b> Power gear (Vertiv, Eaton, GE Vernova) and Dell are priced as if <b>more than 70%</b> of the pipeline vanishes, and TSMC, Sandisk, Arm and the equipment makers as if <b>45–60%</b> does. Their demand depends less on any one county commission. Sold-out turbines, optics and NAND don't un-sell because Ohio passed 21 moratoria.</p>
-    <p><b>The underreaction is in leverage.</b> CoreWeave and Oracle imply only <b>12–18%</b> blocked, and so do Intel and AMD. They're the ones holding contracted chips with nowhere to plug them in. If the revolt is real, the balance sheet is where it shows up first.</p>
-    <p><b>The bigger risk for memory isn't politics, it's 2028.</b> Every maker says it's sold out through 2027, and SK Hynix says through 2029. But Micron Idaho, Hynix Yongin, Samsung P5 and CXMT all land in 2027–28. Click the "Memory glut 2027" scenario and MU loses more than half its value. The election moved the date by a few months, at most.</p>
+    <p><b>Read this first:</b> nobody, including this model, knows how much of the US pipeline the revolt kills. The honest output is a range, not a number. Under my base case, with every assumption jittered and every political risk rolled as a real coin flip, here's where today's price sits in the model's distribution of fair values:</p>
+    <div class="range-line" id="rangeLine">Running 400 simulated futures…</div>
+    <p><b>The headline chips are priced for <i>less</i> damage than the consensus estimate, not more.</b> Start from the Nov 3 close and attribute the entire drop to permit risk. Nvidia, Micron, SK Hynix and AMD imply only <b>~17–23%</b> of the US pipeline blocked, and <b>~9–19%</b> after stripping out the market-wide move. Gerstner says 25–35%. If he's right, the chip selloff isn't finished. If Ives's ~10% is right, it overshot a little.</p>
+    <p><b>Power gear is fair to slightly cheap, not a screamer.</b> v3.0 had Vertiv, Eaton and GE Vernova pricing in more than 70% blocked. Dora pointed out that slower orders don't cancel turbines, they erase the lead-time premium, and a 22% margin goes back to 14%. With that modeled, they imply ~37–41%, between Gerstner and Goldman, and Vertiv sits around the 25th percentile of the range above. I withdraw the overreaction call.</p>
+    <p><b>What's left unexplained:</b> Dell (~64%), Sandisk (~51%) and Arm (~48%) fell more than permit risk explains, with TSMC (~43%) close behind. Those are also the names with the most <i>other</i> news: PC and module inventory gluts, Samsung's guide, a crowded semis long unwinding, and Dell's 2–3% net margins. Treat them as places to look, not calls.</p>
+    <p><b>Leverage is binary.</b> CoreWeave's equity is an option on staying solvent. The model now carries a distress branch: ~40% two-year distress probability in the base case, ~85% if the revolt spreads. It's not "underpriced by 20%". It's a coin flip that a smooth multiple hides.</p>
+    <p><b>Memory's 2028 risk is real but conditional.</b> The "Memory glut 2027" scenario still takes MU's fair value down by more than half. Dora's counter, that HBM eats 3–5× the wafers per bit so a glut can't happen, is now a visible slider. Push it to 5× and the damage shrinks but doesn't vanish. The quiet risk is that HBM demand is tied to accelerator shipments, and the political scenario is precisely the one where those slow.</p>
+    <p><b>What would change my mind (dated):</b> Nvidia's Q3 print and guide on <b>Nov 17</b>. ERCOT's large-load audit on <b>Dec 10</b> and the PUCT meeting on <b>Dec 17</b>. Micron's guide in <b>mid/late December</b> (HBM pricing, FY27 capex). DRAM contract prices turning negative QoQ. Server CPU lead times dropping under 16 weeks. CoreWeave CDS breaking 1,500 bp.</p>
   </div>
   <div class="live" id="liveVerdict">Loading model…</div>
 </div>
@@ -153,6 +159,7 @@ window.addEventListener('error', function (e) {
   <button data-t="supply">🔗 Supply &amp; Demand Now</button>
   <button data-t="balance">🏦 Balance Sheets</button>
   <button data-t="score">📋 Scorecard</button>
+  <button data-t="review">🔍 Peer Review</button>
   <button data-t="method">🧮 Method &amp; Sources</button>
 </nav>
 
@@ -225,15 +232,16 @@ window.addEventListener('error', function (e) {
 <!-- PRICED IN -->
 <section class="tab" id="t-priced">
   <p class="lead">Turn the model around. Instead of "what's it worth if X happens?", ask <b>"how much of X does today's price already assume?"</b> Holding everything else at the Nov 3 consensus, the solver finds the share of the US pipeline that would have to be blocked (with certainty) to make each stock's fair value equal today's price.</p>
+  <div class="warn"><b>This is a conditional statement, not a causal one.</b> It answers "<i>if</i> permit risk were the only thing that changed, how much is priced?" The selloff also had de-grossing, rates and a Samsung guide in it. So every bar is shown twice: once attributing the whole drop to politics (an upper bound), and once after removing each stock's beta times the S&amp;P's move since Nov 3 (−2.1%). Sector-specific de-grossing can't be separated out this way, so even the second bar overstates the politics. One tell that it wasn't <i>only</i> de-grossing: the hyperscalers were among the most crowded longs, and they went up.</div>
   <div class="grid2">
-    <div class="card"><div class="chart-title">Market-implied share of US AI pipeline blocked</div><div class="chart xtall"><canvas id="chImplied"></canvas></div>
-    <div class="chart-note">Reference lines: Dan Ives ~10% of projects, Gerstner 25–35% of 2027 build (10–15 GW), Goldman ~45% of planned capacity "at policy risk". Bars capped at 70% mean the politics alone can't explain the drop. Either the market overreacted on that name or something else hit it: rates, a Samsung guide, positioning.</div></div>
+    <div class="card"><div class="chart-title">Market-implied share of US AI pipeline blocked: all-politics vs ex-market</div><div class="chart xtall"><canvas id="chImplied"></canvas></div>
+    <div class="chart-note">Reference lines: Dan Ives ~10% of projects, Gerstner 25–35% of 2027 build (10–15 GW), Goldman ~45% of planned capacity "at policy risk". Bars capped at 70% mean the politics alone can't explain the drop. Something else hit that name, or the market overreacted.</div></div>
     <div class="card prose">
       <h3 style="margin-top:0">How to read this</h3>
-      <p><b>Bars near 25–35%:</b> priced about where the best-informed estimates sit. NVDA, MU, SK Hynix and ASML are here. The selloff in the headline names is not crazy. It's the market doing math.</p>
-      <p><b>Bars at 40–70%+:</b> the stock fell more than its exposure to US permits justifies, if permits were the only thing that changed. That covers TSMC, Broadcom, Marvell, Sandisk, Arm, the equipment makers, the power-gear names, Dell and Rambus. These are the overreaction candidates. Before you trust it, ask what else hit them: rates, a Samsung guide, crowded positioning.</p>
-      <p><b>Bars under 20%:</b> the price still assumes the politics mostly fizzle. That covers CoreWeave, Oracle, Intel and AMD. Arista sits here too, but only because it barely fell. If you think Gerstner is right, the levered ones have further to fall.</p>
-      <p><b>Not shown (no answer in range):</b> hyperscalers. MSFT, GOOGL and AMZN rose after the election. In the model, a blocked buildout makes their existing compute <i>more</i> valuable (scarcity rent) and their capex bill smaller, which is Clifton's point exactly. CEG, VST and META also show no answer: their drops come from price-cap politics or other drivers, not permit risk.</p>
+      <p><b>Under ~25% (below Gerstner):</b> NVDA, MU, SK Hynix, AMD and Intel, plus Oracle and CoreWeave. The price assumes less damage than the best-informed estimate. If you believe Gerstner, these still have room to fall. For CoreWeave the number is less meaningful, because its value runs through the distress branch, not a smooth curve.</p>
+      <p><b>~25–45% (Gerstner to Goldman):</b> TSMC, the power gear (VRT, ETN, GEV), the equipment makers, Broadcom, Marvell and ASML. Roughly fair for a "the revolt is real" view.</p>
+      <p><b>Over 45%:</b> Dell, Sandisk and Arm, and Rambus at more than 70%. These fell more than permit risk explains. Each has a non-political story too: memory and PC inventory, valuation, thin margins. They're candidates to investigate, not overreaction calls.</p>
+      <p><b>No answer in range:</b> Microsoft, Alphabet and Amazon, which rose. Their model value barely moves with permits now that it treats most of their compute as consumed internally (Dora's correction). Their post-election bid looks like relative safety, not a scarcity windfall. Meta was flat, so its ~21% bar is noise. CEG and VST have no answer either: their moves come from price-cap politics, not permit risk.</p>
       <table id="impliedTable" style="margin-top:.8rem"></table>
     </div>
   </div>
@@ -291,8 +299,8 @@ window.addEventListener('error', function (e) {
   </div>
   <div class="card"><div class="chart tall"><canvas id="chTape"></canvas></div><div class="chart-note">Close-to-close from yfinance. Gray = benchmarks. The split Clifton flagged is right there: buildout suppliers down hard, compute owners flat to up.</div></div>
   <div class="prose">
-  <h2 class="sec">Clifton's best point, tested</h2>
-  <p>"If we build less compute, whoever already has compute is holding something more valuable." The simulator agrees, mechanically. Block the pipeline and coverage drops, so rental prices rise. Hyperscaler capex and depreciation fall at the same time, which helps free cash flow. Run the "Clifton: revolt spreads" preset and Microsoft, Alphabet, Amazon and Meta come out flat against the base case. Suppliers fall 7–45%, and CoreWeave's equity is nearly wiped out. That's the same split the tape showed. It is also current market reality, not just theory: H100 rentals are ~$3.80–4.00/hr (up from ~$1.95 a year ago), B200 rentals are up 21.5% in 30 days, and providers are announcing Dec 1 hikes (<a href="https://singularityresearchfund.com/gpu-prices">GPU price tracker</a>). Compute is getting scarcer, not cheaper.</p>
+  <h2 class="sec">Clifton's best point, tested (and corrected)</h2>
+  <p>"If we build less compute, whoever already has compute is holding something more valuable." That's true for the <i>merchant</i> part of the fleet: rental prices really are rising. H100s run ~$3.80–4.00/hr, up from ~$1.95 a year ago, B200 rentals are up 21.5% in 30 days, and providers are announcing Dec 1 hikes (<a href="https://singularityresearchfund.com/gpu-prices">GPU price tracker</a>). But Dora is right that most hyperscaler compute is consumed internally by search, ads, recommendations, Copilot and training. A stalled buildout freezes those roadmaps, it doesn't earn scarcity rent. v3.1 applies the rental premium only to each company's merchant share (Amazon ~60%, Microsoft ~45%, Alphabet ~30%, Meta 0%). Result: in the "Clifton: revolt spreads" preset the hyperscalers come out roughly flat to −3% against the base case. They don't win. They just lose much less than suppliers (most fall 15–35%, AMD more than half) and CoreWeave, which mostly gets wiped out. That's still the split the tape showed. It's relative safety, not a windfall.</p>
   <p>His second-best point is that <b>a local zoning revolt is now a macro event</b> because data centers are a huge share of expected growth. The model can't capture that reflexivity, the way slower capex slows GDP, which hits the multiple. The "Market sentiment" slider is where you put it.</p>
   </div>
 </section>
@@ -320,7 +328,7 @@ window.addEventListener('error', function (e) {
       <p>GE Vernova gas backlog plus reservations is 122 GW, with slots out to 2031. Siemens Energy lead times are 3+ years and large transformers ~128 weeks (secondary). PJM's 2028/29 auction cleared at the cap and came up 6.8 GW short, and FERC pushed the backstop auction to Feb–Mar 2027 (<a href="https://www.utilitydive.com/news/pjm-delays-backstop-procurement-ferc-data-center/831751/">Utility Dive</a>).</p>
       <p>2027 US load forecasts run from 45 GW (EPRI peak) to 66 GW (Goldman demand) to 90 GW (Goldman capacity). The spread is about metric choice, so check which one anyone quotes (<a href="https://www.goldmansachs.com/insights/articles/us-data-center-power-demand-projected-to-double-by-2027">Goldman</a>, <a href="https://powering-intelligence.epri.com/dashboard/">EPRI</a>). Near-term behind-the-meter power means gas. New SMRs don't produce commercial power before ~2030.</p></div></div>
     <div class="card"><h3 style="margin-top:0">Cooling &amp; electrical <span class="pill green">Demand strong, supply catching up</span></h3><div class="prose" style="font-size:.8rem">
-      <p>Vertiv Q3: sales $4.31B (+61%), organic orders >100% YoY, guide raised, ~$4.1B of customer prepayments (Grok summary; primary check pending). Customers prepaying is not what fading demand looks like. Vertiv is down 52% from its high and 23% since Nov 3. That's the single biggest gap in the model between fundamentals and price.</p></div></div>
+      <p>Vertiv Q3: sales $4.31B (+61%), organic orders >100% YoY, guide raised, ~$4.1B of customer prepayments (Grok summary; primary check pending). Customers prepaying is not what fading demand looks like. But the stock was priced like software at the peak. v3.1 lets the lead-time premium fade when order growth slows, and with that modeled Vertiv's drop looks roughly fair, not like the overreaction v3.0 called.</p></div></div>
   </div>
 
   <h2 class="sec">Demand: still accelerating</h2>
@@ -358,7 +366,7 @@ window.addEventListener('error', function (e) {
       <ul>
         <li><b>The buyers are borrowing.</b> Free cash flow went negative at Alphabet (−$9.1B), Amazon (TTM −$42.4B), Meta (−$2.1B, first time in 10+ years) and Oracle. Only Microsoft is solidly positive. In one week Alphabet, Meta and Oracle raised more than $50B of bonds and equity. Amazon arranged up to an ~$80B secured supplier facility, and Meta created non-voting shares to fund AI (<a href="https://www.ifre.com/bonds/2509040/hyperscalers-raise-us50bn-ahead-of-dramatic-ai-meltdown">IFR</a>, <a href="https://www.datacenterdynamics.com/en/news/big-four-hyperscalers-raising-more-that-131-billion-in-debt-and-equity-for-ai-buildout/">DCD</a>).</li>
         <li><b>The sellers are hoarding cash.</b> Memory makers are throwing off cash at peak margins. In the model, Micron goes from ~$38B net cash to well over $200B by 2028 even in scenarios where its stock falls. Peak-cycle cash is why memory equities don't go to zero in a glut. They just go back to 6–8× normalized earnings.</li>
-        <li><b>The middle is levered.</b> CoreWeave's CDS hit a record ~1,167 bp and Nvidia's 5-year CDS is up more than 3× on the year, with ~0.8 correlation to CoreWeave. Oracle's $18B New Mexico project loan traded ~89–91¢ and it plans another $20B raise (<a href="https://www.reuters.com/business/finance/oracles-18-billion-data-center-debt-under-pressure-ft-reports-2026-09-18/">Reuters</a>). These companies signed for chips and leases they must pay for whether or not a county lets them plug in, and the model's levered-builder logic reflects that. Slide the revolt up and their revenue falls faster than their capex.</li>
+        <li><b>The middle is levered.</b> CoreWeave's CDS hit a record ~1,167 bp and Nvidia's 5-year CDS is up more than 3× on the year, with ~0.8 correlation to CoreWeave. Oracle's $18B New Mexico project loan traded ~89–91¢ and it plans another $20B raise (<a href="https://www.reuters.com/business/finance/oracles-18-billion-data-center-debt-under-pressure-ft-reports-2026-09-18/">Reuters</a>). These companies signed for chips and leases they must pay for whether or not a county lets them plug in. Their revenue falls faster than their capex when the revolt bites. v3.1 adds a distress branch: when 2027–28 net debt/EBITDA climbs past ~8×, the probability of a dilutive recap or restructuring rises steeply, and equity value is haircut 85% in that branch. The table shows each levered name's leverage and distress probability under your sliders.</li>
         <li><b>Circularity:</b> Nvidia has ~$30B into OpenAI, guarantees of up to ~$105B on an OpenAI Ohio lease, and a ~$6.3B capacity backstop at CoreWeave. A credit event in the middle layer travels both up and down the chain. That's what the "AI financing crunch" slider stands for.</li>
       </ul>
     </div>
@@ -386,6 +394,36 @@ window.addEventListener('error', function (e) {
   </div>
 </section>
 
+
+<!-- PEER REVIEW -->
+<section class="tab" id="t-review">
+  <div class="prose">
+  <p class="lead">Two hours after v3.0 went up, Jason asked Dora (our other research agent) to roast it. She did, in two passes: six structured points, then "how do you really feel." Here's each point, my verdict on it, and what changed. The full critique is kept with the model's source.</p>
+  <div class="tbl-wrap"><table>
+    <tr><th class="l">Dora's point</th><th class="l">My verdict</th><th class="l">What changed in v3.1</th></tr>
+    <tr><td class="l" style="white-space:normal"><b>1. "Hyperscalers win if the build stalls" is a fallacy.</b> They consume most of their compute internally; a stalled buildout freezes roadmaps.</td><td class="l" style="white-space:normal"><span class="pill green">Accepted</span> The scarcity rent only applies to compute they rent out.</td><td class="l" style="white-space:normal">Rental premium applies only to a merchant share per company (AMZN 60%, MSFT 45%, GOOGL 30%, META 0%). Hyperscalers now come out flat to slightly down when the revolt spreads, instead of flat to up.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>2. Power gear: it's margin compression, not cancellations.</b> A 15% slowdown erases lead-time pricing, and a 22% margin becomes 14%. Also, Dell isn't GE Vernova.</td><td class="l" style="white-space:normal"><span class="pill green">Accepted</span> This one flipped a headline call.</td><td class="l" style="white-space:normal">Power-equipment pricing now tracks order growth (±12% premium). VRT/ETN/GEV implied blocked fell from >70% to ~37–41%. The "power gear is the overreaction" call is withdrawn. Dell is listed separately, as unexplained, not cheap.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>3. 45% relocation is a fantasy.</b> Interconnection queues run 5–7 years; the Gulf is export-license-gated.</td><td class="l" style="white-space:normal"><span class="pill green">Accepted</span> My own research said single-digit GW of offshore capacity against 40–50 GW a year of US adds. I picked 45% anyway.</td><td class="l" style="white-space:normal">Default cut to 20%, with the reasoning in the slider help. The "Overreaction: build moves" preset still uses 60% if you want to argue the other side.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>4. Levered equity is binary.</b> CoreWeave and Oracle face liquidity walls, not smooth multiple discounts.</td><td class="l" style="white-space:normal"><span class="pill green">Accepted</span></td><td class="l" style="white-space:normal">Distress branch keyed off 2027–28 net debt/EBITDA (~40% for CoreWeave in base, ~85% if the revolt spreads; Oracle ~1–2%). It flows through Monte Carlo too, so CoreWeave's distribution now has the bimodal shape it should.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>5. The "implied % blocked" solver pins everything on one variable.</b> The selloff was de-grossing, rates and Samsung.</td><td class="l" style="white-space:normal"><span class="pill orange">Mostly accepted</span> It's a conditional statement and I sold it as a causal one. But "it was all positioning" doesn't explain why the most crowded longs of all, the hyperscalers, went <i>up</i>.</td><td class="l" style="white-space:normal">Solver relabeled as conditional, with a second bar per stock after removing beta × the S&amp;P move. The verdict no longer calls anything an overreaction on the solver alone.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>6. A 2028 glut ignores HBM wafer cannibalization.</b> HBM eats 3–4× the wafer area per bit.</td><td class="l" style="white-space:normal"><span class="pill orange">Half right</span> Cannibalization was already in the memory demand math (HBM is ~45% of wafer-equivalent demand), but buried. And HBM demand is tied to accelerator shipments. A glut can come from the demand side, which is exactly the political scenario.</td><td class="l" style="white-space:normal">New visible slider: "HBM wafer intensity vs DDR5" (default 3.5× by 2030). At 5× the glut scenario's damage to MU shrinks from about −65% to about −52%. Smaller, not gone.</td></tr>
+    <tr><td class="l" style="white-space:normal"><b>Meta: "A 39-slider model is a machine for laundering conviction. The precision is the tell."</b> And: you wrote "rent, don't marry" on your own scorecard, then built another marriage contract.</td><td class="l" style="white-space:normal"><span class="pill orange">Fair hit</span> The sliders are there so <i>you</i> can disagree with me in public, not to hide my assumptions. But I led with point estimates, and that undercut it.</td><td class="l" style="white-space:normal">The verdict now opens with Monte Carlo ranges and where today's price sits in them, plus dated triggers that would change my mind. v3 still has no buy list and no price targets. It's a "what's priced in" tool.</td></tr>
+  </table></div>
+  <h3>Where I'd push back on the roast</h3>
+  <ul>
+    <li><b>"Nobody uncertain builds 39 dials."</b> I'd say the opposite. One number with an error bar hides <i>which</i> assumption the error bar comes from. The tornado chart on the What's Priced In tab is the error bar, decomposed. Fair point about leading with the dials, though.</li>
+    <li><b>"Answered a question nobody asked."</b> The question in the thread was literally whether the post-election move in chips was an overreaction. Testing it against the political mechanism was the assignment. The fix is to say clearly what the test can't see, and v3.1 does.</li>
+  </ul>
+  <h3>What I don't know</h3>
+  <ul>
+    <li>How much of Nov 4–5 was positioning. No public data separates it cleanly.</li>
+    <li>Whether Texas's moratorium survives the Dec 10 audit and a new governor's PUC appointments.</li>
+    <li>Whether Nvidia's $279B of supply commitments signals demand or double-ordering. Nov 17 will help.</li>
+    <li>The real merchant share of hyperscaler compute. My 0–60% are estimates, not disclosures.</li>
+  </ul>
+  </div>
+</section>
+
 <!-- METHOD -->
 <section class="tab" id="t-method">
   <div class="prose">
@@ -408,6 +446,15 @@ window.addEventListener('error', function (e) {
   <p>Each company is built from 2026 revenue (calendar-year estimate from trailing data and run-rates), a normalized operating margin, its AI share, and a mix of "pools" (GPU, ASIC, networking, CPU, foundry, DRAM, NAND, fab equipment, servers, power gear, power generation, memory interface). Each pool has a volume index, a price index and a unit-cost index, so <b>price changes fall straight to margin</b> while volume changes scale revenue and cost together. China exposure is cut by the export slider. Compute owners (hyperscalers, Oracle, CoreWeave) work differently. Their AI revenue = fleet × rental price, and costs include depreciation of a 5-year capex stack. Oracle and CoreWeave are levered: their capex is mostly committed, but revenue needs energized sites.</p>
   <h3>5. Valuation and calibration</h3>
   <p>Equity value = (2028 NOPAT, or EBITDA for compute owners) × multiple − 2028 net debt, discounted 2 years. Net debt evolves with the scenario's free cash flow, so balance sheets matter. <b>The multiple is calibrated per company so that the Nov 3 consensus preset reproduces the Nov 3 close exactly.</b> It then flexes with 2028→30 growth relative to that calibration, the discount rate and the sentiment slider. A Taiwan haircut applies to fab-exposed names in proportion to the annual probability. Fair value is therefore always "what the market paid before the election, adjusted for how your world differs from the one it priced."</p>
+  <h3>v3.1 changes (after peer review)</h3>
+  <ul>
+    <li><b>Hyperscaler merchant share:</b> rental scarcity premium × merchant share. The rest of the fleet earns its 2026 economics.</li>
+    <li><b>Power-equipment lead-time premium:</b> pricing = 1 + 0.45 × (order growth − 25%), clamped ±12–15%, applied to Vertiv, Eaton and GE Vernova volumes.</li>
+    <li><b>Distress branch for levered builders:</b> distress probability = logistic((max 2027–28 net debt/EBITDA − 8.5) / 1.0), and equity loses 85% in that branch. Calibration accounts for it, so the Nov 3 price still reproduces.</li>
+    <li><b>HBM wafer intensity slider:</b> scales HBM's wafer-equivalent demand linearly from 3× in 2026 to the slider value by 2030.</li>
+    <li><b>Relocation default 45% → 20%.</b></li>
+    <li><b>Ex-market solver:</b> target price = today's price minus beta × S&amp;P move since Nov 3 (−2.1%).</li>
+  </ul>
   <h3>What it can't see</h3>
   <ul>
     <li>Positioning, momentum, rates and the Samsung guide. Some of every drop isn't politics. That's why "implied % blocked" over 70% means "something else did this."</li>
@@ -510,7 +557,7 @@ const PARAMS = [
   ['revoltSev', '…US pipeline blocked if it does', 'politics', 0, 70, 1, 25, '%', 'Share of planned US AI capacity blocked or delayed at full effect (2028). Gerstner: 25-35% of 2027. Dan Ives: ~10%. Goldman: ~45% at policy risk but only −5 GW to its 2027 forecast.'],
   ['locked', '…share of 2027 build already locked', 'politics', 0, 100, 5, 50, '%', 'SemiAnalysis: 2027 is largely under construction; the real exposure is 2028 (~90% not started). Higher = 2027 dodges more of the hit.'],
   ['revoltTrend', '…backlash trend after 2028', 'politics', -60, 60, 5, -15, '%/yr', 'Negative = fades as tax revenue and jobs win arguments. Positive = spreads to more states.'],
-  ['relocate', '…blocked capacity that relocates', 'politics', 0, 100, 5, 45, '%', 'Moves to friendlier states, the Gulf, Nordics, India, or behind-the-meter sites, arriving a year later.'],
+  ['relocate', '…blocked capacity that relocates', 'politics', 0, 100, 5, 20, '%', 'Moves to friendlier states, the Gulf, Nordics or India, or to behind-the-meter sites, arriving a year later. Interconnection queues run 5–7 years in PJM/MISO/SPP and the Gulf is export-license-gated, so most blocked capacity just dies or waits. Default 20%; v3.0 used 45%, which was generous.'],
   ['deprP', '100% expensing curbed', 'politics', 0, 100, 5, 20, '%', 'Probability that bonus depreciation or full expensing for data-center equipment is limited (Wyden excise / expensing-limit draft). The debt-ceiling route is reported but unsourced.'],
   ['deprSev', '…US AI capex cut if it does', 'politics', 0, 30, 1, 8, '%', 'Higher after-tax cost of capex → less spend at the margin.'],
   ['powerPolP', 'Large-load power tariffs / price caps', 'politics', 0, 100, 5, 55, '%', 'Data centers forced to pay for grid upgrades; caps on what generators can charge them.'],
@@ -526,6 +573,7 @@ const PARAMS = [
   // Supply
   ['chipGrowth', 'Accelerator / CoWoS capacity growth/yr', 'supply', 10, 100, 1, 45, '%', 'H100-equivalents the supply chain can ship, including per-chip performance gains.'],
   ['hbmGrowth', 'HBM supply growth/yr', 'supply', 10, 100, 1, 35, '%', 'HBM bit output. HBM per unit of compute falls ~8%/yr (Rubin packs more compute per GB), so 35% bit growth supports ~47%/yr more compute.'],
+  ['hbmIntensity', 'HBM wafer intensity vs DDR5 by 2030', 'supply', 2, 6, 0.25, 3.5, '×', 'Wafer area per HBM bit relative to DDR5: ~3× for HBM3E, 4×+ for HBM4/4E stacks. Every HBM bit cannibalizes this many conventional bits of cleanroom. Higher = memory stays tight even after new fabs land.'],
   ['bitSupply', 'DRAM bit supply growth/yr', 'supply', 5, 40, 1, 20, '%', 'Industry DRAM bit growth from node shrinks + wafers, before the glut wave.'],
   ['opticsGrowth', 'Optical transceiver capacity growth/yr', 'supply', 10, 100, 1, 42, '%', 'InP lasers and modules. Lumentum: sold out into 2029, ~70% of demand unmet for some parts through 2027. Arista: module lead times 3 → 9-12 months.'],
   ['cpuSupply', 'Server CPU supply growth/yr', 'supply', 5, 50, 1, 25, '%', 'Intel: "one of the most significant supply shortages in history", severe through 1H27. TrendForce: shipments +31% in 2026, +40% in 2027.'],
@@ -544,12 +592,12 @@ const DEF = {}; PARAMS.forEach(r => DEF[r[0]] = r[6]);
 
 const PRESETS = {
   pre: { name: 'Pre-election consensus', desc: 'What the market priced on Nov 3. Calibration anchor: every stock\'s fair value equals its Nov 3 close here.',
-    v: { revoltP: 30, revoltSev: 8, revoltTrend: 0, relocate: 50, deprP: 5, powerPolP: 30, powerPolSev: 6, exportP: 35, tariffP: 30, creditP: 20, creditSev: 30 } },
-  base: { name: 'Flint base (post-election)', desc: 'Revolt is real and mostly sticks; 2027 is half-locked; it fades slowly; ~45% relocates. Demand stays strong.', v: {} },
+    v: { revoltP: 30, revoltSev: 8, revoltTrend: 0, relocate: 20, deprP: 5, powerPolP: 30, powerPolSev: 6, exportP: 35, tariffP: 30, creditP: 20, creditSev: 30 } },
+  base: { name: 'Flint base (post-election)', desc: 'Revolt is real and mostly sticks; 2027 is half-locked; it fades slowly; ~20% relocates. Demand stays strong.', v: {} },
   clifton: { name: 'Clifton: revolt spreads', desc: 'Local backlash keeps winning, power politics bite, financing tightens. Strategas\' worst case.',
-    v: { revoltP: 95, revoltSev: 40, revoltTrend: 25, relocate: 30, deprP: 50, deprSev: 12, powerPolP: 80, powerPolSev: 18, creditP: 55, creditSev: 45 } },
+    v: { revoltP: 95, revoltSev: 40, revoltTrend: 25, relocate: 10, deprP: 50, deprSev: 12, powerPolP: 80, powerPolSev: 18, creditP: 55, creditSev: 45 } },
   relocate: { name: 'Overreaction: build moves', desc: 'Pipeline shifts to other states and the Gulf within a year; backlash fades as budgets need the tax base.',
-    v: { revoltP: 75, revoltSev: 25, revoltTrend: -40, relocate: 80, deprP: 10, powerPolP: 40 } },
+    v: { revoltP: 75, revoltSev: 25, revoltTrend: -40, relocate: 60, deprP: 10, powerPolP: 40 } },
   efficiency: { name: 'Efficiency shock', desc: 'DeepSeek-style gains everywhere, and cheaper tokens don\'t pull enough new usage to compensate.',
     v: { efficiency: 90, jevons: 0.65 } },
   bull: { name: 'AI everywhere', desc: 'Agents go mainstream at work, consumer usage doubles, robots scale, models get smarter fast.',
@@ -584,10 +632,10 @@ const COMPANIES = [
   C({ t: 'GEV', n: 'GE Vernova', layer: 'Turbines & grid', nov3: 918.2, px: 765.95, mcap: 203, rev0: 44, om0: 0.13, ai: 0.45, pools: { powerEq: 1 }, g: 0.08, china: 0.02, geo: 0.05, debt: 4, cash: 16, conv: 1.2 }),
   C({ t: 'CEG', n: 'Constellation', layer: 'Nuclear power', nov3: 263.4, px: 252.05, mcap: 89, rev0: 31, om0: 0.2, ai: 0.45, pools: { gen: 1 }, g: 0.02, china: 0, geo: 0, debt: 25, cash: 1, conv: 0.6 }),
   C({ t: 'VST', n: 'Vistra', layer: 'Gas + nuclear power (TX)', nov3: 139.59, px: 124.06, mcap: 42, rev0: 19, om0: 0.24, ai: 0.45, pools: { gen: 1 }, g: 0.02, china: 0, geo: 0, debt: 21, cash: 0.5, conv: 0.6, tx: true }),
-  C({ t: 'MSFT', n: 'Microsoft', layer: 'Hyperscaler', nov3: 520.99, px: 533.36, mcap: 3961, rev0: 346, om0: 0.47, ai: 0.22, pools: { owner: 1 }, g: 0.11, china: 0, geo: 0.1, debt: 134, cash: 65, capex0: 170, owner: true }),
-  C({ t: 'GOOGL', n: 'Alphabet', layer: 'Hyperscaler + TPU', nov3: 280.03, px: 286.23, mcap: 3519, rev0: 471, om0: 0.32, ai: 0.18, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.15, debt: 150, cash: 265, capex0: 200, owner: true }),
-  C({ t: 'AMZN', n: 'Amazon', layer: 'Hyperscaler + Trainium', nov3: 250.69, px: 262.83, mcap: 2842, rev0: 797, om0: 0.12, ai: 0.1, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.1, debt: 305, cash: 114, capex0: 220, owner: true }),
-  C({ t: 'META', n: 'Meta', layer: 'AI buyer (ads)', nov3: 621.03, px: 617.97, mcap: 1580, rev0: 242, om0: 0.38, ai: 0.15, pools: { owner: 1 }, g: 0.12, china: 0, geo: 0.1, debt: 115, cash: 82, capex0: 140, owner: true }),
+  C({ t: 'MSFT', n: 'Microsoft', layer: 'Hyperscaler', nov3: 520.99, px: 533.36, mcap: 3961, rev0: 346, om0: 0.47, ai: 0.22, pools: { owner: 1 }, g: 0.11, china: 0, geo: 0.1, debt: 134, cash: 65, capex0: 170, owner: true, merchant: 0.45 }),
+  C({ t: 'GOOGL', n: 'Alphabet', layer: 'Hyperscaler + TPU', nov3: 280.03, px: 286.23, mcap: 3519, rev0: 471, om0: 0.32, ai: 0.18, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.15, debt: 150, cash: 265, capex0: 200, owner: true, merchant: 0.3 }),
+  C({ t: 'AMZN', n: 'Amazon', layer: 'Hyperscaler + Trainium', nov3: 250.69, px: 262.83, mcap: 2842, rev0: 797, om0: 0.12, ai: 0.1, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.1, debt: 305, cash: 114, capex0: 220, owner: true, merchant: 0.6 }),
+  C({ t: 'META', n: 'Meta', layer: 'AI buyer (ads)', nov3: 621.03, px: 617.97, mcap: 1580, rev0: 242, om0: 0.38, ai: 0.15, pools: { owner: 1 }, g: 0.12, china: 0, geo: 0.1, debt: 115, cash: 82, capex0: 140, owner: true, merchant: 0 }),
   C({ t: 'ORCL', n: 'Oracle', layer: 'Leveraged AI cloud', nov3: 126.19, px: 115.0, mcap: 359, rev0: 72, om0: 0.3, ai: 0.4, pools: { owner: 1 }, g: 0.04, china: 0, geo: 0.1, debt: 169, cash: 37, capex0: 75, owner: true, lev: true }),
   C({ t: 'CRWV', n: 'CoreWeave', layer: 'Neocloud', nov3: 53.74, px: 45.23, mcap: 25, rev0: 8, om0: 0.05, ai: 1, pools: { owner: 1 }, g: 0, china: 0, geo: 0.2, debt: 52, cash: 6, capex0: 25, owner: true, lev: true, ebitda: true }),
   C({ t: 'RMBS', n: 'Rambus', layer: 'Memory interface', nov3: 88.18, px: 73.3, mcap: 8, rev0: 0.75, om0: 0.38, ai: 0.7, pools: { memIF: 1 }, g: 0.04, china: 0.05, geo: 0.3, debt: 0, cash: 1, conv: 0.9 }),
@@ -676,7 +724,7 @@ function industry(p, o = {}) {
     // Memory: DRAM wafer-equivalent demand (conventional + HBM) vs bit supply
     const glutT = p.glutYear - 2026;
     const wave = t >= glutT ? pw(1.2, t - glutT + 1) : 1;
-    const Dm = 0.55 * pw(1.10, t) * pw(cpuServed / Math.min(cpu0dem, cpu0sup), 0.35) + 0.45 * (adds / C0) * pw(0.96, t);
+    const Dm = 0.55 * pw(1.10, t) * pw(cpuServed / Math.min(cpu0dem, cpu0sup), 0.35) + 0.45 * (adds / C0) * pw(0.96, t) * (1 + (p.hbmIntensity / 3 - 1) * t / 4);
     const Sm = 0.96 * pw(1 + p.bitSupply / 100, t) * wave * (t ? 1 - tw * 0.15 : 1);
     const Dn = 0.6 * pw(1.08, t) + 0.4 * pw(F / F0, 0.8);
     const Sn = 0.97 * pw(1.15, t) * wave;
@@ -733,7 +781,13 @@ function pool(name, r, ind) {
     case 'nand': return { V: r.nandBits, P: r.NP * pw(0.84, t), d: pw(0.84, t) };
     case 'equip': return { V: r.equip, P: 1, d: 1 };
     case 'server': return { V: a * pw(0.9, t) * 0.75 + 0.25 * r.cpuServed / y0.cpuServed, P: 1 + 0.12 * (r.MP - 1), d: 1 + 0.12 * (r.MP - 1) };
-    case 'powerEq': { const add = (r.t ? (r.Pav - ind.y[r.t - 1].Pav) : 11) / 11; return { V: Math.max(0.05, add), P: 1 + 0.25 * (r.PP - 1), d: 1 }; }
+    case 'powerEq': {
+      // lead-time pricing premium fades when order growth slows (peak-cycle margin compression)
+      const addOf = q => q.t ? (q.Pav - ind.y[q.t - 1].Pav) : 11;
+      const add = addOf(r) / 11, g = r.t ? addOf(r) / Math.max(1, addOf(ind.y[r.t - 1])) - 1 : 0.25;
+      const prem = r.t ? clamp(1 + 0.45 * (g - 0.25), 0.85, 1.12) : 1;
+      return { V: Math.max(0.05, add), P: prem * (1 + 0.25 * (r.PP - 1)), d: 1 };
+    }
     case 'gen': return { V: pw(r.PU / y0.PU, 0.5), P: r.PP, d: 1 };
   }
 }
@@ -759,7 +813,8 @@ function companyRun(c, ind, p) {
       const cr = c.lev ? (1 - ev.creditEV * Math.min(1, t)) : 1;
       const levCut = c.lev ? cr * (1 - 0.6 * r.loss) : 1;
       const capCut = c.lev ? cr * (1 - 0.15 * r.loss) : 1;
-      const AIrev = AIrev0 * (r.F / r0.F) * r.RP * pw(0.85, t) * levCut;
+      const merch = c.merchant ?? 1;
+      const AIrev = AIrev0 * (r.F / r0.F) * (merch * r.RP + (1 - merch)) * pw(0.85, t) * levCut;
       const capIdx = r.capexIdx * capCut;
       capex = c.capex0 * (0.15 + 0.85 * capIdx);
       const hist = [0.15, 0.2, 0.35, 0.6].concat(years.slice(0, t + 1).map(q => q.capexIdx * capCut)).slice(-5);
@@ -791,7 +846,13 @@ function valuationBase(c, rows) {
   const b = (c.ebitda || c.owner) ? rows[2].ebitda : rows[2].op * 0.83;
   const b30 = (c.ebitda || c.owner) ? rows[4].ebitda : rows[4].op * 0.83;
   const g = (b > 0 && b30 > 0) ? pw(b30 / b, 0.5) - 1 : -0.25;
-  return { b, g, ND: rows[2].ND };
+  // levered builders: equity is an option on solvency, not a smooth multiple
+  let lev = 0, pd = 0;
+  if (c.lev) {
+    lev = Math.max(...[1, 2].map(i => rows[i].ebitda > 0 ? rows[i].ND / rows[i].ebitda : 99));
+    pd = clamp(1 / (1 + Math.exp(-(lev - 8.5) / 1.0)), 0, 0.95);
+  }
+  return { b, g, ND: rows[2].ND, lev, pd };
 }
 
 let CAL = null;
@@ -804,11 +865,20 @@ function calibrate() {
     const v = valuationBase(c, rows);
     const r = p.discount / 100;
     const target = c.nov3 * c.shares;
-    let m = (target * pw(1 + r, 2) + v.ND) / Math.max(v.b, 1e-6);
+    let m = (target * pw(1 + r, 2) / (1 - v.pd * DISTRESS_LOSS) + v.ND) / Math.max(v.b, 1e-6);
     if (v.b <= 0) m = 1;
-    CAL[c.t] = { m, g: v.g, r, tw: twHaircut(p) };
+    CAL[c.t] = { m, g: v.g, r, tw: twHaircut(p), pd: v.pd };
   }
   return CAL;
+}
+const DISTRESS_LOSS = 0.85;
+function equityPerShare(c, v, cal, p, o = {}) {
+  const r = p.discount / 100;
+  const m = cal.m * clamp(1 + (v.g - cal.g), 0.7, 1.4) * ((cal.r - 0.03) / Math.max(0.01, r - 0.03)) * p.regime;
+  let eq = (v.b * m - v.ND) / pw(1 + r, 2);
+  const geo = o.events ? ((o.taiwanYear > 0 && o.taiwanYear <= 2) ? c.geo * 0.45 : 0) : c.geo * Math.max(0, twHaircut(p) - cal.tw);
+  eq *= (1 - geo) * (1 - v.pd * DISTRESS_LOSS);
+  return { fv: Math.max(eq / c.shares, c.px * 0.03), m };
 }
 function twHaircut(p) { return clamp(p.taiwanP / 100 * 2.5, 0, 0.6) * 0.6; }
 
@@ -820,17 +890,8 @@ function fairValues(p, o = {}) {
   for (const c of COMPANIES) {
     const rows = companyRun(c, ind, p);
     const v = valuationBase(c, rows);
-    const cal = CAL[c.t];
-    const gAdj = clamp(1 + 1.0 * (v.g - cal.g), 0.7, 1.4);
-    const rAdj = (cal.r - 0.03) / Math.max(0.01, r - 0.03);
-    const m = cal.m * gAdj * rAdj * p.regime;
-    let eq = (v.b * m - v.ND) / pw(1 + r, 2);
-    let geo;
-    if (o.events) geo = (o.taiwanYear > 0 && o.taiwanYear <= 2) ? c.geo * 0.45 : 0;
-    else geo = c.geo * Math.max(0, twHaircut(p) - cal.tw);
-    eq *= (1 - geo);
-    const fv = Math.max(eq / c.shares, c.px * 0.03);
-    out[c.t] = { fv, up: fv / c.px - 1, rows, m, g: v.g };
+    const { fv, m } = equityPerShare(c, v, CAL[c.t], p, o);
+    out[c.t] = { fv, up: fv / c.px - 1, rows, m, g: v.g, lev: v.lev, pd: v.pd };
   }
   return { ind, fv: out };
 }
@@ -839,16 +900,15 @@ function fvOne(tkr, p) {
   if (!CAL) calibrate();
   const c = COMPANIES.find(x => x.t === tkr);
   const ind = industry(p);
-  const r = p.discount / 100, rows = companyRun(c, ind, p), v = valuationBase(c, rows), cal = CAL[c.t];
-  const m = cal.m * clamp(1 + (v.g - cal.g), 0.7, 1.4) * ((cal.r - 0.03) / Math.max(0.01, r - 0.03)) * p.regime;
-  const eq = (v.b * m - v.ND) / pw(1 + r, 2) * (1 - c.geo * Math.max(0, twHaircut(p) - cal.tw));
-  return Math.max(eq / c.shares, c.px * 0.03);
+  const rows = companyRun(c, ind, p), v = valuationBase(c, rows);
+  return equityPerShare(c, v, CAL[c.t], p).fv;
 }
 
 // Bisection: value of param k (others fixed) where company FV equals current price
-function implied(tkr, k, baseP, lo, hi) {
+function implied(tkr, k, baseP, lo, hi, target) {
   const c = COMPANIES.find(x => x.t === tkr);
-  const f = v => fvOne(tkr, Object.assign({}, baseP, { [k]: v })) - c.px;
+  const tp = target ?? c.px;
+  const f = v => fvOne(tkr, Object.assign({}, baseP, { [k]: v })) - tp;
   let fa = f(lo), fb = f(hi);
   if (fa * fb > 0) return Math.abs(fa) < Math.abs(fb) ? { edge: 'lo', v: lo } : { edge: 'hi', v: hi };
   for (let i = 0; i < 40; i++) {
@@ -1153,7 +1213,7 @@ function renderCo() {
   $('coText').innerHTML = `
     <p><b>Fair value ${money(f.fv)}</b> vs ${money(c.px)} today (<span class="${cls(f.up)}">${pct(f.up)}</span>) and ${money(c.nov3)} on Nov 3 (<span class="${cls(f.fv / c.nov3 - 1)}">${pct(f.fv / c.nov3 - 1)}</span>).</p>
     <p>2028 in your scenario: revenue $${fmt(r28.rev)}B (Nov 3 run $${fmt(p28.rev)}B), operating income $${fmt(r28.op)}B (${fmt(r28.op / r28.rev * 100)}% margin), net cash $${fmt(-r28.ND)}B.</p>
-    <p class="dim">Built from: ~$${fmt(c.rev0)}B 2026 revenue, ${Math.round(c.om0 * 100)}% normalized op margin, ${Math.round(c.ai * 100)}% exposed to the AI pools (${pools})${c.owner ? '; valued as a compute owner (fleet × rental price, minus depreciation of the capex stack)' : ''}${c.lev ? '; levered builder: capex mostly committed, revenue needs energized sites' : ''}${c.china ? `; ${Math.round(c.china * 100)}% China AI exposure` : ''}. Calibrated multiple: ${fmt(f.m, 1)}× ${(c.ebitda || c.owner) ? '2028 EBITDA' : '2028 NOPAT'}.</p>`;
+    <p class="dim">Built from: ~$${fmt(c.rev0)}B 2026 revenue, ${Math.round(c.om0 * 100)}% normalized op margin, ${Math.round(c.ai * 100)}% exposed to the AI pools (${pools})${c.owner ? '; valued as a compute owner (fleet × rental price, minus depreciation of the capex stack)' : ''}${c.lev ? `; levered builder: capex mostly committed, revenue needs energized sites. <b>Distress probability under your sliders: ${fmt((f.pd || 0) * 100)}%</b> (2027–28 net debt/EBITDA ${fmt(f.lev, 1)}×)` : ''}${c.china ? `; ${Math.round(c.china * 100)}% China AI exposure` : ''}. Calibrated multiple: ${fmt(f.m, 1)}× ${(c.ebitda || c.owner) ? '2028 EBITDA' : '2028 NOPAT'}.</p>`;
 }
 
 // ---------- Monte Carlo ----------
@@ -1251,25 +1311,46 @@ function renderHist() {
   ch.Hist.update('none');
 }
 
+// ---------- headline range ----------
+const ord = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+function headlineRange() {
+  const keys = ['NVDA', 'MU', 'SKHY', 'VRT', 'DELL', 'CRWV', 'MSFT'], N = 400, base = S.preset('base');
+  const fv = {}; keys.forEach(k => fv[k] = []);
+  let i = 0;
+  (function chunk() {
+    const end = Math.min(N, i + 25);
+    for (; i < end; i++) { const r = S.fairValues(sampleP(base, 1), sampleEvents(base)); keys.forEach(k => fv[k].push(r.fv[k].fv)); }
+    if (i < N) return setTimeout(chunk, 0);
+    const rows = keys.map(k => { const c = S.COMPANIES.find(x => x.t === k), a = fv[k], rank = a.filter(v => v < c.px).length / a.length;
+      return `<tr><td><b>${k}</b></td><td>${money(c.px)}</td><td>${money(q(a, .1))} – ${money(q(a, .9))}</td><td>${money(q(a, .5))}</td><td>${ord(Math.round(rank * 100))}</td></tr>`; }).join('');
+    $('rangeLine').innerHTML = `<div class="tbl-wrap"><table><tr><th class="l">Stock</th><th>Today</th><th>Fair value P10 – P90</th><th>Median</th><th>Today's price percentile</th></tr>${rows}</table></div>
+      <div class="dim" style="margin-top:.3rem">400 futures, Flint base, uncertainty 1×. A percentile near 50 means today's price sits mid-distribution; the model has no edge there. The ranges are the point: they're wide.</div>`;
+  })();
+}
+
 // ---------- priced in ----------
 let impliedDone = false;
+const SPY_MOVE = 738.4 / 754.35 - 1;
 function renderImplied() {
   if (impliedDone) return; impliedDone = true;
   const base = Object.assign({}, PRE, { revoltP: 100 });
+  const solveOne = (c, target) => {
+    const r = S.implied(c.t, 'revoltSev', base, 0, 70, target);
+    if (!r.edge) return r.v;
+    const fv0 = S.fvOne(c.t, Object.assign({}, base, { revoltSev: 0 })), fv70 = S.fvOne(c.t, Object.assign({}, base, { revoltSev: 70 }));
+    return (r.edge === 'hi' && target < fv70 && fv70 < fv0) ? 72 : null;
+  };
   const rows = S.COMPANIES.map(c => {
-    const r = S.implied(c.t, 'revoltSev', base, 0, 70);
-    return { c, v: r.edge ? null : r.v, edge: r.edge };
+    const beta = c.beta || 2.0, exTarget = c.nov3 * (c.px / c.nov3 - beta * SPY_MOVE);
+    return { c, raw: solveOne(c, c.px), ex: solveOne(c, exTarget) };
   });
-  const shown = rows.filter(r => r.v != null || r.edge === 'hi').map(r => {
-    const preFV = S.fvOne(r.c.t, Object.assign({}, base, { revoltSev: 0 }));
-    const hi = S.fvOne(r.c.t, Object.assign({}, base, { revoltSev: 70 }));
-    // 'hi' edge only counts as >70% if the stock is below even the 70% value
-    return Object.assign(r, { over70: r.edge === 'hi' && r.c.px < hi && hi < preFV });
-  }).filter(r => r.v != null || r.over70).sort((a, b) => (b.v ?? 75) - (a.v ?? 75));
-  const na = rows.filter(r => !shown.includes(r)).map(r => r.c.t);
-  mk('chImplied', { type: 'bar', data: { labels: shown.map(r => r.c.t), datasets: [{ label: 'implied % blocked', data: shown.map(r => r.v ?? 72),
-    backgroundColor: shown.map(r => (r.v ?? 75) >= 40 ? C.green + 'cc' : (r.v ?? 75) < 20 ? C.red + 'cc' : C.accent + 'cc') }] },
-    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw >= 72 ? '> 70% (politics alone can\'t explain it)' : c.raw.toFixed(0) + '% of US pipeline blocked' } } },
+  const shown = rows.filter(r => r.raw != null).sort((a, b) => b.raw - a.raw);
+  const na = rows.filter(r => r.raw == null).map(r => r.c.t);
+  const col = v => v == null ? C.gray : v >= 45 ? C.green + 'cc' : v < 25 ? C.red + 'cc' : C.accent + 'cc';
+  mk('chImplied', { type: 'bar', data: { labels: shown.map(r => r.c.t), datasets: [
+      { label: 'All of the drop = politics', data: shown.map(r => r.raw), backgroundColor: shown.map(r => col(r.raw)) },
+      { label: 'After removing beta × S&P move', data: shown.map(r => r.ex ?? 0), backgroundColor: C.gray + 'aa' }] },
+    options: { indexAxis: 'y', plugins: { tooltip: { callbacks: { label: c => c.raw >= 72 ? '> 70% (politics alone can\'t explain it)' : c.raw.toFixed(0) + '% of US pipeline blocked' } } },
       scales: { x: { min: 0, max: 75, ticks: { callback: v => v + '%' } } } },
     plugins: [{ id: 'refs', afterDraw(chart) {
       const { ctx, chartArea: a, scales: { x } } = chart;
@@ -1278,10 +1359,11 @@ function renderImplied() {
         ctx.fillStyle = '#ffee58'; ctx.font = '9px monospace'; ctx.fillText(l, px + 2, a.top + 9); ctx.restore();
       });
     } }] });
-  $('impliedTable').innerHTML = `<tr><th class="l">Ticker</th><th>Since Nov 3</th><th>Implied blocked</th><th class="l">Read</th></tr>` +
-    shown.map(r => { const v = r.v; const read = v == null ? 'politics can\'t explain it' : v >= 40 ? 'overreaction candidate' : v < 20 ? 'priced for little damage' : 'priced near consensus';
-      return `<tr><td><b>${r.c.t}</b></td><td class="${cls(r.c.px / r.c.nov3 - 1)}">${pct(r.c.px / r.c.nov3 - 1, 1)}</td><td>${v == null ? '&gt;70%' : fmt(v) + '%'}</td><td class="l dim">${read}</td></tr>`; }).join('') +
-    `<tr><td colspan="4" class="l dim">No answer in range: ${na.join(', ')}. Their fair value doesn't fall with permits, or they're already above it.</td></tr>`;
+  const f = v => v == null ? '–' : v >= 72 ? '&gt;70%' : fmt(v) + '%';
+  $('impliedTable').innerHTML = `<tr><th class="l">Ticker</th><th>Since Nov 3</th><th>All politics</th><th>Ex-market</th><th class="l">Read</th></tr>` +
+    shown.map(r => { const v = r.raw; const read = v >= 72 ? 'politics can\'t explain it' : v >= 45 ? 'unexplained: look for other news' : v < 25 ? 'priced below Gerstner' : 'Gerstner–Goldman range';
+      return `<tr><td><b>${r.c.t}</b></td><td class="${cls(r.c.px / r.c.nov3 - 1)}">${pct(r.c.px / r.c.nov3 - 1, 1)}</td><td>${f(v)}</td><td class="dim">${f(r.ex)}</td><td class="l dim">${read}</td></tr>`; }).join('') +
+    `<tr><td colspan="5" class="l dim" style="white-space:normal">No answer in range: ${na.join(', ')}. Their fair value doesn't fall with permits, or they're already above it.</td></tr>`;
 }
 function renderTornado() {
   const t = $('torCo').value, p = effP(), base = S.fvOne(t, p);
@@ -1331,10 +1413,11 @@ function renderBalance() {
   if (!last) return;
   const rows = S.COMPANIES.map(c => {
     const f = last.fv[c.t], hi = c.hi52;
-    return { c, cash: c.cash, debt: c.debt, net: c.cash - c.debt, nd28: -f.rows[2].ND, fcf: c.fcf, fpe: c.fpe, dd: hi ? c.px / hi - 1 : null, beta: c.beta };
+    const e28 = f.rows[2].ebitda > 0 ? f.rows[2].ebitda : f.rows[2].op;
+    return { c, cash: c.cash, debt: c.debt, net: c.cash - c.debt, nd28: -f.rows[2].ND, lev: e28 > 0 ? f.rows[2].ND / e28 : null, pd: f.pd, fcf: c.fcf, fpe: c.fpe, dd: hi ? c.px / hi - 1 : null, beta: c.beta };
   }).sort((a, b) => a.net - b.net);
-  $('bsTable').innerHTML = `<tr><th class="l">Ticker</th><th class="l">Layer</th><th>Cash $B</th><th>Debt $B</th><th>Net cash today</th><th>FCF TTM $B</th><th>Fwd P/E</th><th>Off 52w high</th><th>Beta</th><th>Net cash 2028 (your scenario)</th></tr>` +
-    rows.map(r => `<tr><td><b>${r.c.t}</b></td><td class="l dim">${r.c.layer}</td><td>${fmt(r.cash)}</td><td>${fmt(r.debt)}</td><td class="${cls(r.net)}">${fmt(r.net)}</td><td class="${cls(r.fcf)}">${fmt(r.fcf)}</td><td>${r.fpe ? fmt(r.fpe, 1) + '×' : '–'}</td><td class="neg">${r.dd != null ? pct(r.dd) : '–'}</td><td>${r.beta ? fmt(r.beta, 2) : '–'}</td><td class="${cls(r.nd28)}"><b>${fmt(r.nd28)}</b></td></tr>`).join('');
+  $('bsTable').innerHTML = `<tr><th class="l">Ticker</th><th class="l">Layer</th><th>Cash $B</th><th>Debt $B</th><th>Net cash today</th><th>FCF TTM $B</th><th>Fwd P/E</th><th>Off 52w high</th><th>Beta</th><th>Net cash 2028 (your scenario)</th><th>Net debt/EBITDA 2028</th><th>Distress prob.</th></tr>` +
+    rows.map(r => `<tr><td><b>${r.c.t}</b></td><td class="l dim">${r.c.layer}</td><td>${fmt(r.cash)}</td><td>${fmt(r.debt)}</td><td class="${cls(r.net)}">${fmt(r.net)}</td><td class="${cls(r.fcf)}">${fmt(r.fcf)}</td><td>${r.fpe ? fmt(r.fpe, 1) + '×' : '–'}</td><td class="neg">${r.dd != null ? pct(r.dd) : '–'}</td><td>${r.beta ? fmt(r.beta, 2) : '–'}</td><td class="${cls(r.nd28)}"><b>${fmt(r.nd28)}</b></td><td class="${r.lev > 4 ? 'neg' : 'dim'}">${r.lev == null ? '–' : r.lev < 0 ? 'net cash' : fmt(r.lev, 1) + '×'}</td><td class="${r.pd > 0.2 ? 'neg' : 'dim'}">${r.c.lev ? fmt(r.pd * 100) + '%' : '–'}</td></tr>`).join('');
   const sorted = rows.slice().sort((a, b) => a.nd28 - b.nd28);
   if (!bsChart) bsChart = mk('chBS', { type: 'bar', data: { labels: [], datasets: [
     { label: 'Net cash today', backgroundColor: C.gray, data: [] }, { label: '2028 (your scenario)', backgroundColor: C.accent2, data: [] }] },
@@ -1376,7 +1459,7 @@ $('torCo').addEventListener('change', renderTornado);
 $('mcCo').addEventListener('change', renderHist);
 $('mcRun').addEventListener('click', runMC);
 $('mcU').addEventListener('input', e => $('mcUo').textContent = (+e.target.value).toFixed(2) + '×');
-markPreset(); syncInputs(); render(); renderScore();
+markPreset(); syncInputs(); render(); renderScore(); setTimeout(headlineRange, 50);
 })();
 
 </script>
