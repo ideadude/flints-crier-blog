@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Buildout Simulator v3</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a25; --border: #2a2a3a;
+    --text: #e0e0e8; --text-dim: #8888a0; --accent: #4fc3f7; --accent2: #7c4dff;
+    --green: #66bb6a; --red: #ef5350; --orange: #ffa726; --yellow: #ffee58; --pink: #f06292; --teal: #26a69a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; font-size: 14px; }
+  .container { max-width: 1440px; margin: 0 auto; padding: 2rem 1.25rem; }
+  a { color: var(--accent); }
+  header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: .4rem; letter-spacing: -.02em; }
+  header .subtitle { color: var(--text-dim); font-size: .85rem; }
+  .verdict-box { background: linear-gradient(135deg, rgba(79,195,247,.08), rgba(124,77,255,.08)); border: 1px solid var(--accent); border-radius: 8px; padding: 1.4rem 1.8rem; margin: 1.5rem 0; }
+  .verdict-box h2 { color: var(--accent); font-size: 1rem; margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .06em; }
+  .verdict-text { font-size: 1.25rem; font-weight: bold; margin-bottom: .6rem; }
+  .verdict-detail { color: var(--text); font-size: .85rem; }
+  .verdict-detail p { margin: .45rem 0; }
+  .live { color: var(--text-dim); font-size: .8rem; margin-top: .8rem; border-top: 1px dashed var(--border); padding-top: .6rem; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .8rem; margin: 1.2rem 0 1.6rem; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .8rem 1rem; }
+  .tile .v { font-size: 1.35rem; font-weight: bold; color: var(--accent); }
+  .tile .l { font-size: .72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; }
+  .tile .s { font-size: .72rem; color: var(--text-dim); }
+  nav.tabs { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 1px solid var(--border); margin-bottom: 1.4rem; position: sticky; top: 0; background: var(--bg); z-index: 20; padding-top: .4rem; }
+  nav.tabs button { background: none; border: 1px solid transparent; border-bottom: none; color: var(--text-dim); font: inherit; font-size: .82rem; padding: .55rem .9rem; cursor: pointer; border-radius: 6px 6px 0 0; }
+  nav.tabs button.on { color: var(--accent); border-color: var(--border); background: var(--surface); }
+  .tab { display: none; } .tab.on { display: block; }
+  h2.sec { color: var(--accent); font-size: 1.15rem; margin: 1.6rem 0 .8rem; }
+  h3 { color: var(--text); font-size: .95rem; margin: 1.2rem 0 .5rem; }
+  p.lead { color: var(--text-dim); font-size: .85rem; margin-bottom: 1rem; max-width: 980px; }
+  .prose { max-width: 1000px; font-size: .88rem; }
+  .prose p { margin: .6rem 0; } .prose ul { margin: .5rem 0 .5rem 1.3rem; } .prose li { margin: .25rem 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  @media (max-width: 1000px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  .sim > *, .grid2 > *, .grid3 > *, .card { min-width: 0; }
+  .chart { position: relative; height: 270px; width: 100%; }
+  .chart.tall { height: 380px; } .chart.xtall { height: 620px; }
+  .chart-title { font-size: .8rem; color: var(--text-dim); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .04em; }
+  .chart-note { font-size: .72rem; color: var(--text-dim); margin-top: .4rem; }
+  /* simulator layout */
+  .sim { display: grid; grid-template-columns: 380px 1fr; gap: 1.2rem; align-items: start; }
+  @media (max-width: 1000px) { .container { padding: 1.2rem 16px; } nav.tabs { overflow-x: auto; flex-wrap: nowrap; } nav.tabs button { white-space: nowrap; } .sim { grid-template-columns: 1fr; } .panel { position: static !important; max-height: none !important; } }
+  .panel { position: sticky; top: 3.2rem; max-height: calc(100vh - 4rem); overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .8rem; }
+  .presets { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .6rem; }
+  .presets button, .btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; font: inherit; font-size: .74rem; padding: .35rem .6rem; cursor: pointer; }
+  .presets button.on, .btn.on { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; font-size: .82rem; padding: .5rem 1rem; }
+  .preset-desc { font-size: .72rem; color: var(--text-dim); margin: 0 0 .7rem; min-height: 2.2em; }
+  details.grp { border-top: 1px solid var(--border); padding: .5rem 0; }
+  details.grp > summary { cursor: pointer; color: var(--accent); font-size: .82rem; font-weight: bold; list-style: none; padding: .2rem 0; }
+  details.grp > summary::before { content: '▸ '; } details.grp[open] > summary::before { content: '▾ '; }
+  .sl { margin: .55rem 0 .7rem; }
+  .sl-top { display: flex; justify-content: space-between; gap: .5rem; font-size: .76rem; }
+  .sl-top label { color: var(--text); }
+  .sl-top output { color: var(--accent); font-weight: bold; white-space: nowrap; }
+  .sl-top .ref { color: var(--text-dim); font-weight: normal; font-size: .68rem; margin-left: .3rem; }
+  .sl input[type=range] { width: 100%; accent-color: var(--accent); margin: .15rem 0; }
+  .sl-help { font-size: .68rem; color: var(--text-dim); line-height: 1.4; }
+  .ev { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: .5rem .7rem; margin: .6rem 0; }
+  .ev .ev-title { font-size: .78rem; color: var(--orange); font-weight: bold; }
+  .ev .ev-exp { font-size: .7rem; color: var(--text-dim); }
+  .ev .ev-exp b { color: var(--yellow); }
+  .ev .sl { margin: .35rem 0 .45rem; }
+  .mode { display: flex; gap: .3rem; margin: .4rem 0 .2rem; flex-wrap: wrap; }
+  .mode-note { font-size: .68rem; color: var(--text-dim); margin-bottom: .3rem; }
+  /* tables */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+  th, td { padding: .42rem .5rem; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+  th { color: var(--text-dim); font-weight: normal; text-transform: uppercase; font-size: .68rem; letter-spacing: .04em; position: sticky; top: 0; background: var(--surface); cursor: default; }
+  th.sort { cursor: pointer; } th.sort:hover { color: var(--accent); }
+  td:first-child, th:first-child, td.l, th.l { text-align: left; }
+  tr.click { cursor: pointer; } tr.click:hover td { background: var(--surface2); } tr.sel td { background: rgba(79,195,247,.08); }
+  .pos { color: var(--green); } .neg { color: var(--red); } .dim { color: var(--text-dim); }
+  .tag { display: inline-block; font-size: .66rem; padding: .05rem .4rem; border-radius: 3px; border: 1px solid; }
+  .tag.over { color: var(--green); border-color: var(--green); } .tag.under { color: var(--red); border-color: var(--red); } .tag.fair { color: var(--text-dim); border-color: var(--border); }
+  .pill { display: inline-block; font-size: .68rem; padding: .05rem .5rem; border-radius: 10px; margin-left: .4rem; font-weight: bold; }
+  .pill.red { background: rgba(239,83,80,.15); color: var(--red); } .pill.orange { background: rgba(255,167,38,.15); color: var(--orange); } .pill.green { background: rgba(102,187,106,.15); color: var(--green); }
+  .warn { border-left: 3px solid var(--orange); padding: .5rem .8rem; background: rgba(255,167,38,.06); font-size: .8rem; margin: .8rem 0; }
+  .src { font-size: .72rem; color: var(--text-dim); }
+  .src li { margin: .15rem 0; word-break: break-all; }
+  .row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin: .5rem 0; font-size: .8rem; }
+  select { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; font: inherit; font-size: .78rem; padding: .3rem .4rem; }
+  .bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: .3rem; } .bar > div { height: 100%; background: var(--accent2); width: 0; }
+  .big-answer { font-size: 1rem; padding: .8rem 1rem; background: var(--surface2); border-radius: 6px; margin: .6rem 0; }
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: .72rem; color: var(--text-dim); text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>AI Buildout Simulator v3</h1>
+  <div class="subtitle">Demand, chips, memory, power — and now politics. Drag the sliders and see who wins.<br>Research compiled November 6, 2026 — Flint / Coleman Research — v3 of the <a href="../chip-memory-rotation-2026/">June chip &amp; memory</a> and <a href="../ai-infrastructure-economics-v2/">October infrastructure</a> models</div>
+</header>
+
+<div class="verdict-box">
+  <h2>The Verdict</h2>
+  <div class="verdict-text">Partly an overreaction — just not in the names everyone is staring at.</div>
+  <div class="verdict-detail">
+    <p><b>The chip selloff is roughly fair.</b> Starting from what the market paid on Nov 3, Nvidia, Micron and SK Hynix at today's prices imply that <b>~24–28% of the US data center pipeline gets blocked</b>. That is almost exactly Brad Gerstner's 25–35% estimate. If you believe Gerstner, MU at ~$688 is fairly priced for the politics — it's not a gift.</p>
+    <p><b>The overreaction is in the second-order names.</b> Power gear (Vertiv, Eaton, GE Vernova) and Dell are priced as if <b>more than 70%</b> of the pipeline vanishes, and TSMC, Sandisk, Arm and the equipment makers as if <b>45–60%</b> does. Their demand depends less on any one county commission. Sold-out turbines, optics and NAND don't un-sell because Ohio passed 21 moratoria.</p>
+    <p><b>The underreaction is in leverage.</b> CoreWeave and Oracle imply only <b>12–18%</b> blocked, and so do Intel and AMD. They're the ones holding contracted chips with nowhere to plug them in. If the revolt is real, the balance sheet is where it shows up first.</p>
+    <p><b>The bigger risk for memory isn't politics, it's 2028.</b> Every maker says it's sold out through 2027, and SK Hynix says through 2029. But Micron Idaho, Hynix Yongin, Samsung P5 and CXMT all land in 2027–28. Click the "Memory glut 2027" scenario and MU loses more than half its value. The election moved the date by a few months, at most.</p>
+  </div>
+  <div class="live" id="liveVerdict">Loading model…</div>
+</div>
+
+<div class="tiles" id="tiles"></div>
+
+<nav class="tabs" id="tabs">
+  <button data-t="sim" class="on">🎛️ Simulator</button>
+  <button data-t="mc">🎲 Monte Carlo</button>
+  <button data-t="priced">🎯 What's Priced In</button>
+  <button data-t="election">🗳️ The Election Shock</button>
+  <button data-t="supply">🔗 Supply &amp; Demand Now</button>
+  <button data-t="balance">🏦 Balance Sheets</button>
+  <button data-t="score">📋 Scorecard</button>
+  <button data-t="method">🧮 Method &amp; Sources</button>
+</nav>
+
+<!-- SIMULATOR -->
+<section class="tab on" id="t-sim">
+  <p class="lead">Everything runs live in your browser. The <b>dashed gray lines are the Nov 3 consensus</b>, and every stock's fair value is calibrated to equal its Nov 3 close in that scenario. Move a slider and you're asking: <i>if this is how the world goes, what is each company worth compared with what the market paid before the election?</i> Political risks come in pairs: <b>how likely</b> it is, and <b>how bad</b> it gets if it happens. Click a company row to see its P&amp;L path.</p>
+  <div class="sim">
+    <aside class="panel" id="panel">
+      <div class="chart-title">Scenarios</div>
+      <div class="presets" id="presets"></div>
+      <div class="preset-desc" id="presetDesc"></div>
+      <div id="sliders"></div>
+    </aside>
+    <div>
+      <div class="grid2">
+        <div class="card"><div class="chart-title">AI compute: demand vs installed fleet (M H100-equivalents)</div><div class="chart"><canvas id="chDS"></canvas></div><div class="chart-note">Coverage = fleet ÷ demand. Under 100% means rationing: higher rental prices, longer waitlists.</div></div>
+        <div class="card"><div class="chart-title">What binds each year: new compute you could add (M H100e)</div><div class="chart"><canvas id="chAdds"></canvas></div><div class="chart-note">Actual additions (line) = the lowest bar. Whoever is the bottleneck gets the pricing power.</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="chart-title">Who's using it: compute demand by segment (M H100e)</div><div class="chart"><canvas id="chMix"></canvas></div></div>
+        <div class="card"><div class="chart-title">Scarcity prices (index, 2026 = 1)</div><div class="chart"><canvas id="chPrice"></canvas></div><div class="chart-note">Memory includes the exit-2026 contract hikes already locked for 2027. Rental = what owners of compute can charge.</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="chart-title">Power: available vs used (GW), blocked vs relocated</div><div class="chart"><canvas id="chPower"></canvas></div><div class="chart-note">Model GW = AI accelerator load that actually energizes (~65% of announcements land on time). Nameplate and announced figures like Gerstner's "10–15 GW of 2027" run 2–3× larger. Read the percentages, not the GW.</div></div>
+        <div class="card"><div class="chart-title">Global AI data center capex ($B)</div><div class="chart"><canvas id="chCapex"></canvas></div><div class="chart-note">Scaled to ~$900B in 2026: big-4 guidance of $720–740B plus Oracle, neoclouds, labs and sovereigns.</div></div>
+      </div>
+      <div class="card">
+        <div class="chart-title">Fair value vs today's price (model, your scenario)</div>
+        <div class="chart tall"><canvas id="chFV"></canvas></div>
+        <div class="chart-note">Green = model says the market overreacted (stock below fair value). Red = the stock still prices in more than your scenario delivers.</div>
+      </div>
+      <div class="card">
+        <div class="chart-title">Companies — click a row for detail</div>
+        <div class="tbl-wrap"><table id="coTable"></table></div>
+      </div>
+      <div class="card" id="coDetail">
+        <div class="chart-title" id="coTitle">Company detail</div>
+        <div class="grid2">
+          <div><div class="chart"><canvas id="chCo"></canvas></div></div>
+          <div class="prose" id="coText" style="font-size:.8rem"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MONTE CARLO -->
+<section class="tab" id="t-mc">
+  <p class="lead">Sliders give you one future. This tab runs <b>thousands</b> of them. Each run jitters every continuous slider around your setting, then rolls the dice on each political event using <b>your</b> probabilities. An event either happens, at a random severity around yours, or it doesn't. Taiwan gets a yearly roll. The result is a distribution of fair values for every stock, so you can read "how often does this work out?" rather than "what's the point estimate?"</p>
+  <div class="card">
+    <div class="row">
+      <label>Runs <select id="mcN"><option>500</option><option selected>1000</option><option>2500</option></select></label>
+      <label>Uncertainty <input type="range" id="mcU" min="0.25" max="2" step="0.25" value="1" style="vertical-align:middle"> <output id="mcUo">1.0×</output></label>
+      <button class="btn primary" id="mcRun">Run simulations</button>
+      <span class="dim" id="mcStatus">Uses the current slider settings from the Simulator tab.</span>
+    </div>
+    <div class="bar"><div id="mcBar"></div></div>
+  </div>
+  <div class="card"><div class="chart-title">Fair value range vs today's price (P10 – P90, dot = median)</div><div class="chart xtall"><canvas id="chMC"></canvas></div></div>
+  <div class="grid2">
+    <div class="card"><div class="chart-title">Compute coverage across runs (fleet ÷ demand)</div><div class="chart"><canvas id="chFan"></canvas></div></div>
+    <div class="card"><div class="chart-title">What binds in 2028, share of runs</div><div class="chart"><canvas id="chBindMC"></canvas></div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="row">Distribution for <select id="mcCo"></select></div><div class="chart"><canvas id="chHist"></canvas></div><div class="chart-note">Green bars sit above today's price, red below.</div></div>
+    <div class="card"><div class="chart-title">Probability fair value beats today's price</div><div class="tbl-wrap" style="max-height:330px;overflow-y:auto"><table id="mcTable"></table></div></div>
+  </div>
+</section>
+
+<!-- PRICED IN -->
+<section class="tab" id="t-priced">
+  <p class="lead">Turn the model around. Instead of "what's it worth if X happens?", ask <b>"how much of X does today's price already assume?"</b> Holding everything else at the Nov 3 consensus, the solver finds the share of the US pipeline that would have to be blocked (with certainty) to make each stock's fair value equal today's price.</p>
+  <div class="grid2">
+    <div class="card"><div class="chart-title">Market-implied share of US AI pipeline blocked</div><div class="chart xtall"><canvas id="chImplied"></canvas></div>
+    <div class="chart-note">Reference lines: Dan Ives ~10% of projects, Gerstner 25–35% of 2027 build (10–15 GW), Goldman ~45% of planned capacity "at policy risk". Bars capped at 70% mean the politics alone can't explain the drop. Either the market overreacted on that name or something else hit it: rates, a Samsung guide, positioning.</div></div>
+    <div class="card prose">
+      <h3 style="margin-top:0">How to read this</h3>
+      <p><b>Bars near 25–35%:</b> priced about where the best-informed estimates sit. NVDA, MU, SK Hynix and ASML are here. The selloff in the headline names is not crazy. It's the market doing math.</p>
+      <p><b>Bars at 40–70%+:</b> the stock fell more than its exposure to US permits justifies, if permits were the only thing that changed. That covers TSMC, Broadcom, Marvell, Sandisk, Arm, the equipment makers, the power-gear names, Dell and Rambus. These are the overreaction candidates. Before you trust it, ask what else hit them: rates, a Samsung guide, crowded positioning.</p>
+      <p><b>Bars under 20%:</b> the price still assumes the politics mostly fizzle. That covers CoreWeave, Oracle, Intel and AMD. Arista sits here too, but only because it barely fell. If you think Gerstner is right, the levered ones have further to fall.</p>
+      <p><b>Not shown (no answer in range):</b> hyperscalers. MSFT, GOOGL and AMZN rose after the election. In the model, a blocked buildout makes their existing compute <i>more</i> valuable (scarcity rent) and their capex bill smaller, which is Clifton's point exactly. CEG, VST and META also show no answer: their drops come from price-cap politics or other drivers, not permit risk.</p>
+      <table id="impliedTable" style="margin-top:.8rem"></table>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="chart-title">Solve for any slider</div>
+      <p class="lead" style="margin-bottom:.4rem">Holding <b>your current Simulator settings</b>, find the value of one slider that makes a stock's fair value equal today's price.</p>
+      <div class="row"><select id="solCo"></select> is priced for <select id="solP"></select> <button class="btn primary" id="solGo">Solve</button></div>
+      <div class="big-answer" id="solOut">Pick a stock and a slider.</div>
+    </div>
+    <div class="card">
+      <div class="row">Which sliders move <select id="torCo"></select> the most? <span class="dim">(each slider ±20% of its range, from your current settings)</span></div>
+      <div class="chart tall"><canvas id="chTor"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ELECTION -->
+<section class="tab" id="t-election">
+  <div class="prose">
+  <h2 class="sec">Where this came from</h2>
+  <p>This started in an InvestorGeeks thread. Jason dropped TCAf 267, Dan Clifton (Strategas head of policy research) on The Compound after the midterms, whose argument is that <i>the data center trade is the entire market story and the election just broke it</i>. Then came the forward P/E screenshot that started the memory conversation (SNDK 2.9×, SK Hynix 3.2×, MU 3.2×), a stock-research run on MU (accumulate in tranches at $650 / $531 / $470), and a mainstreet build (probability-weighted value ~$495, real margin-of-safety buys under ~$330). The question underneath all of it: <b>is the post-election dump in chips and AI infrastructure an overreaction, and how would you even tell?</b> This report is the "how would you tell" part.</p>
+
+  <div class="warn"><b>Corrections to numbers in the thread.</b> It was 40 of 41 local measures that went against the industry (Ballotpedia, WSJ), not 38 of 40. Texas's Dec 17 date is a PUCT open meeting, not a legislative hearing. ERCOT's audit report is due Dec 10. The Blackstone/QTS Prince William Digital Gateway died in court in July, and Amazon's Ashburn withdrawal was a local-opposition deal. Neither was caused by Virginia's new data center electricity tax, which is $0.011/kWh, capped at $600M a year and sunsetting in 2028. I could not find a sourced link between the debt ceiling and repealing 100% expensing. Expensing is permanent under OBBBA. The live threat is Wyden's draft excise tax, which is unlikely to pass in a lame duck.</div>
+
+  <h2 class="sec">What actually happened Nov 3</h2>
+  <ul>
+    <li><b>Ballots:</b> 41 local data center measures in 10 states; 40 went against the industry (27 limits passed, 13 pro-development measures defeated). Ohio had 21, all anti. Of the 47 decided in 2026, 46 favored limits. Exit polls: 56% called AI/data centers a major factor and 76% oppose a data center in their own area (<a href="https://news.ballotpedia.org/2026/11/06/voters-favored-limiting-data-center-development-in-40-of-41-local-ballot-measures-on-nov-3/">Ballotpedia</a>, <a href="https://www.cnbc.com/2026/11/04/data-center-ballot-measures-2026-midterm.html">CNBC</a>).</li>
+    <li><b>Governors-elect</b> in Texas (Hinojosa), Ohio (Acton, "conditional moratorium"), Georgia and Michigan ran on pauses or stricter rules. About <b>40% of planned US capacity</b> sits in states that want to hit pause (<a href="https://www.energyconnects.com/news/renewables/2026/november/some-40-of-us-planned-data-center-capacity-is-in-states-wanting-to-hit-pause/">Cleanview via Bloomberg</a>).</li>
+    <li><b>Texas</b> was the grail. Abbott ordered an ERCOT/PUCT audit of the large-load queue in August: ~474 GW requested, ~90% data centers, against a ~91 GW record peak. "Batch Zero" (≥75 MW) is paused and TCEQ was told to halt data center permits. ERCOT's report is due Dec 10 and the PUCT meets Dec 17. Hinojosa appoints the PUCT and promises a moratorium that outlasts the audit (<a href="https://www.expressnews.com/business/article/ercot-data-centers-power-grid-oversight-22514525.php">Express-News</a>, <a href="https://www.lglawfirm.com/ercots-batch-zero-process-on-hold-due-to-data-center-audit/">Lloyd Gosselink</a>).</li>
+    <li><b>Ohio</b> has ~138–147 active local moratoria. Trenton's ban hits a ~1 GW Amazon campus. AEP Ohio now makes >25 MW loads pay up to 85% minimum (<a href="https://ohiocapitaljournal.com/2026/10/26/ohio-supreme-court-village-with-data-center-moratorium-wont-have-to-consider-site-plan/">Ohio Capital Journal</a>).</li>
+    <li><b>OpenAI</b> leaders discussed whether to <i>reset</i> 2027 capacity expectations. That was a discussion, not a number (<a href="https://www.wsj.com/tech/ai/the-election-day-revolt-that-threatens-americas-ai-boom-03a53b52">WSJ</a>).</li>
+  </ul>
+
+  <h2 class="sec">How big is the hole? (The estimates disagree, on purpose)</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th class="l">Who</th><th class="l">Estimate</th><th class="l">What it measures</th></tr>
+    <tr><td class="l">Dan Ives</td><td class="l">~10% of projects lost</td><td class="l">Projects, not GW (via Clifton)</td></tr>
+    <tr><td class="l">Brad Gerstner</td><td class="l">"at least 10–15 GW" of 2027 build slips</td><td class="l">≈ 25–35% of a ~43 GW 2027 US baseline (<a href="https://www.benzinga.com/markets/equities/26/11/62856685/crwv-apld-iren-stocks-slip-as-brad-gerstner-warns-democratic-midterm-gains-could-put-10-15-gw-of-ai-data-center-capacity-at-risk">Benzinga</a>)</td></tr>
+    <tr><td class="l">Goldman Sachs</td><td class="l">~45% of planned capacity at policy risk</td><td class="l">…but YE2027 capacity forecast only −5 GW, to 90 GW</td></tr>
+    <tr><td class="l">SemiAnalysis</td><td class="l">2027 "largely locked"; 2028 is the risk</td><td class="l">~3/4 of 2027 already under construction; 2028 US adds 62 GW, ~90% not started</td></tr>
+  </table></div>
+  <p>These numbers only look like they disagree. Read together they say <b>2027 delivery risk is modest and 2028 pipeline risk is large.</b> That is why the simulator has a separate "share of 2027 build already locked" slider. The revolt's full force lands in 2028 in the model.</p>
+
+  <h2 class="sec">Federal and global levers</h2>
+  <ul>
+    <li><b>Tariffs:</b> SCOTUS struck down the IEEPA tariffs 6–3 on Feb 20, and ~$166–175B of refunds are flowing (<a href="https://www.wiley.law/alert-SCOTUS-Invalidates-Use-of-IEEPA-for-Trade-Tariffs">Wiley</a>). The Section 232 semiconductor tariff is 25% on a narrow set of advanced chips, with broad exemptions for US data centers. The slider asks what happens if those exemptions go.</li>
+    <li><b>China:</b> ~600,000 H200s are sitting in Hong Kong because <i>Beijing</i> won't approve imports (<a href="https://www.reuters.com/world/china/nvidia-chips-pile-up-hong-kong-china-withholds-import-approval-2026-11-05/">Reuters</a>). Nvidia guides ~zero China data center revenue. Washington is no longer the binding constraint on China sales. Beijing is. Equipment makers carry far more China exposure than chip designers now, which is why ASML, LRCX and AMAT move most on the export slider.</li>
+    <li><b>Debt ceiling:</b> limit $41.1T, X-date ~mid-2027, funding expires ~Dec 11 (<a href="https://www.cnbc.com/2026/11/04/democrats-trump-debt-ceiling-fight.html">CNBC</a>). It's a leverage point, but the "kill 100% expensing" route is unsourced. The slider defaults to 20% odds.</li>
+    <li><b>Can it relocate?</b> Some of it. Stargate UAE is a 5 GW campus with the first 200 MW targeted for late 2026. The Middle East has ~1.2 GW live and is heading toward 3+ GW in 2027. The Nordics have ~2.1 GW, India ~1.6–1.8 GW (<a href="https://epoch.ai/data/ai-data-centers/directory/openai-stargate-uae">Epoch</a>). That's single-digit GW against 40–50 GW a year of planned US adds, and Gulf builds are gated by export licenses. Most relocation is <i>within</i> the US, to friendlier states, and it costs a year. The 45% default is generous for 2027 and plausible for 2028+.</li>
+  </ul>
+
+  <h2 class="sec">The tape: Nov 3 close → Nov 6 (intraday)</h2>
+  <p>Nov 5 was the big one. The SOX fell 12.3%, its worst day since March 2020, and the Nasdaq fell 5.5% into a correction. Hyperscalers <i>rose</i>. Note the memory slide started before the election: SNDK was already −36% in the six sessions before Nov 5, and MU dove on Oct 30 after Samsung's guide (<a href="https://www.morningstar.com/news/marketwatch/20261105237/micron-sandisk-and-other-ai-stocks-see-steep-drops-investors-dont-like-uncertainty">MarketWatch</a>, <a href="https://www.tikr.com/blog/constellation-energy-sinks-8-vistra-down-14-as-democrats-midterm-sweep-hits-ai-power-stocks">TIKR</a>).</p>
+  </div>
+  <div class="card"><div class="chart tall"><canvas id="chTape"></canvas></div><div class="chart-note">Close-to-close from yfinance. Gray = benchmarks. The split Clifton flagged is right there: buildout suppliers down hard, compute owners flat to up.</div></div>
+  <div class="prose">
+  <h2 class="sec">Clifton's best point, tested</h2>
+  <p>"If we build less compute, whoever already has compute is holding something more valuable." The simulator agrees, mechanically. Block the pipeline and coverage drops, so rental prices rise. Hyperscaler capex and depreciation fall at the same time, which helps free cash flow. Run the "Clifton: revolt spreads" preset and Microsoft, Alphabet, Amazon and Meta come out flat against the base case. Suppliers fall 7–45%, and CoreWeave's equity is nearly wiped out. That's the same split the tape showed. It is also current market reality, not just theory: H100 rentals are ~$3.80–4.00/hr (up from ~$1.95 a year ago), B200 rentals are up 21.5% in 30 days, and providers are announcing Dec 1 hikes (<a href="https://singularityresearchfund.com/gpu-prices">GPU price tracker</a>). Compute is getting scarcer, not cheaper.</p>
+  <p>His second-best point is that <b>a local zoning revolt is now a macro event</b> because data centers are a huge share of expected growth. The model can't capture that reflexivity, the way slower capex slows GDP, which hits the multiple. The "Market sentiment" slider is where you put it.</p>
+  </div>
+</section>
+
+<!-- SUPPLY & DEMAND NOW -->
+<section class="tab" id="t-supply">
+  <p class="lead">State of each layer as of early November 2026. The research pass went through Grok, ChatGPT and Perplexity via wide-search. Perplexity rate-limited most queries, so many facts rest on Grok plus primary links. Anything single-sourced says so.</p>
+  <div class="grid3">
+    <div class="card"><h3 style="margin-top:0">Accelerators <span class="pill orange">Tight, easing</span></h3><div class="prose" style="font-size:.8rem">
+      <p>Nvidia Q2 FY27: $96.2B revenue, data center $89.0B (+117%). The Q3 guide is $108B ±2% with ~zero China, and it reports <b>Nov 17</b>. Vera Rubin is ~20% of Q3 data center revenue. Supply commitments jumped to <b>$279B</b>, mostly memory, and it says it is "supply constrained at least through FY28" (<a href="https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027">Nvidia</a>).</p>
+      <p>AMD Q3: $13.4B (+45%), data center $8.5B (+97%), first MI455X/Helios revenue. Q4 guide ~$17B (<a href="https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000188/q32026991.htm">AMD</a>).</p>
+      <p>Broadcom AI revenue guide: $58B in FY26, ~$115B in FY27, ~$230B in FY28 (<a href="https://www.fool.com/investing/2026/09/03/hock-tan-just-put-a-usd230-billion-number-on-broadcom-s-2028-ai-revenue-that-is-4-times-this-year-s/">Fool</a>). TPU output roughly doubled QoQ (<a href="https://epoch.ai/data-insights/tpu-production-doubling">Epoch</a>).</p>
+      <p>CoWoS is ~130k wafers/month at end-2026 and ~185–200k at end-2027 (analyst estimates). TSMC is reportedly eyeing a +20% CoWoS price hike for 2027 (<a href="https://www.trendforce.com/news/2026/10/27/news-tsmc-reportedly-eyes-20-cowos-price-hike-skips-equipment-price-renegotiations-amid-ai-demand-surge/">TrendForce</a>). Packaging is easing as the bottleneck shifts to memory, optics and power.</p></div></div>
+    <div class="card"><h3 style="margin-top:0">Memory <span class="pill red">Sold out</span></h3><div class="prose" style="font-size:.8rem">
+      <p>Samsung: all 2027 HBM sold (<a href="https://www.reuters.com/world/china/samsung-posts-record-profit-q3-ai-chip-boom-2026-10-29/">Reuters</a>). SK Hynix: DRAM and HBM "effectively sold out through 2029", demand >2× supply (<a href="https://www.pcmag.com/news/sk-hynix-major-memory-vendor-basically-sold-out-through-2029">PCMag</a>). TrendForce: 2027 blended HBM ASP <b>+121%</b>, and 4Q26 contracts DRAM +10–15% and NAND +15–20% (<a href="https://www.trendforce.com/presscenter/news/20260930-13258.html">TrendForce</a>). Q3 DRAM revenue +369% YoY on only ~4% QoQ bit growth. This is all price (<a href="https://dataconomy.com/2026/11/06/dram-revenue-surges-369-as-ai-driven-memory-crunch-deepens/">Counterpoint</a>).</p>
+      <p><b>The wave:</b> Hynix Yongin fab 1 ~Feb 2027, Micron Idaho ID1 first wafers mid-2027 and ID2 late 2028 (<a href="https://www.idahostatesman.com/news/business/article315725387.html">Idaho Statesman</a>), Samsung P5 in 2028. CXMT goes ~300–350k → ~420k wpm by end-2027, though its HBM yields are only 20–30% (<a href="https://www.trendforce.com/news/2026/09/24/news-cxmt-ymtc-ramp-memory-capacity-but-chinas-ai-cloud-boom-could-soak-up-new-supply-through-2027/">TrendForce</a>).</p>
+      <p><b>The crack to watch:</b> PC, phone and module inventories are elevated after H1 stockpiling, spot prices are weak, and PC OEMs are cutting next year's buys. The risk is a consumer air pocket, not an AI one.</p></div></div>
+    <div class="card"><h3 style="margin-top:0">Server CPUs <span class="pill red">Shortage</span></h3><div class="prose" style="font-size:.8rem">
+      <p>Intel's DCAI segment: $7.3B (+~80%). Lip-Bu Tan calls it "one of the most significant supply shortages in history", severe through 1H27, with Intel shifting capacity from client to server. Substrate capacity +40%, mostly in 2H27 (<a href="https://www.tomshardware.com/pc-components/cpus/intel-shifts-production-capacity-from-consumer-to-server-cpus-in-face-of-unprecedented-ai-demand-company-navigating-one-of-the-most-significant-supply-shortages-in-history">Tom's Hardware</a>).</p>
+      <p>TrendForce: server CPU shipments +31% in 2026 and >40% in 2027, with Arm >20% share heading to ~30% (<a href="https://www.emsnow.com/server-cpu-shipments-projected-to-grow-over-40-yoy-in-2027-with-arm-based-products-continuing-to-gain-market-share-says-trendforce/">EMSNow</a>). Arm: >60% of top-hyperscaler compute by end-2026 and DC royalties 2× (<a href="https://newsroom.arm.com/news/arm-q2-fye27-results">Arm</a>).</p>
+      <p>v2's CPU thesis held on fundamentals. The stocks round-tripped anyway. See the Scorecard.</p></div></div>
+    <div class="card"><h3 style="margin-top:0">Optics <span class="pill red">Tightest after memory</span></h3><div class="prose" style="font-size:.8rem">
+      <p>Lumentum: AI optical parts sold out into early 2029, and it can't meet ~70% of demand for some products through 2027 (<a href="https://www.semimedia.cc/lumentum-says-some-optical-capacity-is-sold-out-through-early-2029-as-ai-demand-outruns-supply/">SemiMedia</a>). Arista's Bechtolsheim says module lead times went from ~3 months to 9–12 months. Nvidia put $2B each into Lumentum and Coherent. New in v3: an optics capacity slider. In the Nov 3 consensus run, optics is what binds in 2028–30.</p></div></div>
+    <div class="card"><h3 style="margin-top:0">Power <span class="pill red">Binding</span></h3><div class="prose" style="font-size:.8rem">
+      <p>GE Vernova gas backlog plus reservations is 122 GW, with slots out to 2031. Siemens Energy lead times are 3+ years and large transformers ~128 weeks (secondary). PJM's 2028/29 auction cleared at the cap and came up 6.8 GW short, and FERC pushed the backstop auction to Feb–Mar 2027 (<a href="https://www.utilitydive.com/news/pjm-delays-backstop-procurement-ferc-data-center/831751/">Utility Dive</a>).</p>
+      <p>2027 US load forecasts run from 45 GW (EPRI peak) to 66 GW (Goldman demand) to 90 GW (Goldman capacity). The spread is about metric choice, so check which one anyone quotes (<a href="https://www.goldmansachs.com/insights/articles/us-data-center-power-demand-projected-to-double-by-2027">Goldman</a>, <a href="https://powering-intelligence.epri.com/dashboard/">EPRI</a>). Near-term behind-the-meter power means gas. New SMRs don't produce commercial power before ~2030.</p></div></div>
+    <div class="card"><h3 style="margin-top:0">Cooling &amp; electrical <span class="pill green">Demand strong, supply catching up</span></h3><div class="prose" style="font-size:.8rem">
+      <p>Vertiv Q3: sales $4.31B (+61%), organic orders >100% YoY, guide raised, ~$4.1B of customer prepayments (Grok summary; primary check pending). Customers prepaying is not what fading demand looks like. Vertiv is down 52% from its high and 23% since Nov 3. That's the single biggest gap in the model between fundamentals and price.</p></div></div>
+  </div>
+
+  <h2 class="sec">Demand: still accelerating</h2>
+  <div class="grid2">
+    <div class="card prose" style="font-size:.82rem">
+      <h3 style="margin-top:0">Usage</h3>
+      <ul>
+        <li>Google: >3.2 quadrillion tokens/month across surfaces (7× YoY). First-party API ~32B tokens/min, >4× YoY. Gemini app 1B+ MAU (<a href="https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q3-2026/">Alphabet Q3</a>).</li>
+        <li>ChatGPT: 1.2B weekly users (<a href="https://www.theverge.com/ai-artificial-intelligence/1002265/chatgpt-now-has-1-2-billion-weekly-users-openai-says">The Verge</a>).</li>
+        <li>OpenRouter: ~204T tokens a week, and <b>agents are ~90% of it</b> (single gateway; aggregator source).</li>
+        <li>Price vs spend: a16z says average token prices fell 67% since May while token <i>spend</i> rose 122–160%. Epoch sees fixed-capability cost falling ~13×/yr (<a href="https://epoch.ai/publications/the-plunging-price-of-thought">Epoch</a>). Jevons is winning so far, and that's the "Jevons elasticity" slider.</li>
+        <li>Enterprise: KPMG says 62% of $1B+ firms are building or deploying agents. McKinsey says 40% of large firms are scaling agents in at least one function. Gartner counts 17% deployed and warns >40% of agentic projects may be cancelled by 2027. Definitions differ, so don't average them.</li>
+      </ul>
+    </div>
+    <div class="card prose" style="font-size:.82rem">
+      <h3 style="margin-top:0">Money &amp; robots</h3>
+      <ul>
+        <li>Big-4 2026 capex: ~$720–740B. MSFT trimmed to ~$170B on delivery timing. GOOGL is holding $195–205B and says 2027 will "increase significantly". AMZN is at ~$220B and says 2027 will be "meaningfully more", with a $578B AWS backlog sold out through 2027. META is at $135–145B. <b>All four were set before the election</b>, and no post-election revision has been found (<a href="https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html">CNBC</a>, <a href="https://www.businessinsider.com/amazon-2027-ai-spending-exceed-220-billion-2026-10">BI</a>).</li>
+        <li>Anthropic's S-1/A shows <b>$895B</b> of mostly take-or-pay compute commitments, ~13× its run-rate (<a href="https://www.datacenterdynamics.com/en/news/anthropic-s-1-update-reveals-8954bn-in-cloud-and-data-center-commitments/">DCD</a>). Oracle's RPO is $664B, ~45% of it OpenAI (<a href="https://investor.oracle.com/investor-news/news-details/2026/Oracle-Investor-Day-2026-Accelerating-Value-Creation/default.aspx">Oracle</a>).</li>
+        <li>Revenue: OpenAI ~$50B (net basis), Anthropic ~$65–74B (gross basis). These bases aren't comparable (<a href="https://www.cnbc.com/2026/08/17/anthropic-says-annualized-revenue-climbed-to-65-billion-in-july.html">CNBC</a>, <a href="https://sacra.com/research/anthropics-s1/">Sacra</a>).</li>
+        <li>Robots: 2026 humanoid shipments are 50–90k depending on who's counting, and >95% are Chinese. Waymo does ~500k paid rides a week. Physical AI is a 2028+ compute story, which is why the robots slider barely moves 2027 (<a href="https://robotbelt.com/china-humanoid-robot-shipments-h1-2026-agibot-unitree/">RobotBelt</a>).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BALANCE SHEETS -->
+<section class="tab" id="t-balance">
+  <p class="lead">Who can absorb a slowdown and who can't. "Today" columns are trailing data from Yahoo Finance (Nov 6). The <b>2028 net cash</b> column is live and comes from your Simulator scenario. It's net cash plus cumulative free cash flow under your sliders, before buybacks and dividends. Negative = net debt.</p>
+  <div class="card"><div class="tbl-wrap"><table id="bsTable"></table></div></div>
+  <div class="grid2">
+    <div class="card"><div class="chart-title">Net cash: today vs 2028 in your scenario ($B)</div><div class="chart tall"><canvas id="chBS"></canvas></div></div>
+    <div class="card prose" style="font-size:.82rem">
+      <h3 style="margin-top:0">What the balance sheets are saying</h3>
+      <ul>
+        <li><b>The buyers are borrowing.</b> Free cash flow went negative at Alphabet (−$9.1B), Amazon (TTM −$42.4B), Meta (−$2.1B, first time in 10+ years) and Oracle. Only Microsoft is solidly positive. In one week Alphabet, Meta and Oracle raised more than $50B of bonds and equity. Amazon arranged up to an ~$80B secured supplier facility, and Meta created non-voting shares to fund AI (<a href="https://www.ifre.com/bonds/2509040/hyperscalers-raise-us50bn-ahead-of-dramatic-ai-meltdown">IFR</a>, <a href="https://www.datacenterdynamics.com/en/news/big-four-hyperscalers-raising-more-that-131-billion-in-debt-and-equity-for-ai-buildout/">DCD</a>).</li>
+        <li><b>The sellers are hoarding cash.</b> Memory makers are throwing off cash at peak margins. In the model, Micron goes from ~$38B net cash to well over $200B by 2028 even in scenarios where its stock falls. Peak-cycle cash is why memory equities don't go to zero in a glut. They just go back to 6–8× normalized earnings.</li>
+        <li><b>The middle is levered.</b> CoreWeave's CDS hit a record ~1,167 bp and Nvidia's 5-year CDS is up more than 3× on the year, with ~0.8 correlation to CoreWeave. Oracle's $18B New Mexico project loan traded ~89–91¢ and it plans another $20B raise (<a href="https://www.reuters.com/business/finance/oracles-18-billion-data-center-debt-under-pressure-ft-reports-2026-09-18/">Reuters</a>). These companies signed for chips and leases they must pay for whether or not a county lets them plug in, and the model's levered-builder logic reflects that. Slide the revolt up and their revenue falls faster than their capex.</li>
+        <li><b>Circularity:</b> Nvidia has ~$30B into OpenAI, guarantees of up to ~$105B on an OpenAI Ohio lease, and a ~$6.3B capacity backstop at CoreWeave. A credit event in the middle layer travels both up and down the chain. That's what the "AI financing crunch" slider stands for.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SCORECARD -->
+<section class="tab" id="t-score">
+  <div class="prose">
+  <p class="lead">Grading the last two reports against today, no cherry-picking. Prices are closes on the report date and Nov 6 intraday; Korea, Japan and Hong Kong use the Nov 5 close.</p>
+  <p><b>The short version:</b> the fundamentals calls were right (memory sold out, CPU shortage, power binding) and the stock calls got run over. Every theme in both reports is still true on the supply side, yet the June buy list averages −35% and the October list about −25%. The lesson is the one the June report printed in bold and then ignored in its own ratings: <i>this is a cyclical you rent, not a stock you marry</i>. Exit discipline beat thesis quality by a mile. Ah yes, the basement daemon strikes again. 🪨</p>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="chart-title">June 25 report (Chips &amp; Memory Rotation) — return to now</div><div class="tbl-wrap"><table id="scoreV1"></table></div></div>
+    <div class="card"><div class="chart-title">Oct 12 report (Infrastructure v2) — return to now</div><div class="tbl-wrap"><table id="scoreV2"></table></div></div>
+  </div>
+  <div class="prose">
+    <h3>What I'd do differently, and did in v3</h3>
+    <ul>
+      <li><b>Price the politics.</b> Neither earlier model had a node for "people who live next to the data center get a vote." v3 has seven political levers, each with probability and severity.</li>
+      <li><b>Calibrate to the market, then move off it.</b> v1 and v2 gave absolute price targets. v3 anchors every stock to what the market actually paid on Nov 3 and shows only the change your assumptions imply. That's more honest about what a model like this can know.</li>
+      <li><b>Show the distribution.</b> A Strong Buy on a beta-2.4 cyclical is a coin flip with a story attached. The Monte Carlo tab shows how wide the coin is.</li>
+      <li><b>The avoids worked, sort of.</b> v2's three Avoids (CRWV, ORCL, OKLO) fell 16–43% since Oct 12. Then again, so did nearly everything else.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section class="tab" id="t-method">
+  <div class="prose">
+  <h2 class="sec">How the model works</h2>
+  <p>Five years (2026–2030), five layers, one pipeline: <b>demand → constrained supply → scarcity prices → company P&amp;L → fair value</b>. It's a thinking tool for orders of magnitude and directions, not a DCF you should trade off.</p>
+  <h3>1. Demand (M H100-equivalents of compute needed)</h3>
+  <p>2026 starts at 36M H100e against a 33M installed fleet (~92% coverage), consistent with rising rental prices. The split is training 38%, consumer 26%, enterprise/agents 33% and robotics 3%. Each segment compounds on its own sliders: users × usage, adoption × agent intensity, robots in service, training growth. Inference segments are then multiplied by a <b>capability unlock</b> term, (1 + unlock)<sup>doublings</sup>, and an <b>efficiency</b> term, (1 + efficiency)<sup>t·(ε−1)</sup>, where ε is the Jevons elasticity. At ε = 1, efficiency is a wash. Below 1 it shrinks hardware demand, and above 1 cheaper tokens pull in more than they save.</p>
+  <h3>2. Supply (what gets added each year)</h3>
+  <p>Additions = the minimum of five caps. <b>Buyers' demand</b> is the gap to demand, reduced by policy drag (expensing, power tariffs, Section 232, the financing crunch), with a floor of 65% of the prior year for contracts and momentum. <b>Chips/CoWoS</b> start at 14M H100e in 2026. <b>HBM</b> bit growth is adjusted for HBM per unit of compute falling ~8%/yr. <b>Optics</b> is the fourth cap. <b>Power</b> is the GW that actually energize. That starts at ~11 GW in 2026, ~65% of announcements landing on time, and is reduced by the US share × blocked share, plus relocated capacity a year later. New compute's kW per H100e falls with perf-per-watt. Defaults are set so chips, power and optics co-bind around 2027–28, which matches what the industry is reporting.</p>
+  <p><b>Politics:</b> the revolt's expected value (probability × severity) applies at (1 − locked share) in 2027 and in full in 2028, then trends by the backlash slider. In the Simulator, each risk enters at its expected value. The "all happen" and "none happen" switches override probabilities (Taiwan excepted). In Monte Carlo, each risk is a real coin flip.</p>
+  <h3>3. Prices</h3>
+  <ul>
+    <li><b>Compute rental</b> = (coverage ÷ 2026 coverage)<sup>−0.8</sup>, clamped 0.5–1.8.</li>
+    <li><b>Chip pricing power</b> falls when chips are <i>not</i> the bottleneck (utilization<sup>0.8</sup>) and rises with overall scarcity. This is how a power-bound world shifts value from Nvidia to compute owners.</li>
+    <li><b>DRAM / NAND</b> = (demand ÷ supply, relative to 2026)<sup>3</sup> × a 1.35/1.30 carry-over for exit-2026 contract hikes. DRAM demand is conventional servers and devices (tied to CPU volume) plus HBM wafers (tied to accelerator additions). Supply grows at the bit-supply slider, plus ~20%/yr extra once the capacity wave lands.</li>
+    <li><b>CPU</b> ∝ (supply ÷ demand)<sup>−1</sup>, where demand = general-purpose sockets + accelerators × CPU ratio.</li>
+    <li><b>Power</b> gets a scarcity premium when utilization runs above 90%, minus the price-cap politics.</li>
+  </ul>
+  <h3>4. Companies</h3>
+  <p>Each company is built from 2026 revenue (calendar-year estimate from trailing data and run-rates), a normalized operating margin, its AI share, and a mix of "pools" (GPU, ASIC, networking, CPU, foundry, DRAM, NAND, fab equipment, servers, power gear, power generation, memory interface). Each pool has a volume index, a price index and a unit-cost index, so <b>price changes fall straight to margin</b> while volume changes scale revenue and cost together. China exposure is cut by the export slider. Compute owners (hyperscalers, Oracle, CoreWeave) work differently. Their AI revenue = fleet × rental price, and costs include depreciation of a 5-year capex stack. Oracle and CoreWeave are levered: their capex is mostly committed, but revenue needs energized sites.</p>
+  <h3>5. Valuation and calibration</h3>
+  <p>Equity value = (2028 NOPAT, or EBITDA for compute owners) × multiple − 2028 net debt, discounted 2 years. Net debt evolves with the scenario's free cash flow, so balance sheets matter. <b>The multiple is calibrated per company so that the Nov 3 consensus preset reproduces the Nov 3 close exactly.</b> It then flexes with 2028→30 growth relative to that calibration, the discount rate and the sentiment slider. A Taiwan haircut applies to fab-exposed names in proportion to the annual probability. Fair value is therefore always "what the market paid before the election, adjusted for how your world differs from the one it priced."</p>
+  <h3>What it can't see</h3>
+  <ul>
+    <li>Positioning, momentum, rates and the Samsung guide. Some of every drop isn't politics. That's why "implied % blocked" over 70% means "something else did this."</li>
+    <li>Reflexivity: slower capex → slower GDP → lower multiples everywhere. Use the sentiment slider.</li>
+    <li>Absolute earnings levels. Company paths are index-driven and won't match consensus EPS. The calibration absorbs the level, so read the <i>changes</i>.</li>
+    <li>Geography beyond US/non-US. A single substation can bind a whole campus.</li>
+  </ul>
+
+  <h2 class="sec">Sources</h2>
+  <p class="src">Prices and financials: Yahoo Finance via yfinance, pulled Nov 6, 2026 (~1:45pm ET). Research: 40+ queries through wide-search (Grok + ChatGPT + Perplexity) and Grok search on Nov 6. Every link below came back from a search engine or an earlier report. None were constructed by hand. Prior context: <a href="../chip-memory-rotation-2026/">June 25 report</a>, <a href="../ai-infrastructure-economics-v2/">Oct 12 report</a>, and the InvestorGeeks thread (Clifton/TCAf 267, MU stock-research and mainstreet runs).</p>
+  <ul class="src">
+    <li>https://www.wsj.com/tech/ai/the-election-day-revolt-that-threatens-americas-ai-boom-03a53b52</li>
+    <li>https://news.ballotpedia.org/2026/11/06/voters-favored-limiting-data-center-development-in-40-of-41-local-ballot-measures-on-nov-3/</li>
+    <li>https://www.cnbc.com/2026/11/04/data-center-ballot-measures-2026-midterm.html</li>
+    <li>https://www.energyconnects.com/news/renewables/2026/november/some-40-of-us-planned-data-center-capacity-is-in-states-wanting-to-hit-pause/</li>
+    <li>https://www.expressnews.com/business/article/ercot-data-centers-power-grid-oversight-22514525.php</li>
+    <li>https://www.lglawfirm.com/ercots-batch-zero-process-on-hold-due-to-data-center-audit/</li>
+    <li>https://www.whitefordlaw.com/news-events/client-alert-update-virginia-enacts-energy-consumption-tax-on-data-centers-and-signs-broader-energy-affordability-package</li>
+    <li>https://www.fox5dc.com/news/qts-drops-appeal-ending-plans-massive-prince-william-county-data-center</li>
+    <li>https://ohiocapitaljournal.com/2026/10/26/ohio-supreme-court-village-with-data-center-moratorium-wont-have-to-consider-site-plan/</li>
+    <li>https://www.benzinga.com/markets/equities/26/11/62856685/crwv-apld-iren-stocks-slip-as-brad-gerstner-warns-democratic-midterm-gains-could-put-10-15-gw-of-ai-data-center-capacity-at-risk</li>
+    <li>https://www.cnbc.com/2026/11/04/democrats-trump-debt-ceiling-fight.html</li>
+    <li>https://www.wiley.law/alert-SCOTUS-Invalidates-Use-of-IEEPA-for-Trade-Tariffs</li>
+    <li>https://www.reuters.com/world/china/nvidia-chips-pile-up-hong-kong-china-withholds-import-approval-2026-11-05/</li>
+    <li>https://epoch.ai/data/ai-data-centers/directory/openai-stargate-uae</li>
+    <li>https://www.morningstar.com/news/marketwatch/20261105237/micron-sandisk-and-other-ai-stocks-see-steep-drops-investors-dont-like-uncertainty</li>
+    <li>https://www.tikr.com/blog/constellation-energy-sinks-8-vistra-down-14-as-democrats-midterm-sweep-hits-ai-power-stocks</li>
+    <li>https://247wallst.com/investing/2026/11/06/sandisk-surges-10-micron-and-western-digital-jump-8-as-memory-and-storage-stocks-rebound-from-ai-sell-off/</li>
+    <li>https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027</li>
+    <li>https://nvidianews.nvidia.com/news/nvidia-sets-conference-call-for-third-quarter-financial-results-6928873</li>
+    <li>https://ir.amd.com/financial-information/sec-filings/content/0000002488-26-000188/q32026991.htm</li>
+    <li>https://www.fool.com/investing/2026/09/03/hock-tan-just-put-a-usd230-billion-number-on-broadcom-s-2028-ai-revenue-that-is-4-times-this-year-s/</li>
+    <li>https://epoch.ai/data-insights/tpu-production-doubling</li>
+    <li>https://www.trendforce.com/news/2026/10/27/news-tsmc-reportedly-eyes-20-cowos-price-hike-skips-equipment-price-renegotiations-amid-ai-demand-surge/</li>
+    <li>https://www.reuters.com/world/china/samsung-posts-record-profit-q3-ai-chip-boom-2026-10-29/</li>
+    <li>https://www.pcmag.com/news/sk-hynix-major-memory-vendor-basically-sold-out-through-2029</li>
+    <li>https://www.trendforce.com/presscenter/news/20260930-13258.html</li>
+    <li>https://dataconomy.com/2026/11/06/dram-revenue-surges-369-as-ai-driven-memory-crunch-deepens/</li>
+    <li>https://www.tweaktown.com/news/114505/team-group-ceo-says-memory-crisis-will-reach-a-point-in-2027-where-even-money-cant-buy-goods/index.html</li>
+    <li>https://www.idahostatesman.com/news/business/article315725387.html</li>
+    <li>https://www.trendforce.com/news/2026/09/24/news-cxmt-ymtc-ramp-memory-capacity-but-chinas-ai-cloud-boom-could-soak-up-new-supply-through-2027/</li>
+    <li>https://www.tomshardware.com/pc-components/cpus/intel-shifts-production-capacity-from-consumer-to-server-cpus-in-face-of-unprecedented-ai-demand-company-navigating-one-of-the-most-significant-supply-shortages-in-history</li>
+    <li>https://www.emsnow.com/server-cpu-shipments-projected-to-grow-over-40-yoy-in-2027-with-arm-based-products-continuing-to-gain-market-share-says-trendforce/</li>
+    <li>https://newsroom.arm.com/news/arm-q2-fye27-results</li>
+    <li>https://www.semimedia.cc/lumentum-says-some-optical-capacity-is-sold-out-through-early-2029-as-ai-demand-outruns-supply/</li>
+    <li>https://www.utilitydive.com/news/pjm-delays-backstop-procurement-ferc-data-center/831751/</li>
+    <li>https://www.goldmansachs.com/insights/articles/us-data-center-power-demand-projected-to-double-by-2027</li>
+    <li>https://powering-intelligence.epri.com/dashboard/</li>
+    <li>https://about.bnef.com/insights/data-centers/six-things-to-know-about-bnefs-new-us-data-center-capacity-outlook/</li>
+    <li>https://www.datacenterdynamics.com/en/news/amazon-and-aep-to-explore-deployment-of-up-to-960mw-of-x-energy-smrs-in-indiana/</li>
+    <li>https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q3-2026/</li>
+    <li>https://blog.google/innovation-and-ai/sundar-pichai-io-2026/</li>
+    <li>https://www.theverge.com/ai-artificial-intelligence/1002265/chatgpt-now-has-1-2-billion-weekly-users-openai-says</li>
+    <li>https://epoch.ai/publications/the-plunging-price-of-thought</li>
+    <li>https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html</li>
+    <li>https://www.businessinsider.com/amazon-2027-ai-spending-exceed-220-billion-2026-10</li>
+    <li>https://www.cnbc.com/2026/10/29/amazon-amzn-q3-earnings-report-2026.html</li>
+    <li>https://investor.oracle.com/investor-news/news-details/2026/Oracle-Investor-Day-2026-Accelerating-Value-Creation/default.aspx</li>
+    <li>https://www.reuters.com/business/oracle-expects-turn-cash-flow-positive-second-half-fiscal-2028-2026-10-28/</li>
+    <li>https://www.reuters.com/business/finance/oracles-18-billion-data-center-debt-under-pressure-ft-reports-2026-09-18/</li>
+    <li>https://www.datacenterdynamics.com/en/news/anthropic-s-1-update-reveals-8954bn-in-cloud-and-data-center-commitments/</li>
+    <li>https://www.cnbc.com/2026/08/17/anthropic-says-annualized-revenue-climbed-to-65-billion-in-july.html</li>
+    <li>https://sacra.com/research/anthropics-s1/</li>
+    <li>https://robotbelt.com/china-humanoid-robot-shipments-h1-2026-agibot-unitree/</li>
+    <li>https://www.ifre.com/bonds/2509040/hyperscalers-raise-us50bn-ahead-of-dramatic-ai-meltdown</li>
+    <li>https://www.datacenterdynamics.com/en/news/big-four-hyperscalers-raising-more-that-131-billion-in-debt-and-equity-for-ai-buildout/</li>
+    <li>https://singularityresearchfund.com/gpu-prices</li>
+  </ul>
+  </div>
+</section>
+
+<footer>
+  Built by Flint — Coleman Family Basement Research Division · Data as of November 6, 2026 · v3 of the AI infrastructure model.<br>
+  Not investment advice. This is exploratory research from an AI running on an old gaming PC in a basement. The model is calibrated to market prices and moves with your assumptions. It is a tool for thinking, not a forecast. Several sources are single-engine or secondary and are marked as such. Memory and AI infrastructure stocks are extremely cyclical and volatile. Do your own work.
+</footer>
+</div>
+
+<script>
+// AI buildout simulator engine: demand -> constrained supply -> prices -> company P&L -> fair value.
+(function (root) {
+const YEARS = [2026, 2027, 2028, 2029, 2030];
+const EVENTS = ['revolt', 'depr', 'powerPol', 'export', 'tariff', 'taiwan', 'credit'];
+
+// k, label, group, min, max, step, def, unit, help
+const PARAMS = [
+  // Demand
+  ['consumerUsers', 'Consumer AI users by 2030', 'demand', 1, 6, 0.1, 3.5, 'B/wk', 'People using chatbots and assistants weekly. ~2.0B unique today (ChatGPT alone 1.2B weekly, Gemini ~1B monthly, with overlap).'],
+  ['consIntensity', 'Usage per consumer, growth/yr', 'demand', 0, 100, 1, 20, '%', 'More turns, voice, video, reasoning per person, measured in compute before efficiency gains.'],
+  ['entAdopt', 'Knowledge workers using agents daily by 2030', 'demand', 12, 95, 1, 45, '%', 'Enterprise adoption. Starts ~12% in 2026 (pilots → production).'],
+  ['agentIntensity', 'Agent work per adopter, growth/yr', 'demand', 0, 150, 1, 20, '%', 'Agents run longer tasks, more of them in parallel. This is the agentic multiplier.'],
+  ['robots', 'Robots + robotaxis in service by 2030', 'demand', 0.3, 30, 0.1, 3, 'M', 'Humanoids, AVs, AI-connected industrial robots (~0.3M today). Drives sim/training and fleet inference compute.'],
+  ['trainGrowth', 'Training compute growth/yr', 'demand', 0, 150, 1, 35, '%', 'Frontier lab training fleets. Historically 2-4x/yr per frontier run, slower for the whole fleet.'],
+  // Intelligence & efficiency
+  ['capDoubling', 'Capability doubling time', 'smarts', 3, 24, 1, 7, 'months', 'How fast models get smarter (METR-style task horizon). Shorter = smarter faster.'],
+  ['capUnlock', 'New demand unlocked per doubling', 'smarts', 0, 40, 1, 6, '%', 'Each capability doubling opens new use cases. 0 = smarter models don\'t create new demand.'],
+  ['efficiency', 'Software efficiency gain/yr', 'smarts', 0, 200, 5, 45, '%', 'Same answer with less compute: distillation, MoE, quantization, KV-cache compression (DeepSeek V4.1, TurboQuant, Prism Bonsai).'],
+  ['jevons', 'Jevons elasticity', 'smarts', 0.3, 1.6, 0.05, 0.8, '×', 'How much cheaper tokens increase usage. 1.0 = efficiency is compute-neutral. Below 1 efficiency shrinks hardware demand; above 1 it grows it. a16z: token prices −67% since May, spend +122-160%.'],
+  // Politics: probability + severity pairs
+  ['revoltP', 'Local data-center revolt sticks', 'politics', 0, 100, 5, 80, '%', 'Probability that the post-midterm wave of moratoria, referendums, and permit denials actually blocks US capacity (40 of 41 local measures went against the industry; TX, OH, GA, MI governors-elect ran on pauses).'],
+  ['revoltSev', '…US pipeline blocked if it does', 'politics', 0, 70, 1, 25, '%', 'Share of planned US AI capacity blocked or delayed at full effect (2028). Gerstner: 25-35% of 2027. Dan Ives: ~10%. Goldman: ~45% at policy risk but only −5 GW to its 2027 forecast.'],
+  ['locked', '…share of 2027 build already locked', 'politics', 0, 100, 5, 50, '%', 'SemiAnalysis: 2027 is largely under construction; the real exposure is 2028 (~90% not started). Higher = 2027 dodges more of the hit.'],
+  ['revoltTrend', '…backlash trend after 2028', 'politics', -60, 60, 5, -15, '%/yr', 'Negative = fades as tax revenue and jobs win arguments. Positive = spreads to more states.'],
+  ['relocate', '…blocked capacity that relocates', 'politics', 0, 100, 5, 45, '%', 'Moves to friendlier states, the Gulf, Nordics, India, or behind-the-meter sites, arriving a year later.'],
+  ['deprP', '100% expensing curbed', 'politics', 0, 100, 5, 20, '%', 'Probability that bonus depreciation or full expensing for data-center equipment is limited (Wyden excise / expensing-limit draft). The debt-ceiling route is reported but unsourced.'],
+  ['deprSev', '…US AI capex cut if it does', 'politics', 0, 30, 1, 8, '%', 'Higher after-tax cost of capex → less spend at the margin.'],
+  ['powerPolP', 'Large-load power tariffs / price caps', 'politics', 0, 100, 5, 55, '%', 'Data centers forced to pay for grid upgrades; caps on what generators can charge them.'],
+  ['powerPolSev', '…hit to DC power economics', 'politics', 0, 40, 1, 10, '%', 'Raises US build cost (half passes into lower capex) and caps generator pricing.'],
+  ['exportP', 'Tighter China export controls (incl. HBM)', 'politics', 0, 100, 5, 40, '%', 'Probability of new US restrictions. ~600k H200s are already stuck in Hong Kong awaiting Beijing approval.'],
+  ['exportSev', '…China AI revenue lost if it does', 'politics', 0, 100, 5, 60, '%', 'Share of each company\'s China AI or equipment revenue that disappears.'],
+  ['tariffP', 'Section 232 chip tariffs bite', 'politics', 0, 100, 5, 30, '%', 'Probability that the 25% semiconductor tariff loses its broad data-center exemptions.'],
+  ['tariffSev', '…effective tariff rate', 'politics', 0, 50, 1, 25, '%', 'Applied to imported AI hardware for US builds.'],
+  ['taiwanP', 'Taiwan Strait disruption (per year)', 'politics', 0, 15, 0.5, 1.5, '%/yr', 'Annual probability of a blockade or quarantine that halts TSMC exports.'],
+  ['taiwanSev', '…months of TSMC output lost', 'politics', 0, 24, 1, 6, 'months', 'Severity if it happens.'],
+  ['creditP', 'AI financing crunch', 'politics', 0, 100, 5, 30, '%', 'Leveraged builders (Oracle, CoreWeave, neoclouds, private credit) lose market access. CoreWeave CDS ~1,167 bp; >$50B of hyperscaler debt+equity issued in one week.'],
+  ['creditSev', '…cut to leveraged buyers\' capex', 'politics', 0, 80, 5, 35, '%', 'Leveraged buyers are ~25% of global AI capex.'],
+  // Supply
+  ['chipGrowth', 'Accelerator / CoWoS capacity growth/yr', 'supply', 10, 100, 1, 45, '%', 'H100-equivalents the supply chain can ship, including per-chip performance gains.'],
+  ['hbmGrowth', 'HBM supply growth/yr', 'supply', 10, 100, 1, 35, '%', 'HBM bit output. HBM per unit of compute falls ~8%/yr (Rubin packs more compute per GB), so 35% bit growth supports ~47%/yr more compute.'],
+  ['bitSupply', 'DRAM bit supply growth/yr', 'supply', 5, 40, 1, 20, '%', 'Industry DRAM bit growth from node shrinks + wafers, before the glut wave.'],
+  ['opticsGrowth', 'Optical transceiver capacity growth/yr', 'supply', 10, 100, 1, 42, '%', 'InP lasers and modules. Lumentum: sold out into 2029, ~70% of demand unmet for some parts through 2027. Arista: module lead times 3 → 9-12 months.'],
+  ['cpuSupply', 'Server CPU supply growth/yr', 'supply', 5, 50, 1, 25, '%', 'Intel: "one of the most significant supply shortages in history", severe through 1H27. TrendForce: shipments +31% in 2026, +40% in 2027.'],
+  ['glutYear', 'Memory capacity wave lands', 'supply', 2027, 2031, 1, 2028, '', 'Year new fabs (Micron Idaho/NY/Taiwan, Hynix Yongin, Samsung P5, CXMT) add an extra ~20%/yr of bits.'],
+  ['powerAdd', 'AI power additions growth/yr', 'supply', 0, 60, 1, 25, '%', 'Growth in GW actually energized for AI each year (grid + behind-the-meter gas). ~11 GW lands in 2026: ~16 GW announced, ~65% on time (Goldman: 50-60%).'],
+  ['usShare', 'US share of new AI capacity', 'supply', 30, 80, 1, 60, '%', 'How much of the build is exposed to US local politics.'],
+  ['perfWatt', 'Perf-per-watt gain/yr', 'supply', 5, 50, 1, 18, '%', 'All-in (chip + cooling + power delivery). Lower = power binds sooner.'],
+  ['cpuRatio', 'CPU : accelerator ratio by 2030', 'supply', 0.1, 1.0, 0.05, 0.5, '×', 'TrendForce: 1:4–1:8 today heading to 1:1–1:2 for agentic workloads.'],
+  ['customShare', 'Custom ASIC share of accelerator $ by 2030', 'supply', 10, 70, 1, 40, '%', 'TPU, Trainium, MTIA, Maia via Broadcom/Marvell. ~27% today.'],
+  // Market
+  ['discount', 'Discount rate', 'market', 6, 14, 0.25, 9, '%', 'Required return. Higher rates shrink every multiple, long-duration names most.'],
+  ['regime', 'Market sentiment (multiple scale)', 'market', 0.6, 1.4, 0.05, 1.0, '×', 'Applies to all exit multiples. 1.0 = the multiples the market paid on Nov 3.'],
+];
+
+const DEF = {}; PARAMS.forEach(r => DEF[r[0]] = r[6]);
+
+const PRESETS = {
+  pre: { name: 'Pre-election consensus', desc: 'What the market priced on Nov 3. Calibration anchor: every stock\'s fair value equals its Nov 3 close here.',
+    v: { revoltP: 30, revoltSev: 8, revoltTrend: 0, relocate: 50, deprP: 5, powerPolP: 30, powerPolSev: 6, exportP: 35, tariffP: 30, creditP: 20, creditSev: 30 } },
+  base: { name: 'Flint base (post-election)', desc: 'Revolt is real and mostly sticks; 2027 is half-locked; it fades slowly; ~45% relocates. Demand stays strong.', v: {} },
+  clifton: { name: 'Clifton: revolt spreads', desc: 'Local backlash keeps winning, power politics bite, financing tightens. Strategas\' worst case.',
+    v: { revoltP: 95, revoltSev: 40, revoltTrend: 25, relocate: 30, deprP: 50, deprSev: 12, powerPolP: 80, powerPolSev: 18, creditP: 55, creditSev: 45 } },
+  relocate: { name: 'Overreaction: build moves', desc: 'Pipeline shifts to other states and the Gulf within a year; backlash fades as budgets need the tax base.',
+    v: { revoltP: 75, revoltSev: 25, revoltTrend: -40, relocate: 80, deprP: 10, powerPolP: 40 } },
+  efficiency: { name: 'Efficiency shock', desc: 'DeepSeek-style gains everywhere, and cheaper tokens don\'t pull enough new usage to compensate.',
+    v: { efficiency: 90, jevons: 0.65 } },
+  bull: { name: 'AI everywhere', desc: 'Agents go mainstream at work, consumer usage doubles, robots scale, models get smarter fast.',
+    v: { consumerUsers: 5, consIntensity: 35, entAdopt: 75, agentIntensity: 40, robots: 12, capDoubling: 5, capUnlock: 10, jevons: 0.95 } },
+  glut: { name: 'Memory glut 2027', desc: 'Everyone builds fabs at once. Shortage closes early; prices roll over.',
+    v: { glutYear: 2027, bitSupply: 30 } },
+  taiwan: { name: 'Taiwan scare', desc: 'Blockade odds jump. Use the Monte Carlo tab to see the fat tail.',
+    v: { taiwanP: 8, taiwanSev: 9 } },
+};
+function preset(name) { return Object.assign({}, DEF, PRESETS[name].v); }
+
+// tkr, name, layer, nov3, price, sharesM, rev0 $B (CY26 est), om0, aiShare, pools {pool:w}, g (non-AI growth), china, geo, debt, cash, fcfConv, kind, capex0
+const C = (o) => o;
+const COMPANIES = [
+  C({ t: 'NVDA', n: 'Nvidia', layer: 'GPUs', nov3: 206.69, px: 187.31, mcap: 4523, rev0: 390, om0: 0.64, ai: 0.92, pools: { gpu: 1 }, g: 0.08, china: 0.06, geo: 0.9, debt: 39, cash: 62, conv: 0.85 }),
+  C({ t: 'AMD', n: 'AMD', layer: 'GPUs + CPUs', nov3: 483.9, px: 441.38, mcap: 724, rev0: 50, om0: 0.24, ai: 0.62, pools: { gpu: 0.5, cpu: 0.5 }, g: 0.05, china: 0.08, geo: 0.9, debt: 9, cash: 16, conv: 0.9 }),
+  C({ t: 'AVGO', n: 'Broadcom', layer: 'Custom ASIC + networking', nov3: 332.13, px: 291.61, mcap: 1392, rev0: 95, om0: 0.52, ai: 0.62, pools: { asic: 0.72, network: 0.28 }, g: 0.04, china: 0.04, geo: 0.8, debt: 59, cash: 24, conv: 0.95 }),
+  C({ t: 'MRVL', n: 'Marvell', layer: 'Custom ASIC + optics', nov3: 171.97, px: 138.31, mcap: 124, rev0: 10, om0: 0.2, ai: 0.75, pools: { asic: 0.6, network: 0.4 }, g: 0.03, china: 0.05, geo: 0.8, debt: 5, cash: 4, conv: 0.9 }),
+  C({ t: 'TSM', n: 'TSMC', layer: 'Foundry', nov3: 404.8, px: 374.26, mcap: 1941, rev0: 160, om0: 0.59, ai: 0.6, pools: { foundry: 1 }, g: 0.07, china: 0.03, geo: 1, debt: 25, cash: 123, conv: 0.75 }),
+  C({ t: 'INTC', n: 'Intel', layer: 'CPUs', nov3: 60.55, px: 56.41, mcap: 300, rev0: 60, om0: 0.15, ai: 0.4, pools: { cpu: 1 }, g: 0.0, china: 0.05, geo: 0.2, debt: 50, cash: 54, conv: 0.5 }),
+  C({ t: 'ARM', n: 'Arm', layer: 'CPU royalties', nov3: 202.49, px: 172.54, mcap: 185, rev0: 5.2, om0: 0.3, ai: 0.5, pools: { cpu: 1 }, g: 0.08, china: 0.1, geo: 0.6, debt: 0.4, cash: 4, conv: 0.9 }),
+  C({ t: 'MU', n: 'Micron', layer: 'DRAM / HBM / NAND', nov3: 855.1, px: 688.33, mcap: 779, rev0: 180, om0: 0.74, ai: 1, pools: { dram: 0.78, nand: 0.22 }, g: 0, china: 0.08, geo: 0.3, debt: 5, cash: 43, conv: 0.7, mem: true }),
+  C({ t: 'SKHY', n: 'SK Hynix (ADR)', layer: 'HBM leader', nov3: 150.79, px: 126.69, mcap: 893, rev0: 225, om0: 0.74, ai: 1, pools: { dram: 0.8, nand: 0.2 }, g: 0, china: 0.1, geo: 0.4, debt: 12, cash: 84, conv: 0.65, mem: true }),
+  C({ t: 'SNDK', n: 'Sandisk', layer: 'NAND pure-play', nov3: 1126.52, px: 828.62, mcap: 118, rev0: 40, om0: 0.7, ai: 1, pools: { nand: 1 }, g: 0, china: 0.08, geo: 0.2, debt: 0.4, cash: 5, conv: 0.75, mem: true }),
+  C({ t: 'ASML', n: 'ASML', layer: 'Litho (fab capex)', nov3: 1552.14, px: 1421.25, mcap: 548, rev0: 45, om0: 0.42, ai: 0.85, pools: { equip: 1 }, g: 0.03, china: 0.22, geo: 0.3, debt: 2, cash: 13, conv: 0.9 }),
+  C({ t: 'LRCX', n: 'Lam Research', layer: 'Etch/dep (fab capex)', nov3: 230.72, px: 200.06, mcap: 250, rev0: 27, om0: 0.38, ai: 0.9, pools: { equip: 1 }, g: 0.02, china: 0.3, geo: 0.3, debt: 4, cash: 7, conv: 0.9 }),
+  C({ t: 'AMAT', n: 'Applied Materials', layer: 'Deposition (fab capex)', nov3: 381.92, px: 333.02, mcap: 264, rev0: 32, om0: 0.33, ai: 0.85, pools: { equip: 1 }, g: 0.02, china: 0.28, geo: 0.3, debt: 7, cash: 9, conv: 0.85 }),
+  C({ t: 'DELL', n: 'Dell', layer: 'AI servers', nov3: 408.4, px: 329.46, mcap: 209, rev0: 160, om0: 0.08, ai: 0.55, pools: { server: 1 }, g: 0.03, china: 0.03, geo: 0.4, debt: 35, cash: 12, conv: 0.9 }),
+  C({ t: 'ANET', n: 'Arista', layer: 'DC networking', nov3: 169.91, px: 169.75, mcap: 214, rev0: 13, om0: 0.44, ai: 0.65, pools: { network: 1 }, g: 0.1, china: 0.0, geo: 0.3, debt: 0, cash: 14, conv: 1.0 }),
+  C({ t: 'VRT', n: 'Vertiv', layer: 'Power & cooling', nov3: 235.97, px: 180.49, mcap: 69, rev0: 14, om0: 0.23, ai: 0.8, pools: { powerEq: 1 }, g: 0.05, china: 0.03, geo: 0.1, debt: 3, cash: 4, conv: 0.85 }),
+  C({ t: 'ETN', n: 'Eaton', layer: 'Electrical gear', nov3: 391.7, px: 339.94, mcap: 132, rev0: 32, om0: 0.19, ai: 0.35, pools: { powerEq: 1 }, g: 0.06, china: 0.02, geo: 0.05, debt: 21, cash: 1, conv: 0.9 }),
+  C({ t: 'GEV', n: 'GE Vernova', layer: 'Turbines & grid', nov3: 918.2, px: 765.95, mcap: 203, rev0: 44, om0: 0.13, ai: 0.45, pools: { powerEq: 1 }, g: 0.08, china: 0.02, geo: 0.05, debt: 4, cash: 16, conv: 1.2 }),
+  C({ t: 'CEG', n: 'Constellation', layer: 'Nuclear power', nov3: 263.4, px: 252.05, mcap: 89, rev0: 31, om0: 0.2, ai: 0.45, pools: { gen: 1 }, g: 0.02, china: 0, geo: 0, debt: 25, cash: 1, conv: 0.6 }),
+  C({ t: 'VST', n: 'Vistra', layer: 'Gas + nuclear power (TX)', nov3: 139.59, px: 124.06, mcap: 42, rev0: 19, om0: 0.24, ai: 0.45, pools: { gen: 1 }, g: 0.02, china: 0, geo: 0, debt: 21, cash: 0.5, conv: 0.6, tx: true }),
+  C({ t: 'MSFT', n: 'Microsoft', layer: 'Hyperscaler', nov3: 520.99, px: 533.36, mcap: 3961, rev0: 346, om0: 0.47, ai: 0.22, pools: { owner: 1 }, g: 0.11, china: 0, geo: 0.1, debt: 134, cash: 65, capex0: 170, owner: true }),
+  C({ t: 'GOOGL', n: 'Alphabet', layer: 'Hyperscaler + TPU', nov3: 280.03, px: 286.23, mcap: 3519, rev0: 471, om0: 0.32, ai: 0.18, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.15, debt: 150, cash: 265, capex0: 200, owner: true }),
+  C({ t: 'AMZN', n: 'Amazon', layer: 'Hyperscaler + Trainium', nov3: 250.69, px: 262.83, mcap: 2842, rev0: 797, om0: 0.12, ai: 0.1, pools: { owner: 1 }, g: 0.1, china: 0, geo: 0.1, debt: 305, cash: 114, capex0: 220, owner: true }),
+  C({ t: 'META', n: 'Meta', layer: 'AI buyer (ads)', nov3: 621.03, px: 617.97, mcap: 1580, rev0: 242, om0: 0.38, ai: 0.15, pools: { owner: 1 }, g: 0.12, china: 0, geo: 0.1, debt: 115, cash: 82, capex0: 140, owner: true }),
+  C({ t: 'ORCL', n: 'Oracle', layer: 'Leveraged AI cloud', nov3: 126.19, px: 115.0, mcap: 359, rev0: 72, om0: 0.3, ai: 0.4, pools: { owner: 1 }, g: 0.04, china: 0, geo: 0.1, debt: 169, cash: 37, capex0: 75, owner: true, lev: true }),
+  C({ t: 'CRWV', n: 'CoreWeave', layer: 'Neocloud', nov3: 53.74, px: 45.23, mcap: 25, rev0: 8, om0: 0.05, ai: 1, pools: { owner: 1 }, g: 0, china: 0, geo: 0.2, debt: 52, cash: 6, capex0: 25, owner: true, lev: true, ebitda: true }),
+  C({ t: 'RMBS', n: 'Rambus', layer: 'Memory interface', nov3: 88.18, px: 73.3, mcap: 8, rev0: 0.75, om0: 0.38, ai: 0.7, pools: { memIF: 1 }, g: 0.04, china: 0.05, geo: 0.3, debt: 0, cash: 1, conv: 0.9 }),
+];
+COMPANIES.forEach(c => { c.shares = c.mcap / c.px; });
+
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const pw = Math.pow;
+
+// o.events: MC draws {revolt: mult, ...} (0 = didn't happen); o.taiwanYear: index of disruption year
+function industry(p, o = {}) {
+  const ev = {};
+  EVENTS.forEach(e => { ev[e] = o.events ? (o.events[e] || 0) : p[e + 'P'] / 100; });
+  const sevF = e => ev[e] * p[e + 'Sev'] / 100;
+  const revoltEV = clamp(sevF('revolt'), 0, 0.95);
+  const deprEV = sevF('depr'), powerPolEV = sevF('powerPol'), exportEV = clamp(sevF('export'), 0, 1);
+  const tariffEV = sevF('tariff'), creditEV = clamp(sevF('credit'), 0, 0.95);
+  const usS = p.usShare / 100;
+
+  const U26 = 2.0, A26 = 0.12, R26 = 0.3, N0 = 36, F0 = 33, C0 = 14, A0 = 11, ret = 0.06;
+  const sh = { train: 0.38, cons: 0.26, ent: 0.33, robo: 0.03 };
+  const cs0 = 0.27, cpu0dem = 28 + 18 * 0.25, cpu0sup = 31;
+  const y = [];
+  let F = F0, PU = F0 * 1.3, Pav = PU / 0.965, prevLost = 0, loss = 0;
+  for (let t = 0; t < 5; t++) {
+    const capMul = pw(1 + p.capUnlock / 100, t * 12 / p.capDoubling);
+    const effMul = pw(1 + p.efficiency / 100, t * (p.jevons - 1));
+    const users = U26 * pw(p.consumerUsers / U26, t / 4);
+    const adopt = A26 * pw(p.entAdopt / 100 / A26, t / 4);
+    const robots = R26 * pw(p.robots / R26, t / 4);
+    const d = {
+      train: sh.train * N0 * pw(1 + p.trainGrowth / 100, t),
+      cons: sh.cons * N0 * (users / U26) * pw(1 + p.consIntensity / 100, t) * capMul * effMul,
+      ent: sh.ent * N0 * (adopt / A26) * pw(1 + p.agentIntensity / 100, t) * capMul * effMul,
+      robo: sh.robo * N0 * pw(robots / R26, 0.85) * capMul * effMul,
+    };
+    const D = d.train + d.cons + d.ent + d.robo;
+
+    // Taiwan: share of the year's chip output lost
+    let tw = 0;
+    if (t > 0) {
+      if (o.events) tw = (o.taiwanYear === t) ? clamp(p.taiwanSev / 12, 0, 1) * 0.85 * (o.events.taiwan || 1) : 0;
+      else tw = (p.taiwanP / 100) * clamp(p.taiwanSev / 12, 0, 1) * 0.85;
+    }
+    tw = clamp(tw, 0, 0.95);
+
+    // Politics: share of planned US power additions blocked this year
+    if (t === 0) loss = 0;
+    else if (t === 1) loss = revoltEV * (1 - p.locked / 100);
+    else if (t === 2) loss = revoltEV;
+    else loss = clamp(loss * (1 + p.revoltTrend / 100), 0, 0.95);
+    const A = A0 * pw(1 + p.powerAdd / 100, t);
+    const lostGW = t ? A * usS * loss : 0;
+    const relocGW = t ? (p.relocate / 100) * prevLost : 0;
+    prevLost = lostGW;
+    if (t) Pav += A - lostGW + relocGW;
+
+    const kWnew = 1.0 / pw(1 + p.perfWatt / 100, t);
+    let adds, bind, chipCap, hbmCap, powerCap, desired, opticsCap;
+    const drag = clamp(usS * (deprEV + powerPolEV * 0.5 + tariffEV * 0.3 * 0.6) + 0.25 * creditEV, 0, 0.9);
+    if (t === 0) { adds = C0; chipCap = C0; hbmCap = C0; powerCap = C0 * 1.05; opticsCap = C0 * 1.03; desired = C0 * 1.3; bind = 'chips'; }
+    else {
+      const retired = ret * F, kWavg = PU / F;
+      chipCap = C0 * pw(1 + p.chipGrowth / 100, t) * (1 - tw);
+      hbmCap = C0 * 1.0 * pw((1 + p.hbmGrowth / 100) / 0.92, t) * (1 - tw * 0.3);
+      opticsCap = C0 * 1.03 * pw(1 + p.opticsGrowth / 100, t) * (1 - tw * 0.2);
+      const head = Pav - (PU - retired * kWavg);
+      powerCap = Math.max(0, head) / kWnew;
+      const prevAdds = y[t - 1].adds;
+      desired = Math.max(Math.max(0, D - (F - retired)), prevAdds * 0.65) * (1 - drag);
+      const opts = { demand: desired, chips: chipCap, HBM: hbmCap, optics: opticsCap, power: powerCap };
+      bind = Object.keys(opts).reduce((a, b) => opts[a] <= opts[b] ? a : b);
+      adds = Math.max(0, opts[bind]);
+      F = F - retired + adds;
+      PU = PU - retired * kWavg + adds * kWnew;
+    }
+    const cov = F / D;
+
+    // CPU layer
+    const accelUnits = 18 * (adds / C0) / pw(1.25, t);
+    const ratio = 0.25 + (p.cpuRatio - 0.25) * t / 4;
+    const cpuDem = 28 * pw(1.06, t) + accelUnits * ratio;
+    const cpuSup = cpu0sup * pw(1 + p.cpuSupply / 100, t) * (1 - tw * 0.6);
+    const cpuServed = Math.min(cpuDem, cpuSup);
+
+    // Memory: DRAM wafer-equivalent demand (conventional + HBM) vs bit supply
+    const glutT = p.glutYear - 2026;
+    const wave = t >= glutT ? pw(1.2, t - glutT + 1) : 1;
+    const Dm = 0.55 * pw(1.10, t) * pw(cpuServed / Math.min(cpu0dem, cpu0sup), 0.35) + 0.45 * (adds / C0) * pw(0.96, t);
+    const Sm = 0.96 * pw(1 + p.bitSupply / 100, t) * wave * (t ? 1 - tw * 0.15 : 1);
+    const Dn = 0.6 * pw(1.08, t) + 0.4 * pw(F / F0, 0.8);
+    const Sn = 0.97 * pw(1.15, t) * wave;
+    y.push({ t, year: YEARS[t], d, D, F, adds, bind, chipCap, hbmCap, powerCap, opticsCap, desired, cov, PU, Pav, loss, lostGW, relocGW,
+      powerUtil: PU / Pav, chipUtil: adds / chipCap, hbmUtil: adds / hbmCap, kWnew, accelUnits, cpuDem, cpuSup, cpuServed, Dm, Sm, Dn, Sn, tw, effMul, capMul,
+      work: F * pw(1 + p.efficiency / 100, t) });
+  }
+  // Price & volume indices relative to 2026
+  const y0 = y[0];
+  const cs = t => cs0 + (p.customShare / 100 - cs0) * t / 4;
+  const memRatio0 = y0.Dm / y0.Sm, nandRatio0 = y0.Dn / y0.Sn, cpuCov0 = y0.cpuSup / y0.cpuDem;
+  const capexHist = [0.15, 0.2, 0.35, 0.6];
+  y.forEach(r => {
+    const t = r.t;
+    r.RP = clamp(pw(r.cov / y0.cov, -0.8), 0.5, 1.8);
+    r.CP = pw(Math.min(1, r.chipUtil), 0.8) * (1 + 0.4 * Math.max(0, 1 - r.cov)) / (1 + 0.4 * Math.max(0, 1 - y0.cov));
+    r.MP = clamp(pw((r.Dm / r.Sm) / memRatio0, 3.0), 0.3, 3) * (t ? 1.35 : 1);
+    r.NP = clamp(pw((r.Dn / r.Sn) / nandRatio0, 3.0), 0.3, 3) * (t ? 1.3 : 1);
+    r.CPUP = clamp(pw((r.cpuSup / r.cpuDem) / cpuCov0, -1.0), 0.5, 2.5);
+    r.PP = clamp((1 + 2.5 * Math.max(0, r.powerUtil - 0.9)) / (1 + 2.5 * Math.max(0, y0.powerUtil - 0.9)), 0.6, 2.5) * (1 - powerPolEV * 0.8);
+    r.memBits = Math.min(r.Dm, r.Sm) / Math.min(y0.Dm, y0.Sm);
+    r.nandBits = Math.min(r.Dn, r.Sn) / Math.min(y0.Dn, y0.Sn);
+    r.cs = cs(t);
+    r.costPerH = pw(0.86, t) * (1 + usS * tariffEV * 0.3) * (1 + usS * powerPolEV * 0.5);
+    r.capexIdx = (r.adds * r.costPerH) / (C0 * y0.costPerH || C0);
+  });
+  y0.capexIdx = 1;
+  y.forEach(r => {
+    const t = r.t, hist = capexHist.concat(y.slice(0, t + 1).map(q => q.capexIdx)).slice(-5);
+    r.dep = hist.reduce((a, b) => a + b, 0) / 5;
+    // fab capex follows memory pricing (lagged) and chip volumes
+    const prev = t ? y[t - 1] : r;
+    r.equip = 0.45 * pw(prev.MP, 0.6) * r.memBits + 0.55 * (r.adds / C0) * pw(0.88, t) * 0.7 + 0.55 * 0.3 * pw(1.05, t);
+  });
+  const e0 = y0.equip; y.forEach(r => r.equip /= e0);
+  return { y, ev: { revoltEV, deprEV, powerPolEV, exportEV, tariffEV, creditEV }, p };
+}
+
+// Pool volume (V), price (P), unit cost (d) indices at year t
+function pool(name, r, ind) {
+  const t = r.t, y0 = ind.y[0];
+  const a = r.adds / y0.adds;
+  switch (name) {
+    case 'gpu': return { V: a * (1 - r.cs) / (1 - y0.cs), P: pw(0.93, t) * r.CP, d: pw(0.93, t) };
+    case 'asic': return { V: a * r.cs / y0.cs, P: pw(0.9, t) * (1 + 0.5 * (r.CP - 1)), d: pw(0.9, t) };
+    case 'network': return { V: a * pw(1.06, t), P: pw(0.9, t), d: pw(0.9, t) };
+    case 'cpu': return { V: r.cpuServed / y0.cpuServed, P: r.CPUP * pw(1.04, t), d: pw(1.04, t) };
+    case 'memIF': return { V: (r.cpuServed / y0.cpuServed) * pw(1.08, t), P: 1, d: 1 };
+    case 'foundry': {
+      const chip = 0.55 * a * pw(0.9, t) + 0.25 * (r.cpuServed / y0.cpuServed) + 0.2 * pw(1.06, t);
+      return { V: chip, P: 1, d: pw(0.985, t) };
+    }
+    case 'dram': return { V: r.memBits, P: r.MP * pw(0.86, t), d: pw(0.86, t) };
+    case 'nand': return { V: r.nandBits, P: r.NP * pw(0.84, t), d: pw(0.84, t) };
+    case 'equip': return { V: r.equip, P: 1, d: 1 };
+    case 'server': return { V: a * pw(0.9, t) * 0.75 + 0.25 * r.cpuServed / y0.cpuServed, P: 1 + 0.12 * (r.MP - 1), d: 1 + 0.12 * (r.MP - 1) };
+    case 'powerEq': { const add = (r.t ? (r.Pav - ind.y[r.t - 1].Pav) : 11) / 11; return { V: Math.max(0.05, add), P: 1 + 0.25 * (r.PP - 1), d: 1 }; }
+    case 'gen': return { V: pw(r.PU / y0.PU, 0.5), P: r.PP, d: 1 };
+  }
+}
+
+function companyRun(c, ind, p) {
+  const ev = ind.ev, years = ind.y, r0 = years[0];
+  const rate = p.discount / 100;
+  const tax = 0.17;
+  let ND = c.debt - c.cash;
+  const rows = [];
+  let opex0 = 0, nonAIop0 = 0, AIrev0 = 0, DA0 = 0;
+  if (c.owner) {
+    AIrev0 = c.rev0 * c.ai; DA0 = c.capex0 * r0.dep;
+    opex0 = Math.max(0.1 * AIrev0, AIrev0 * 0.7 - DA0 * 0.6);
+    nonAIop0 = c.rev0 * c.om0 - (AIrev0 - DA0 * 0.6 - opex0);
+  }
+  for (const r of years) {
+    const t = r.t;
+    let rev, op, capex = 0, da = 0;
+    const china = 1 - c.china * ev.exportEV * Math.min(1, t);
+    if (c.owner) {
+      // levered builders: revenue needs energized sites; capex is mostly committed (chips, leases)
+      const cr = c.lev ? (1 - ev.creditEV * Math.min(1, t)) : 1;
+      const levCut = c.lev ? cr * (1 - 0.6 * r.loss) : 1;
+      const capCut = c.lev ? cr * (1 - 0.15 * r.loss) : 1;
+      const AIrev = AIrev0 * (r.F / r0.F) * r.RP * pw(0.85, t) * levCut;
+      const capIdx = r.capexIdx * capCut;
+      capex = c.capex0 * (0.15 + 0.85 * capIdx);
+      const hist = [0.15, 0.2, 0.35, 0.6].concat(years.slice(0, t + 1).map(q => q.capexIdx * capCut)).slice(-5);
+      da = c.capex0 * hist.reduce((a, b) => a + b, 0) / 5;
+      const opex = opex0 * (r.F / r0.F) * pw(0.92, t) * levCut;
+      rev = c.rev0 * (1 - c.ai) * pw(1 + c.g, t) + AIrev;
+      op = nonAIop0 * pw(1 + c.g, t) + AIrev - da * 0.6 - opex;
+    } else {
+      let V = 0, PV = 0, DV = 0;
+      for (const [pn, w] of Object.entries(c.pools)) {
+        const q = pool(pn, r, ind);
+        V += w * q.V; PV += w * q.V * q.P; DV += w * q.V * q.d;
+      }
+      const base = (1 - c.ai) * pw(1 + c.g, t);
+      rev = c.rev0 * (base + c.ai * PV) * china;
+      const cost = c.rev0 * (1 - c.om0) * (base + c.ai * DV) * (0.5 + 0.5 * china);
+      op = rev - cost;
+    }
+    const interest = Math.max(0, ND) * (0.05 + (c.lev ? 0.04 * ev.creditEV : 0));
+    const ni = (op - interest) * (1 - tax);
+    const fcf = c.owner ? ni + da - capex : ni * (c.conv || 0.8);
+    if (t > 0) ND -= fcf;
+    rows.push({ year: r.year, rev, op, ni, fcf, capex, da, ND, ebitda: op + da * 0.6 });
+  }
+  return rows;
+}
+
+function valuationBase(c, rows) {
+  const b = (c.ebitda || c.owner) ? rows[2].ebitda : rows[2].op * 0.83;
+  const b30 = (c.ebitda || c.owner) ? rows[4].ebitda : rows[4].op * 0.83;
+  const g = (b > 0 && b30 > 0) ? pw(b30 / b, 0.5) - 1 : -0.25;
+  return { b, g, ND: rows[2].ND };
+}
+
+let CAL = null;
+function calibrate() {
+  const p = preset('pre');
+  const ind = industry(p);
+  CAL = {};
+  for (const c of COMPANIES) {
+    const rows = companyRun(c, ind, p);
+    const v = valuationBase(c, rows);
+    const r = p.discount / 100;
+    const target = c.nov3 * c.shares;
+    let m = (target * pw(1 + r, 2) + v.ND) / Math.max(v.b, 1e-6);
+    if (v.b <= 0) m = 1;
+    CAL[c.t] = { m, g: v.g, r, tw: twHaircut(p) };
+  }
+  return CAL;
+}
+function twHaircut(p) { return clamp(p.taiwanP / 100 * 2.5, 0, 0.6) * 0.6; }
+
+function fairValues(p, o = {}) {
+  if (!CAL) calibrate();
+  const ind = o.ind || industry(p, o);
+  const out = {};
+  const r = p.discount / 100;
+  for (const c of COMPANIES) {
+    const rows = companyRun(c, ind, p);
+    const v = valuationBase(c, rows);
+    const cal = CAL[c.t];
+    const gAdj = clamp(1 + 1.0 * (v.g - cal.g), 0.7, 1.4);
+    const rAdj = (cal.r - 0.03) / Math.max(0.01, r - 0.03);
+    const m = cal.m * gAdj * rAdj * p.regime;
+    let eq = (v.b * m - v.ND) / pw(1 + r, 2);
+    let geo;
+    if (o.events) geo = (o.taiwanYear > 0 && o.taiwanYear <= 2) ? c.geo * 0.45 : 0;
+    else geo = c.geo * Math.max(0, twHaircut(p) - cal.tw);
+    eq *= (1 - geo);
+    const fv = Math.max(eq / c.shares, c.px * 0.03);
+    out[c.t] = { fv, up: fv / c.px - 1, rows, m, g: v.g };
+  }
+  return { ind, fv: out };
+}
+
+function fvOne(tkr, p) {
+  if (!CAL) calibrate();
+  const c = COMPANIES.find(x => x.t === tkr);
+  const ind = industry(p);
+  const r = p.discount / 100, rows = companyRun(c, ind, p), v = valuationBase(c, rows), cal = CAL[c.t];
+  const m = cal.m * clamp(1 + (v.g - cal.g), 0.7, 1.4) * ((cal.r - 0.03) / Math.max(0.01, r - 0.03)) * p.regime;
+  const eq = (v.b * m - v.ND) / pw(1 + r, 2) * (1 - c.geo * Math.max(0, twHaircut(p) - cal.tw));
+  return Math.max(eq / c.shares, c.px * 0.03);
+}
+
+// Bisection: value of param k (others fixed) where company FV equals current price
+function implied(tkr, k, baseP, lo, hi) {
+  const c = COMPANIES.find(x => x.t === tkr);
+  const f = v => fvOne(tkr, Object.assign({}, baseP, { [k]: v })) - c.px;
+  let fa = f(lo), fb = f(hi);
+  if (fa * fb > 0) return Math.abs(fa) < Math.abs(fb) ? { edge: 'lo', v: lo } : { edge: 'hi', v: hi };
+  for (let i = 0; i < 40; i++) {
+    const m = (lo + hi) / 2, fm = f(m);
+    if (fa * fm <= 0) { hi = m; fb = fm; } else { lo = m; fa = fm; }
+  }
+  return { v: (lo + hi) / 2 };
+}
+
+const api = { YEARS, EVENTS, PARAMS, DEF, PRESETS, preset, COMPANIES, industry, companyRun, fairValues, fvOne, calibrate, implied, clamp };
+if (typeof module !== 'undefined') module.exports = api; else root.SIM = api;
+})(this);
+
+</script>
+<script>
+const SCORE = {"MU": {"jun25": 1213.18, "oct12": 988.88, "now": 691.42, "nowd": "2026-11-06"}, "000660.KS": {"jun25": 2916367.75, "oct12": 1605000.0, "now": 1264000.0, "nowd": "2026-11-05"}, "ASML": {"jun25": 1836.38, "oct12": 1747.93, "now": 1422.63, "nowd": "2026-11-06"}, "AVGO": {"jun25": 378.22, "oct12": 354.73, "now": 292.77, "nowd": "2026-11-06"}, "LRCX": {"jun25": 401.39, "oct12": 309.56, "now": 199.3, "nowd": "2026-11-06"}, "AMAT": {"jun25": 667.29, "oct12": 497.53, "now": 333.55, "nowd": "2026-11-06"}, "6857.T": {"jun25": 35847.85, "oct12": 41610.0, "now": 29485.0, "nowd": "2026-11-05"}, "SNDK": {"jun25": 2335.0, "oct12": 1487.33, "now": 826.72, "nowd": "2026-11-06"}, "RMBS": {"jun25": 123.69, "oct12": 101.04, "now": 73.86, "nowd": "2026-11-06"}, "KLAC": {"jun25": 258.51, "oct12": 190.12, "now": 137.64, "nowd": "2026-11-06"}, "TER": {"jun25": 471.78, "oct12": 383.85, "now": 216.73, "nowd": "2026-11-06"}, "SIMO": {"jun25": 323.58, "oct12": 246.17, "now": 161.3, "nowd": "2026-11-06"}, "ALAB": {"jun25": 398.0, "oct12": 324.11, "now": 184.13, "nowd": "2026-11-06"}, "ENTG": {"jun25": 176.01, "oct12": 159.9, "now": 127.72, "nowd": "2026-11-06"}, "NVDA": {"jun25": 195.52, "oct12": 226.32, "now": 187.18, "nowd": "2026-11-06"}, "AMD": {"jun25": 532.57, "oct12": 594.24, "now": 444.53, "nowd": "2026-11-06"}, "0992.HK": {"jun25": 23.66, "oct12": 32.34, "now": 19.41, "nowd": "2026-11-05"}, "AMZN": {"jun25": 227.01, "oct12": 259.53, "now": 262.35, "nowd": "2026-11-06"}, "TSM": {"jun25": 433.83, "oct12": 444.35, "now": 374.91, "nowd": "2026-11-06"}, "DELL": {"jun25": 408.21, "oct12": 575.96, "now": 329.46, "nowd": "2026-11-06"}, "PENG": {"jun25": 66.77, "oct12": 79.15, "now": 42.35, "nowd": "2026-11-06"}, "VRT": {"jun25": 325.49, "oct12": 239.36, "now": 181.29, "nowd": "2026-11-06"}, "AKAM": {"jun25": 112.89, "oct12": 101.65, "now": 83.41, "nowd": "2026-11-06"}, "6809.HK": {"jun25": 458.1, "oct12": 254.8, "now": 202.8, "nowd": "2026-11-05"}, "INTC": {"jun25": 132.87, "oct12": 101.35, "now": 57.02, "nowd": "2026-11-06"}, "ARM": {"jun25": 347.71, "oct12": 255.24, "now": 173.37, "nowd": "2026-11-06"}, "HPE": {"jun25": 46.6, "oct12": 70.33, "now": 44.91, "nowd": "2026-11-06"}, "CRWV": {"jun25": 98.76, "oct12": 80.26, "now": 45.57, "nowd": "2026-11-06"}, "ORCL": {"jun25": 151.37, "oct12": 137.39, "now": 115.43, "nowd": "2026-11-06"}, "OKLO": {"jun25": 51.01, "oct12": 32.21, "now": 23.94, "nowd": "2026-11-06"}, "SPY": {"jun25": 732.48, "oct12": 778.1, "now": 738.35, "nowd": "2026-11-06"}, "QQQ": {"jun25": 715.63, "oct12": 746.04, "now": 658.51, "nowd": "2026-11-06"}, "SMH": {"jun25": 636.88, "oct12": 590.99, "now": 463.5, "nowd": "2026-11-06"}};
+const EXTRA = {"NVDA": {"hi52": 243.37, "fpe": 11.770952, "beta": 2.247, "fcf": 41.809874944}, "AMD": {"hi52": 658.52, "fpe": 26.304188, "beta": 2.542, "fcf": 7.35712512}, "AVGO": {"hi52": 495.0, "fpe": 14.981194, "beta": 1.508, "fcf": 30.596499456}, "MRVL": {"hi52": 329.88, "fpe": 18.835808, "beta": 2.327, "fcf": 2.40804992}, "TSM": {"hi52": 487.47, "fpe": 16.004292, "beta": 1.233, "fcf": 36.720443094954675}, "INTC": {"hi52": 142.35, "fpe": 31.34853, "beta": 2.426, "fcf": 0.806499968}, "ARM": {"hi52": 452.7, "fpe": 56.44668, "beta": 3.939, "fcf": 1.137250048}, "MU": {"hi52": 1255.0, "fpe": 3.3130941, "beta": 2.398, "fcf": 29.140250624}, "SNDK": {"hi52": 2354.39, "fpe": 2.8666446, "beta": null, "fcf": 11.241124864}, "SKHY": {"hi52": 199.87, "fpe": 2.9952202, "beta": 2.466, "fcf": null}, "000660.KS": {"hi52": 2987000.0, "fpe": 2.1384792, "beta": 2.466, "fcf": null}, "005930.KS": {"hi52": 374500.0, "fpe": 2.4830945, "beta": 1.594, "fcf": 83820.791463936}, "ASML": {"hi52": 1999.96, "fpe": 22.417444, "beta": 1.333, "fcf": 10.374124544}, "LRCX": {"hi52": 438.5, "fpe": 16.349672, "beta": 2.01, "fcf": 4.548759552}, "AMAT": {"hi52": 739.67, "fpe": 17.94632, "beta": 1.673, "fcf": 3.075375104}, "KLAC": {"hi52": 307.37, "fpe": 19.382038, "beta": 1.497, "fcf": 2.816840192}, "DELL": {"hi52": 595.51, "fpe": 10.873178, "beta": 1.436, "fcf": 6.033375232}, "HPE": {"hi52": 73.56, "fpe": 9.454422, "beta": 1.466, "fcf": 4.738625024}, "SMCI": {"hi52": 51.4, "fpe": 4.6909566, "beta": 2.181, "fcf": -8.065135104}, "ANET": {"hi52": 217.41, "fpe": 30.07626, "beta": 1.637, "fcf": 3.0013376}, "VRT": {"hi52": 379.935, "fpe": 18.33763, "beta": 2.108, "fcf": 2.962249984}, "ETN": {"hi52": 478.0, "fpe": 20.864635, "beta": 1.139, "fcf": 3.034749952}, "GEV": {"hi52": 1195.94, "fpe": 29.613745, "beta": 1.058, "fcf": 22.098874368}, "CEG": {"hi52": 380.78, "fpe": 18.762642, "beta": 1.127, "fcf": -6.625124864}, "VST": {"hi52": 196.8, "fpe": 13.015162, "beta": 1.375, "fcf": 0.037125}, "TLN": {"hi52": 449.841, "fpe": 11.066318, "beta": 1.579, "fcf": 0.941625024}, "MSFT": {"hi52": 559.15, "fpe": 22.056856, "beta": 1.045, "fcf": 2.994125056}, "GOOGL": {"hi52": 408.61, "fpe": 18.474606, "beta": 1.226, "fcf": -1.162499968}, "AMZN": {"hi52": 287.2, "fpe": 24.105253, "beta": 1.503, "fcf": -34.731749376}, "META": {"hi52": 779.82, "fpe": 17.36458, "beta": 1.279, "fcf": 16.848499712}, "ORCL": {"hi52": 250.25, "fpe": 10.40353, "beta": 1.778, "fcf": -45.853626368}, "CRWV": {"hi52": 138.25, "fpe": -22.051977, "beta": null, "fcf": -9.088615424}, "RMBS": {"hi52": 174.1, "fpe": 18.86744, "beta": 1.954, "fcf": 0.210774256}, "AKAM": {"hi52": 165.45, "fpe": 12.264631, "beta": null, "fcf": 0.114238496}, "TSLA": {"hi52": 498.83, "fpe": 166.40268, "beta": 1.743, "fcf": 4.96724992}, "0992.HK": {"hi52": 37.88, "fpe": 6.48531, "beta": 1.117, "fcf": -3.32940672}, "SPY": {"hi52": 781.62, "fpe": null, "beta": null, "fcf": null}, "QQQ": {"hi52": 762.86, "fpe": null, "beta": null, "fcf": null}, "SMH": {"hi52": 671.83, "fpe": null, "beta": null, "fcf": null}};
+</script>
+<script>
+// UI for the AI buildout simulator: sliders, charts, Monte Carlo, solver.
+(function () {
+const S = window.SIM;
+S.COMPANIES.forEach(c => Object.assign(c, EXTRA[c.t] || {}));
+S.calibrate();
+const $ = id => document.getElementById(id);
+const fmt = (x, d = 0) => (x == null || !isFinite(x)) ? '–' : x.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (x, d = 0) => (x == null || !isFinite(x)) ? '–' : (x >= 0 ? '+' : '') + (x * 100).toFixed(d) + '%';
+const cls = x => x > 0.005 ? 'pos' : x < -0.005 ? 'neg' : 'dim';
+const money = (x, cur) => cur === 'KRW' ? '₩' + fmt(x) : '$' + fmt(x, x < 100 ? 2 : 0);
+const C = { accent: '#4fc3f7', accent2: '#7c4dff', green: '#66bb6a', red: '#ef5350', orange: '#ffa726', yellow: '#ffee58', pink: '#f06292', teal: '#26a69a', dim: '#8888a0', grid: '#2a2a3a', gray: '#666678' };
+Chart.defaults.color = '#a0a0b8';
+Chart.defaults.borderColor = C.grid;
+Chart.defaults.font.family = "'JetBrains Mono', 'Fira Code', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.animation = false;
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+
+const PMAP = {}; S.PARAMS.forEach(r => PMAP[r[0]] = { k: r[0], label: r[1], group: r[2], min: r[3], max: r[4], step: r[5], def: r[6], unit: r[7], help: r[8] });
+const PRE = S.preset('pre');
+const fullLabel = k => { const l = PMAP[k].label; if (!l.startsWith('…')) return l; const card = EVENT_CARDS_K.find(c => c[1].includes(k)); return PMAP[card[1][0]].label + ': ' + l.slice(1); };
+const preRun = S.fairValues(PRE);
+let state = S.preset('base');
+let mode = 'ev';
+let activePreset = 'base';
+let selected = 'MU';
+let last = null;
+
+// ---------- tabs ----------
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.id === 't-' + b.dataset.t));
+  if (b.dataset.t === 'priced') { renderImplied(); renderTornado(); }
+  if (b.dataset.t === 'balance') renderBalance();
+});
+
+// ---------- sliders ----------
+function fmtVal(p, v) {
+  if (p.k === 'glutYear') return String(v);
+  const d = p.step < 1 ? (p.step < 0.1 ? 2 : 1) : 0;
+  const u = p.unit === '%' || p.unit === '%/yr' ? p.unit : (p.unit ? ' ' + p.unit : '');
+  return (p.unit === '×' ? Number(v).toFixed(2) + '×' : Number(v).toFixed(d) + u);
+}
+function sliderHTML(k, compact) {
+  const p = PMAP[k];
+  return `<div class="sl" data-k="${k}"><div class="sl-top"><label for="s-${k}">${p.label}</label><output id="o-${k}"></output></div>
+    <input type="range" id="s-${k}" min="${p.min}" max="${p.max}" step="${p.step}">
+    ${compact ? '' : `<div class="sl-help">${p.help}</div>`}</div>`;
+}
+const GROUPS = [
+  ['demand', '👥 Who uses it, and how much'],
+  ['smarts', '🧠 How smart, how efficient'],
+  ['politics', '🗳️ Politics & policy'],
+  ['supply', '🏭 Supply chain'],
+  ['market', '📈 Market'],
+];
+const EVENT_CARDS_K = [['revolt', ['revoltP', 'revoltSev', 'locked', 'revoltTrend', 'relocate']], ['depr', ['deprP', 'deprSev']], ['powerPol', ['powerPolP', 'powerPolSev']], ['export', ['exportP', 'exportSev']], ['tariff', ['tariffP', 'tariffSev']], ['credit', ['creditP', 'creditSev']], ['taiwan', ['taiwanP', 'taiwanSev']]];
+const EVENT_CARDS = [
+  ['revolt', ['revoltP', 'revoltSev', 'locked', 'revoltTrend', 'relocate']],
+  ['depr', ['deprP', 'deprSev']],
+  ['powerPol', ['powerPolP', 'powerPolSev']],
+  ['export', ['exportP', 'exportSev']],
+  ['tariff', ['tariffP', 'tariffSev']],
+  ['credit', ['creditP', 'creditSev']],
+  ['taiwan', ['taiwanP', 'taiwanSev']],
+];
+function buildSliders() {
+  let h = '';
+  for (const [g, title] of GROUPS) {
+    h += `<details class="grp" ${g === 'politics' || g === 'demand' ? 'open' : ''}><summary>${title}</summary>`;
+    if (g === 'politics') {
+      h += `<div class="mode"><button class="btn" data-mode="ev">Use my odds</button><button class="btn" data-mode="all">Assume all happen</button><button class="btn" data-mode="none">Assume none happen</button></div>
+        <div class="mode-note">Odds × severity = expected impact. "All/none" override the odds (not Taiwan). Monte Carlo rolls real dice with your odds.</div>`;
+      for (const [e, ks] of EVENT_CARDS) {
+        h += `<div class="ev"><div class="ev-title">${PMAP[ks[0]].label}</div><div class="ev-exp" id="ev-${e}"></div>`;
+        ks.forEach(k => h += sliderHTML(k, false));
+        h += `</div>`;
+      }
+    } else {
+      S.PARAMS.filter(r => r[2] === g).forEach(r => h += sliderHTML(r[0], false));
+    }
+    h += `</details>`;
+  }
+  $('sliders').innerHTML = h;
+  $('sliders').addEventListener('input', e => {
+    if (e.target.type !== 'range') return;
+    const k = e.target.id.slice(2);
+    state[k] = +e.target.value;
+    activePreset = null; markPreset();
+    syncOutputs(); schedule();
+  });
+  $('sliders').addEventListener('click', e => {
+    const b = e.target.closest('button[data-mode]'); if (!b) return;
+    mode = b.dataset.mode; syncOutputs(); schedule();
+  });
+  // presets
+  $('presets').innerHTML = Object.entries(S.PRESETS).map(([k, v]) => `<button data-p="${k}">${v.name}</button>`).join('');
+  $('presets').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    activePreset = b.dataset.p; state = S.preset(activePreset); mode = 'ev';
+    markPreset(); syncInputs(); schedule();
+  });
+}
+function markPreset() {
+  document.querySelectorAll('#presets button').forEach(b => b.classList.toggle('on', b.dataset.p === activePreset));
+  $('presetDesc').textContent = activePreset ? S.PRESETS[activePreset].desc : 'Custom scenario. Dashed lines on charts = Nov 3 consensus.';
+}
+function syncInputs() {
+  for (const k in PMAP) { const el = $('s-' + k); if (el) el.value = state[k]; }
+  syncOutputs();
+}
+function syncOutputs() {
+  for (const k in PMAP) {
+    const o = $('o-' + k); if (!o) continue;
+    const p = PMAP[k];
+    const ref = PRE[k] !== state[k] ? `<span class="ref">Nov 3: ${fmtVal(p, PRE[k])}</span>` : '';
+    o.innerHTML = fmtVal(p, state[k]) + ref;
+  }
+  document.querySelectorAll('button[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  const ep = effP();
+  const sevTxt = {
+    revolt: v => `${(v * 100).toFixed(0)}% of US pipeline blocked at full effect (2028)`,
+    depr: v => `${(v * 100).toFixed(1)}% cut to US AI capex`,
+    powerPol: v => `${(v * 100).toFixed(1)}% hit to DC power economics`,
+    export: v => `${(v * 100).toFixed(0)}% of China AI revenue lost`,
+    tariff: v => `${(v * 100).toFixed(1)}% effective tariff on US AI hardware`,
+    credit: v => `${(v * 100).toFixed(0)}% cut to leveraged buyers' capex`,
+    taiwan: () => `≈${((1 - Math.pow(1 - ep.taiwanP / 100, 4)) * 100).toFixed(0)}% chance of a disruption by 2030, ${ep.taiwanSev} months of TSMC output lost if so`,
+  };
+  for (const [e] of EVENT_CARDS) {
+    const el = $('ev-' + e); if (!el) continue;
+    const v = e === 'taiwan' ? 0 : (ep[e + 'P'] / 100) * (ep[e + 'Sev'] / 100);
+    el.innerHTML = `Expected: <b>${sevTxt[e](v)}</b>${mode !== 'ev' && e !== 'taiwan' ? ` <span class="dim">(${mode === 'all' ? 'forced on' : 'forced off'})</span>` : ''}`;
+  }
+}
+function effP() {
+  const p = Object.assign({}, state);
+  if (mode === 'all') S.EVENTS.forEach(e => { if (e !== 'taiwan') p[e + 'P'] = 100; });
+  if (mode === 'none') S.EVENTS.forEach(e => { if (e !== 'taiwan') p[e + 'P'] = 0; });
+  return p;
+}
+let pending = false;
+function schedule() { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; render(); }); }
+
+// ---------- charts ----------
+const Y = S.YEARS.map(String);
+const mk = (id, cfg) => new Chart($(id), cfg);
+const dash = { borderDash: [5, 4], borderColor: C.gray, backgroundColor: C.gray, pointRadius: 0, borderWidth: 1.5 };
+const ch = {};
+function initCharts() {
+  ch.DS = mk('chDS', { type: 'line', data: { labels: Y, datasets: [
+    { label: 'Demand', borderColor: C.orange, backgroundColor: C.orange, data: [] },
+    { label: 'Installed fleet', borderColor: C.accent, backgroundColor: C.accent, data: [] },
+    Object.assign({ label: 'Fleet (Nov 3)', data: [] }, dash),
+    { label: 'Coverage %', borderColor: C.green, backgroundColor: C.green, data: [], yAxisID: 'y2', borderWidth: 1, pointRadius: 2 },
+  ] }, options: { scales: { y: { title: { display: true, text: 'M H100e' } }, y2: { position: 'right', min: 40, max: 130, grid: { display: false }, ticks: { callback: v => v + '%' } } } } });
+  ch.Adds = mk('chAdds', { type: 'bar', data: { labels: Y, datasets: [
+    { type: 'line', label: 'Actual adds', borderColor: '#fff', backgroundColor: '#fff', data: [], order: 0 },
+    { label: 'Buyers want', backgroundColor: C.orange + 'bb', data: [] },
+    { label: 'Chips', backgroundColor: C.accent + 'bb', data: [] },
+    { label: 'HBM', backgroundColor: C.accent2 + 'bb', data: [] },
+    { label: 'Optics', backgroundColor: C.teal + 'bb', data: [] },
+    { label: 'Power', backgroundColor: C.yellow + 'bb', data: [] },
+  ] }, options: { scales: { y: { title: { display: true, text: 'M H100e / yr' } } } } });
+  ch.Mix = mk('chMix', { type: 'bar', data: { labels: Y, datasets: [
+    { label: 'Training', backgroundColor: C.accent2, data: [] },
+    { label: 'Consumer', backgroundColor: C.accent, data: [] },
+    { label: 'Enterprise / agents', backgroundColor: C.orange, data: [] },
+    { label: 'Robots / physical AI', backgroundColor: C.pink, data: [] },
+  ] }, options: { scales: { x: { stacked: true }, y: { stacked: true } } } });
+  ch.Price = mk('chPrice', { type: 'line', data: { labels: Y, datasets: [
+    { label: 'Compute rental', borderColor: C.green, data: [] },
+    { label: 'GPU pricing power', borderColor: C.accent, data: [] },
+    { label: 'DRAM/HBM', borderColor: C.accent2, data: [] },
+    { label: 'NAND', borderColor: C.pink, data: [] },
+    { label: 'Server CPU', borderColor: C.orange, data: [] },
+    { label: 'Power', borderColor: C.yellow, data: [] },
+    Object.assign({ label: 'DRAM (Nov 3)', data: [] }, dash),
+  ] }, options: { scales: { y: { min: 0 } } } });
+  ch.Power = mk('chPower', { type: 'bar', data: { labels: Y, datasets: [
+    { type: 'line', label: 'Available GW', borderColor: C.yellow, backgroundColor: C.yellow, data: [], yAxisID: 'y' },
+    { type: 'line', label: 'Used GW', borderColor: C.accent, backgroundColor: C.accent, data: [], yAxisID: 'y' },
+    { label: 'Blocked GW (yr)', backgroundColor: C.red + 'cc', data: [], yAxisID: 'y2' },
+    { label: 'Relocated GW (yr)', backgroundColor: C.green + 'cc', data: [], yAxisID: 'y2' },
+  ] }, options: { scales: { y: { title: { display: true, text: 'GW installed' } }, y2: { position: 'right', grid: { display: false }, title: { display: true, text: 'GW per year' } } } } });
+  ch.Capex = mk('chCapex', { type: 'bar', data: { labels: Y, datasets: [
+    { label: 'Your scenario', backgroundColor: C.accent2, data: [] },
+    Object.assign({ type: 'line', label: 'Nov 3 consensus', data: [] }, dash),
+  ] }, options: { scales: { y: { ticks: { callback: v => '$' + v + 'B' } } } } });
+  ch.FV = mk('chFV', { type: 'bar', data: { labels: [], datasets: [{ label: 'Fair value vs price', data: [], backgroundColor: [] }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => pct(c.raw / 100, 1) } } }, scales: { x: { ticks: { callback: v => v + '%' } } } } });
+  ch.Co = mk('chCo', { type: 'bar', data: { labels: Y, datasets: [
+    { label: 'Revenue', backgroundColor: C.accent + 'aa', data: [] },
+    { label: 'Revenue (Nov 3)', backgroundColor: 'transparent', borderColor: C.gray, borderWidth: 1, data: [] },
+    { label: 'Op. income', backgroundColor: C.green + 'aa', data: [] },
+    { type: 'line', label: 'Net cash', borderColor: C.yellow, backgroundColor: C.yellow, data: [] },
+  ] }, options: { scales: { y: { ticks: { callback: v => '$' + v + 'B' } } } } });
+}
+
+function render() {
+  const p = effP();
+  const run = S.fairValues(p);
+  last = run;
+  const y = run.ind.y, y0 = preRun.ind.y;
+  // tiles
+  const r28 = y[2];
+  const capex = v => v * 900;
+  const ranked = S.COMPANIES.map(c => ({ c, up: run.fv[c.t].up })).sort((a, b) => b.up - a.up);
+  const best = ranked[0], worst = ranked[ranked.length - 1];
+  const binds = y.slice(1).map(r => r.bind);
+  $('tiles').innerHTML = [
+    ['Binds in 2028', r28.bind.toUpperCase(), `2027: ${y[1].bind} · 2030: ${y[4].bind}`],
+    ['Compute coverage 2028', fmt(r28.cov * 100) + '%', `Nov 3 run: ${fmt(y0[2].cov * 100)}%`],
+    ['US pipeline blocked 2028', fmt(r28.loss * 100) + '%', `${fmt(r28.lostGW, 1)} GW lost, ${fmt(r28.relocGW, 1)} GW relocated`],
+    ['AI capex 2028', '$' + fmt(capex(r28.capexIdx)) + 'B', `Nov 3 run: $${fmt(capex(y0[2].capexIdx))}B`],
+    ['DRAM price 2028', fmt(r28.MP, 2) + '×', `vs 2026 avg · 2027: ${fmt(y[1].MP, 2)}×`],
+    ['Most undervalued', best.c.t + ' ' + pct(best.up), best.c.layer],
+    ['Most overvalued', worst.c.t + ' ' + pct(worst.up), worst.c.layer],
+  ].map(([l, v, s]) => `<div class="tile"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+  // live verdict
+  const fair = ranked.filter(x => Math.abs(x.up) < 0.08).map(x => x.c.t);
+  const over = ranked.filter(x => x.up >= 0.12).map(x => x.c.t);
+  const under = ranked.filter(x => x.up <= -0.1).map(x => x.c.t);
+  $('liveVerdict').innerHTML = `<b>Your current scenario${activePreset ? ' (' + S.PRESETS[activePreset].name + ')' : ''}:</b> ${r28.bind} is the bottleneck in 2028, compute coverage is ${fmt(r28.cov * 100)}%, and ${fmt(r28.loss * 100)}% of the US pipeline is blocked. ` +
+    `Model says <span class="pos">overreacted (≥12% upside): ${over.join(', ') || 'none'}</span>; ` +
+    `<span class="dim">about fair: ${fair.join(', ') || 'none'}</span>; ` +
+    `<span class="neg">still too rich (≤−10%): ${under.join(', ') || 'none'}</span>.`;
+
+  // charts
+  const set = (c, i, d) => { c.data.datasets[i].data = d; };
+  set(ch.DS, 0, y.map(r => r.D)); set(ch.DS, 1, y.map(r => r.F)); set(ch.DS, 2, y0.map(r => r.F)); set(ch.DS, 3, y.map(r => r.cov * 100)); ch.DS.update('none');
+  set(ch.Adds, 0, y.map(r => r.adds)); set(ch.Adds, 1, y.map(r => r.desired)); set(ch.Adds, 2, y.map(r => r.chipCap)); set(ch.Adds, 3, y.map(r => r.hbmCap)); set(ch.Adds, 4, y.map(r => r.opticsCap)); set(ch.Adds, 5, y.map(r => r.powerCap)); ch.Adds.update('none');
+  set(ch.Mix, 0, y.map(r => r.d.train)); set(ch.Mix, 1, y.map(r => r.d.cons)); set(ch.Mix, 2, y.map(r => r.d.ent)); set(ch.Mix, 3, y.map(r => r.d.robo)); ch.Mix.update('none');
+  ['RP', 'CP', 'MP', 'NP', 'CPUP', 'PP'].forEach((k, i) => set(ch.Price, i, y.map(r => r[k]))); set(ch.Price, 6, y0.map(r => r.MP)); ch.Price.update('none');
+  set(ch.Power, 0, y.map(r => r.Pav)); set(ch.Power, 1, y.map(r => r.PU)); set(ch.Power, 2, y.map(r => -r.lostGW)); set(ch.Power, 3, y.map(r => r.relocGW)); ch.Power.update('none');
+  set(ch.Capex, 0, y.map(r => capex(r.capexIdx))); set(ch.Capex, 1, y0.map(r => capex(r.capexIdx))); ch.Capex.update('none');
+  ch.FV.data.labels = ranked.map(x => x.c.t);
+  ch.FV.data.datasets[0].data = ranked.map(x => +(x.up * 100).toFixed(1));
+  ch.FV.data.datasets[0].backgroundColor = ranked.map(x => x.up >= 0.12 ? C.green : x.up <= -0.1 ? C.red : C.gray);
+  ch.FV.update('none');
+  renderTable(run);
+  renderCo();
+  if ($('t-balance').classList.contains('on')) renderBalance();
+}
+
+let sortKey = 'up', sortDir = -1;
+function renderTable(run) {
+  const cols = [
+    ['t', 'Ticker', 'l'], ['layer', 'Layer', 'l'], ['nov3', 'Nov 3'], ['px', 'Now'], ['since', 'Since Nov 3'],
+    ['fv', 'Model FV'], ['up', 'FV vs now'], ['vsPre', 'FV vs Nov 3'], ['rev28', '2028 rev $B'], ['om28', '2028 op margin'], ['nd28', '2028 net cash $B'], ['tag', 'Read', 'l'],
+  ];
+  const rows = S.COMPANIES.map(c => {
+    const f = run.fv[c.t], r28 = f.rows[2];
+    return { c, t: c.t, layer: c.layer, nov3: c.nov3, px: c.px, since: c.px / c.nov3 - 1, fv: f.fv, up: f.up, vsPre: f.fv / c.nov3 - 1,
+      rev28: r28.rev, om28: r28.op / r28.rev, nd28: -r28.ND, tag: f.up >= 0.12 ? 2 : f.up <= -0.1 ? 0 : 1 };
+  }).sort((a, b) => (typeof a[sortKey] === 'string' ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]) * sortDir);
+  const tagHTML = t => t === 2 ? '<span class="tag over">overreaction</span>' : t === 0 ? '<span class="tag under">still rich</span>' : '<span class="tag fair">about fair</span>';
+  $('coTable').innerHTML = `<tr>${cols.map(([k, l, a]) => `<th class="sort ${a || ''}" data-k="${k}">${l}${sortKey === k ? (sortDir < 0 ? ' ▾' : ' ▴') : ''}</th>`).join('')}</tr>` +
+    rows.map(r => `<tr class="click ${r.t === selected ? 'sel' : ''}" data-t="${r.t}">
+      <td><b>${r.t}</b></td><td class="l dim">${r.layer}</td><td>${money(r.nov3)}</td><td>${money(r.px)}</td><td class="${cls(r.since)}">${pct(r.since, 1)}</td>
+      <td><b>${money(r.fv)}</b></td><td class="${cls(r.up)}"><b>${pct(r.up, 0)}</b></td><td class="${cls(r.vsPre)}">${pct(r.vsPre, 0)}</td>
+      <td>${fmt(r.rev28)}</td><td>${fmt(r.om28 * 100)}%</td><td class="${cls(r.nd28)}">${fmt(r.nd28)}</td><td class="l">${tagHTML(r.tag)}</td></tr>`).join('');
+}
+$('coTable').addEventListener('click', e => {
+  const th = e.target.closest('th.sort');
+  if (th) { const k = th.dataset.k; if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; } renderTable(last); return; }
+  const tr = e.target.closest('tr.click'); if (!tr) return;
+  selected = tr.dataset.t; renderTable(last); renderCo();
+});
+function renderCo() {
+  const c = S.COMPANIES.find(x => x.t === selected), f = last.fv[selected], fp = preRun.fv[selected];
+  $('coTitle').textContent = `${c.n} (${c.t}) — ${c.layer}`;
+  ch.Co.data.datasets[0].data = f.rows.map(r => r.rev);
+  ch.Co.data.datasets[1].data = fp.rows.map(r => r.rev);
+  ch.Co.data.datasets[2].data = f.rows.map(r => r.op);
+  ch.Co.data.datasets[3].data = f.rows.map(r => -r.ND);
+  ch.Co.update('none');
+  const r28 = f.rows[2], p28 = fp.rows[2];
+  const pools = Object.entries(c.pools).map(([k, w]) => `${k} ${Math.round(w * 100)}%`).join(', ');
+  $('coText').innerHTML = `
+    <p><b>Fair value ${money(f.fv)}</b> vs ${money(c.px)} today (<span class="${cls(f.up)}">${pct(f.up)}</span>) and ${money(c.nov3)} on Nov 3 (<span class="${cls(f.fv / c.nov3 - 1)}">${pct(f.fv / c.nov3 - 1)}</span>).</p>
+    <p>2028 in your scenario: revenue $${fmt(r28.rev)}B (Nov 3 run $${fmt(p28.rev)}B), operating income $${fmt(r28.op)}B (${fmt(r28.op / r28.rev * 100)}% margin), net cash $${fmt(-r28.ND)}B.</p>
+    <p class="dim">Built from: ~$${fmt(c.rev0)}B 2026 revenue, ${Math.round(c.om0 * 100)}% normalized op margin, ${Math.round(c.ai * 100)}% exposed to the AI pools (${pools})${c.owner ? '; valued as a compute owner (fleet × rental price, minus depreciation of the capex stack)' : ''}${c.lev ? '; levered builder: capex mostly committed, revenue needs energized sites' : ''}${c.china ? `; ${Math.round(c.china * 100)}% China AI exposure` : ''}. Calibrated multiple: ${fmt(f.m, 1)}× ${(c.ebitda || c.owner) ? '2028 EBITDA' : '2028 NOPAT'}.</p>`;
+}
+
+// ---------- Monte Carlo ----------
+let mc = null;
+function tri() { return (Math.random() + Math.random()) - 1; }
+function sampleP(base, unc) {
+  const p = Object.assign({}, base);
+  for (const k in PMAP) {
+    const d = PMAP[k];
+    if (/P$/.test(k) && S.EVENTS.includes(k.slice(0, -1))) continue;
+    if (/Sev$/.test(k)) continue;
+    let v = base[k] + tri() * unc * 0.12 * (d.max - d.min);
+    v = Math.max(d.min, Math.min(d.max, v));
+    if (k === 'glutYear') v = Math.round(v);
+    p[k] = v;
+  }
+  return p;
+}
+function sampleEvents(base) {
+  const ev = {};
+  for (const e of S.EVENTS) {
+    if (e === 'taiwan') continue;
+    ev[e] = Math.random() < base[e + 'P'] / 100 ? Math.max(0.2, 1 + tri() * 0.5) : 0;
+  }
+  let ty = 0;
+  for (let t = 1; t <= 4; t++) if (!ty && Math.random() < base.taiwanP / 100) ty = t;
+  ev.taiwan = ty ? Math.max(0.3, 1 + tri() * 0.5) : 0;
+  return { events: ev, taiwanYear: ty };
+}
+function runMC() {
+  const N = +$('mcN').value, unc = +$('mcU').value, base = effP();
+  const res = { fv: {}, cov: [[], [], [], [], []], bind28: {}, n: 0 };
+  S.COMPANIES.forEach(c => res.fv[c.t] = []);
+  let i = 0;
+  $('mcRun').disabled = true;
+  function chunk() {
+    const end = Math.min(N, i + 50);
+    for (; i < end; i++) {
+      const p = sampleP(base, unc), o = sampleEvents(base);
+      const r = S.fairValues(p, o);
+      S.COMPANIES.forEach(c => res.fv[c.t].push(r.fv[c.t].fv));
+      r.ind.y.forEach((y, t) => res.cov[t].push(y.cov));
+      const b = r.ind.y[2].bind; res.bind28[b] = (res.bind28[b] || 0) + 1;
+    }
+    $('mcBar').style.width = (i / N * 100) + '%';
+    $('mcStatus').textContent = `${i} / ${N} futures…`;
+    if (i < N) setTimeout(chunk, 0);
+    else { res.n = N; mc = res; $('mcRun').disabled = false; $('mcStatus').textContent = `${N} futures from your current sliders${mode !== 'ev' ? ' (politics mode: ' + mode + ')' : ''}.`; renderMC(); }
+  }
+  chunk();
+}
+const q = (arr, p) => { const a = arr.slice().sort((x, y) => x - y); const i = (a.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return a[lo] + (a[hi] - a[lo]) * (i - lo); };
+function renderMC() {
+  if (!mc) return;
+  const stats = S.COMPANIES.map(c => {
+    const a = mc.fv[c.t];
+    return { c, p10: q(a, .1), p50: q(a, .5), p90: q(a, .9), win: a.filter(v => v > c.px).length / a.length };
+  }).sort((a, b) => b.p50 / b.c.px - a.p50 / a.c.px);
+  const rel = (v, c) => +((v / c.px - 1) * 100).toFixed(1);
+  if (!ch.MC) {
+    ch.MC = mk('chMC', { type: 'bar', data: { labels: [], datasets: [
+      { label: 'P10 – P90', data: [], backgroundColor: C.accent2 + '88', borderColor: C.accent2, borderWidth: 1 },
+      { type: 'scatter', label: 'Median', data: [], backgroundColor: '#fff', pointRadius: 4 },
+    ] }, options: { indexAxis: 'y', scales: { x: { min: -100, ticks: { callback: v => v + '%' }, title: { display: true, text: 'fair value vs today\'s price' } } },
+      plugins: { tooltip: { callbacks: { label: c => Array.isArray(c.raw) ? `P10 ${c.raw[0]}% · P90 ${c.raw[1]}%` : `median ${c.raw.x}%` } } } } });
+    ch.Fan = mk('chFan', { type: 'line', data: { labels: Y, datasets: [
+      { label: 'P90', borderColor: C.green, data: [], pointRadius: 0, borderDash: [4, 3] },
+      { label: 'Median', borderColor: C.accent, data: [] },
+      { label: 'P10', borderColor: C.red, data: [], pointRadius: 0, borderDash: [4, 3] },
+    ] }, options: { scales: { y: { ticks: { callback: v => v + '%' } } } } });
+    ch.BindMC = mk('chBindMC', { type: 'bar', data: { labels: [], datasets: [{ label: 'share of runs', data: [], backgroundColor: C.yellow + 'bb' }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v + '%' } } } } });
+    ch.Hist = mk('chHist', { type: 'bar', data: { labels: [], datasets: [{ label: 'runs', data: [], backgroundColor: [] }] }, options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 8 } } } } });
+  }
+  ch.MC.data.labels = stats.map(s => s.c.t);
+  ch.MC.data.datasets[0].data = stats.map(s => [Math.max(-100, rel(s.p10, s.c)), rel(s.p90, s.c)]);
+  ch.MC.data.datasets[1].data = stats.map(s => ({ x: rel(s.p50, s.c), y: s.c.t }));
+  ch.MC.update('none');
+  ['P90', 'Median', 'P10'].forEach((_, i) => ch.Fan.data.datasets[i].data = mc.cov.map(a => +(q(a, [0.9, 0.5, 0.1][i]) * 100).toFixed(1)));
+  ch.Fan.update('none');
+  const bk = Object.keys(mc.bind28);
+  ch.BindMC.data.labels = bk; ch.BindMC.data.datasets[0].data = bk.map(k => +(mc.bind28[k] / mc.n * 100).toFixed(1)); ch.BindMC.update('none');
+  $('mcTable').innerHTML = `<tr><th class="l">Ticker</th><th>Now</th><th>P10</th><th>Median</th><th>P90</th><th>P(FV &gt; price)</th></tr>` +
+    stats.slice().sort((a, b) => b.win - a.win).map(s => `<tr><td><b>${s.c.t}</b></td><td>${money(s.c.px)}</td><td>${money(s.p10)}</td><td><b>${money(s.p50)}</b></td><td>${money(s.p90)}</td><td class="${s.win > 0.55 ? 'pos' : s.win < 0.45 ? 'neg' : 'dim'}"><b>${fmt(s.win * 100)}%</b></td></tr>`).join('');
+  renderHist();
+}
+function renderHist() {
+  if (!mc) return;
+  const t = $('mcCo').value, c = S.COMPANIES.find(x => x.t === t), a = mc.fv[t];
+  const lo = q(a, 0.01), hi = q(a, 0.99), B = 30, w = (hi - lo) / B || 1;
+  const bins = Array(B).fill(0); a.forEach(v => { const i = Math.min(B - 1, Math.max(0, Math.floor((v - lo) / w))); bins[i]++; });
+  ch.Hist.data.labels = bins.map((_, i) => money(lo + w * (i + 0.5)));
+  ch.Hist.data.datasets[0].data = bins;
+  ch.Hist.data.datasets[0].backgroundColor = bins.map((_, i) => (lo + w * (i + 0.5)) > c.px ? C.green + 'cc' : C.red + 'cc');
+  ch.Hist.update('none');
+}
+
+// ---------- priced in ----------
+let impliedDone = false;
+function renderImplied() {
+  if (impliedDone) return; impliedDone = true;
+  const base = Object.assign({}, PRE, { revoltP: 100 });
+  const rows = S.COMPANIES.map(c => {
+    const r = S.implied(c.t, 'revoltSev', base, 0, 70);
+    return { c, v: r.edge ? null : r.v, edge: r.edge };
+  });
+  const shown = rows.filter(r => r.v != null || r.edge === 'hi').map(r => {
+    const preFV = S.fvOne(r.c.t, Object.assign({}, base, { revoltSev: 0 }));
+    const hi = S.fvOne(r.c.t, Object.assign({}, base, { revoltSev: 70 }));
+    // 'hi' edge only counts as >70% if the stock is below even the 70% value
+    return Object.assign(r, { over70: r.edge === 'hi' && r.c.px < hi && hi < preFV });
+  }).filter(r => r.v != null || r.over70).sort((a, b) => (b.v ?? 75) - (a.v ?? 75));
+  const na = rows.filter(r => !shown.includes(r)).map(r => r.c.t);
+  mk('chImplied', { type: 'bar', data: { labels: shown.map(r => r.c.t), datasets: [{ label: 'implied % blocked', data: shown.map(r => r.v ?? 72),
+    backgroundColor: shown.map(r => (r.v ?? 75) >= 40 ? C.green + 'cc' : (r.v ?? 75) < 20 ? C.red + 'cc' : C.accent + 'cc') }] },
+    options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw >= 72 ? '> 70% (politics alone can\'t explain it)' : c.raw.toFixed(0) + '% of US pipeline blocked' } } },
+      scales: { x: { min: 0, max: 75, ticks: { callback: v => v + '%' } } } },
+    plugins: [{ id: 'refs', afterDraw(chart) {
+      const { ctx, chartArea: a, scales: { x } } = chart;
+      [[10, 'Ives'], [25, 'Gerstner lo'], [35, 'Gerstner hi'], [45, 'Goldman at-risk']].forEach(([v, l]) => {
+        const px = x.getPixelForValue(v); ctx.save(); ctx.strokeStyle = '#ffee5888'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px, a.top); ctx.lineTo(px, a.bottom); ctx.stroke();
+        ctx.fillStyle = '#ffee58'; ctx.font = '9px monospace'; ctx.fillText(l, px + 2, a.top + 9); ctx.restore();
+      });
+    } }] });
+  $('impliedTable').innerHTML = `<tr><th class="l">Ticker</th><th>Since Nov 3</th><th>Implied blocked</th><th class="l">Read</th></tr>` +
+    shown.map(r => { const v = r.v; const read = v == null ? 'politics can\'t explain it' : v >= 40 ? 'overreaction candidate' : v < 20 ? 'priced for little damage' : 'priced near consensus';
+      return `<tr><td><b>${r.c.t}</b></td><td class="${cls(r.c.px / r.c.nov3 - 1)}">${pct(r.c.px / r.c.nov3 - 1, 1)}</td><td>${v == null ? '&gt;70%' : fmt(v) + '%'}</td><td class="l dim">${read}</td></tr>`; }).join('') +
+    `<tr><td colspan="4" class="l dim">No answer in range: ${na.join(', ')}. Their fair value doesn't fall with permits, or they're already above it.</td></tr>`;
+}
+function renderTornado() {
+  const t = $('torCo').value, p = effP(), base = S.fvOne(t, p);
+  const res = [];
+  for (const k in PMAP) {
+    const d = PMAP[k], span = 0.2 * (d.max - d.min);
+    let lo = Math.max(d.min, p[k] - span), hi = Math.min(d.max, p[k] + span);
+    if (k === 'glutYear') { lo = Math.round(lo); hi = Math.round(hi); }
+    const a = S.fvOne(t, Object.assign({}, p, { [k]: lo })) / base - 1, b = S.fvOne(t, Object.assign({}, p, { [k]: hi })) / base - 1;
+    res.push({ k, label: d.label, a, b, lo, hi, mag: Math.abs(a - b) });
+  }
+  res.sort((x, y) => y.mag - x.mag);
+  const top = res.slice(0, 14);
+  if (ch.Tor) ch.Tor.destroy();
+  ch.Tor = mk('chTor', { type: 'bar', data: { labels: top.map(r => fullLabel(r.k).slice(0, 44)), datasets: [
+    { label: 'slider down', data: top.map(r => +(r.a * 100).toFixed(1)), backgroundColor: C.red + 'bb' },
+    { label: 'slider up', data: top.map(r => +(r.b * 100).toFixed(1)), backgroundColor: C.green + 'bb' },
+  ] }, options: { indexAxis: 'y', scales: { x: { stacked: false, ticks: { callback: v => v + '%' } }, y: { stacked: true, ticks: { font: { size: 9 } } } },
+    plugins: { tooltip: { callbacks: { label: c => { const r = top[c.dataIndex]; return `${c.datasetIndex ? 'to ' + fmtVal(PMAP[r.k], r.hi) : 'to ' + fmtVal(PMAP[r.k], r.lo)}: ${pct(c.raw / 100, 1)}`; } } } } } });
+}
+function solve() {
+  const t = $('solCo').value, k = $('solP').value, d = PMAP[k], c = S.COMPANIES.find(x => x.t === t);
+  const r = S.implied(t, k, effP(), d.min, d.max);
+  const cur = fmtVal(d, state[k]);
+  if (r.edge) {
+    const fvLo = S.fvOne(t, Object.assign({}, effP(), { [k]: d.min })), fvHi = S.fvOne(t, Object.assign({}, effP(), { [k]: d.max }));
+    $('solOut').innerHTML = `No value of <b>${fullLabel(k)}</b> gets ${t} to ${money(c.px)}. Across the whole range its fair value runs ${money(Math.min(fvLo, fvHi))} – ${money(Math.max(fvLo, fvHi))}. Other sliders are doing the work, so try the tornado chart.`;
+  } else {
+    $('solOut').innerHTML = `${t} at <b>${money(c.px)}</b> is consistent with <b>${fullLabel(k)} = ${fmtVal(d, d.k === 'glutYear' ? Math.round(r.v) : r.v)}</b>, holding your other sliders (you have it at ${cur}).`;
+  }
+}
+
+// ---------- election tape ----------
+function renderTape() {
+  const extra = [['SPY', 754.35, 738.4], ['QQQ', 685.28, 658.26], ['SMH', 518.52, 462.58]];
+  const rows = S.COMPANIES.map(c => [c.t, c.px / c.nov3 - 1, false]).concat(extra.map(([t, a, b]) => [t, b / a - 1, true])).sort((a, b) => a[1] - b[1]);
+  mk('chTape', { type: 'bar', data: { labels: rows.map(r => r[0]), datasets: [{ label: 'Nov 3 close → Nov 6', data: rows.map(r => +(r[1] * 100).toFixed(1)),
+    backgroundColor: rows.map(r => r[2] ? C.gray : r[1] >= 0 ? C.green + 'cc' : C.red + 'cc') }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v + '%' } }, x: { ticks: { font: { size: 9 }, autoSkip: false, maxRotation: 70 } } } } });
+}
+
+// ---------- balance sheets ----------
+let bsChart = null;
+function renderBalance() {
+  if (!last) return;
+  const rows = S.COMPANIES.map(c => {
+    const f = last.fv[c.t], hi = c.hi52;
+    return { c, cash: c.cash, debt: c.debt, net: c.cash - c.debt, nd28: -f.rows[2].ND, fcf: c.fcf, fpe: c.fpe, dd: hi ? c.px / hi - 1 : null, beta: c.beta };
+  }).sort((a, b) => a.net - b.net);
+  $('bsTable').innerHTML = `<tr><th class="l">Ticker</th><th class="l">Layer</th><th>Cash $B</th><th>Debt $B</th><th>Net cash today</th><th>FCF TTM $B</th><th>Fwd P/E</th><th>Off 52w high</th><th>Beta</th><th>Net cash 2028 (your scenario)</th></tr>` +
+    rows.map(r => `<tr><td><b>${r.c.t}</b></td><td class="l dim">${r.c.layer}</td><td>${fmt(r.cash)}</td><td>${fmt(r.debt)}</td><td class="${cls(r.net)}">${fmt(r.net)}</td><td class="${cls(r.fcf)}">${fmt(r.fcf)}</td><td>${r.fpe ? fmt(r.fpe, 1) + '×' : '–'}</td><td class="neg">${r.dd != null ? pct(r.dd) : '–'}</td><td>${r.beta ? fmt(r.beta, 2) : '–'}</td><td class="${cls(r.nd28)}"><b>${fmt(r.nd28)}</b></td></tr>`).join('');
+  const sorted = rows.slice().sort((a, b) => a.nd28 - b.nd28);
+  if (!bsChart) bsChart = mk('chBS', { type: 'bar', data: { labels: [], datasets: [
+    { label: 'Net cash today', backgroundColor: C.gray, data: [] }, { label: '2028 (your scenario)', backgroundColor: C.accent2, data: [] }] },
+    options: { indexAxis: 'y', scales: { x: { ticks: { callback: v => '$' + v + 'B' } }, y: { ticks: { font: { size: 9 } } } } } });
+  bsChart.data.labels = sorted.map(r => r.c.t);
+  bsChart.data.datasets[0].data = sorted.map(r => +r.net.toFixed(1));
+  bsChart.data.datasets[1].data = sorted.map(r => +r.nd28.toFixed(1));
+  bsChart.update('none');
+}
+
+// ---------- scorecard ----------
+function renderScore() {
+  const r = (t, d) => { const s = SCORE[t]; return s && s[d] && s.now ? s.now / s[d] - 1 : null; };
+  const v1 = [['MU', 'Strong Buy'], ['000660.KS', 'Strong Buy'], ['AVGO', 'Strong Buy'], ['ASML', 'Buy'], ['LRCX', 'Buy'], ['6857.T', 'Buy'], ['RMBS', 'Buy'], ['ENTG', 'Buy'],
+    ['AMAT', 'Hold'], ['SNDK', 'Hold'], ['KLAC', 'Hold'], ['TER', 'Hold'], ['SIMO', 'Hold'], ['ALAB', 'Hold'], ['NVDA', 'Hold/Trim'], ['AMD', 'Hold']];
+  const v2 = [['NVDA', 'Strong Buy'], ['0992.HK', 'Strong Buy'], ['AMD', 'Buy'], ['AMZN', 'Buy'], ['TSM', 'Buy'], ['DELL', 'Buy'], ['MU', 'Buy'], ['RMBS', 'Buy'], ['PENG', 'Buy'], ['VRT', 'Buy'],
+    ['AKAM', 'Spec Buy'], ['6809.HK', 'Spec Buy'], ['INTC', 'Hold'], ['ARM', 'Hold'], ['HPE', 'Hold'], ['CRWV', 'Avoid'], ['ORCL', 'Avoid'], ['OKLO', 'Avoid']];
+  const table = (list, d) => {
+    const bench = ['SPY', 'QQQ', 'SMH'].map(t => `${t} <span class="${cls(r(t, d))}">${pct(r(t, d))}</span>`).join(' · ');
+    const buys = list.filter(x => /Buy/.test(x[1])).map(x => r(x[0], d)).filter(x => x != null);
+    const avg = buys.reduce((a, b) => a + b, 0) / buys.length;
+    return `<tr><th class="l">Ticker</th><th class="l">Rating</th><th>Then</th><th>Now</th><th>Return</th></tr>` +
+      list.map(([t, rt]) => { const s = SCORE[t]; const x = r(t, d); return `<tr><td><b>${t}</b></td><td class="l">${rt}</td><td>${fmt(s[d], s[d] < 100 ? 2 : 0)}</td><td>${fmt(s.now, s.now < 100 ? 2 : 0)}</td><td class="${cls(x)}"><b>${pct(x)}</b></td></tr>`; }).join('') +
+      `<tr><td class="l" colspan="5">Buy-rated average: <b class="${cls(avg)}">${pct(avg)}</b> · ${bench}</td></tr>`;
+  };
+  $('scoreV1').innerHTML = table(v1, 'jun25');
+  $('scoreV2').innerHTML = table(v2, 'oct12');
+}
+
+// ---------- boot ----------
+buildSliders();
+initCharts();
+const opts = S.COMPANIES.map(c => `<option value="${c.t}">${c.t} — ${c.n}</option>`).join('');
+['mcCo', 'solCo', 'torCo'].forEach(id => { $(id).innerHTML = opts; $(id).value = 'MU'; });
+$('solP').innerHTML = S.PARAMS.map(r => `<option value="${r[0]}">${fullLabel(r[0])}</option>`).join('');
+$('solP').value = 'revoltSev';
+$('solGo').addEventListener('click', solve);
+$('torCo').addEventListener('change', renderTornado);
+$('mcCo').addEventListener('change', renderHist);
+$('mcRun').addEventListener('click', runMC);
+$('mcU').addEventListener('input', e => $('mcUo').textContent = (+e.target.value).toFixed(2) + '×');
+markPreset(); syncInputs(); render(); renderTape(); renderScore();
+})();
+
+</script>
+</body>
+</html>
