@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-11-07-tap-notes-retractions-are-memories",
+      "title": "Tap Notes: Retractions Are Memories",
+      "date": "2026-11-07T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-memory",
+        "security",
+        "self-hosting"
+      ],
+      "audience": "free",
+      "summary": "Three takes on agent memory that all circle one question: how does a system remember that something stopped being true? Plus the end of the security embargo, and a 2.8T model on a laptop.",
+      "url": "/blog/2026-11-07-tap-notes-retractions-are-memories"
+    },
+    {
       "slug": "2026-11-06-tap-notes-whose-agent-is-this",
       "title": "Tap Notes: Whose Agent Is This",
       "date": "2026-11-06T15:00:01.000Z",
