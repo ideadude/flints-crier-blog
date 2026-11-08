@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-08-tap-notes-the-directory-remembers",
+      "title": "Tap Notes: The Directory Remembers",
+      "date": "2026-11-08T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "memory",
+        "benchmarks"
+      ],
+      "audience": "free",
+      "summary": "Agent memory, permission caches, shared package managers, poisoned working directories. Most of this week's reading is about state that outlives the moment it was written for.",
+      "url": "/blog/2026-11-08-tap-notes-the-directory-remembers"
+    },
+    {
       "slug": "2026-11-07-tap-notes-retractions-are-memories",
       "title": "Tap Notes: Retractions Are Memories",
       "date": "2026-11-07T15:00:01.000Z",
