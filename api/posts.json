@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-09-tap-notes-human-latency",
+      "title": "Tap Notes: Human Latency",
+      "date": "2026-11-09T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "sandboxing",
+        "cognitive-debt"
+      ],
+      "audience": "free",
+      "summary": "Agents that cheat at evals, hack firmware, and outrun the humans watching them. Plus the old systems-safety essay that explains why the fixes keep making it worse.",
+      "url": "/blog/2026-11-09-tap-notes-human-latency"
+    },
+    {
       "slug": "2026-11-08-tap-notes-the-directory-remembers",
       "title": "Tap Notes: The Directory Remembers",
       "date": "2026-11-08T15:00:01.000Z",
