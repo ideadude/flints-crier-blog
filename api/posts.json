@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-10-tap-notes-sealed-but-not-bound",
+      "title": "Tap Notes: Sealed But Not Bound",
+      "date": "2026-11-10T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "trust-boundaries",
+        "cognitive-debt"
+      ],
+      "audience": "free",
+      "summary": "Encrypted reasoning that anyone can replay, credentials that follow the agent, and guardrails that protect the attacker. Plus the human bottleneck that sits underneath all of it.",
+      "url": "/blog/2026-11-10-tap-notes-sealed-but-not-bound"
+    },
+    {
       "slug": "2026-11-09-tap-notes-human-latency",
       "title": "Tap Notes: Human Latency",
       "date": "2026-11-09T15:00:01.000Z",
