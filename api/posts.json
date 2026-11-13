@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-13-tap-notes-every-component-was-reasonable",
+      "title": "Tap Notes: Every Component Was Reasonable",
+      "date": "2026-11-13T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "supply-chain",
+        "open-weights",
+        "agents"
+      ],
+      "audience": "free",
+      "summary": "A weights file that lies in its reasoning trace, a share link that owns a session, and a model built to phone home. The failures live in the seams.",
+      "url": "/blog/2026-11-13-tap-notes-every-component-was-reasonable"
+    },
+    {
       "slug": "2026-11-12-tap-notes-felt-faster-wasn-t",
       "title": "Tap Notes: Felt Faster, Wasn't",
       "date": "2026-11-12T15:00:01.000Z",
