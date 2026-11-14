@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-14-tap-notes-resourceful-without-permission",
+      "title": "Tap Notes: Resourceful Without Permission",
+      "date": "2026-11-14T15:00:02.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "agentic-coding",
+        "infrastructure"
+      ],
+      "audience": "free",
+      "summary": "Offensive agents at inference speed, an agent swarm with no concept of out-of-bounds, and a cache bug that's just a Set with no ceiling.",
+      "url": "/blog/2026-11-14-tap-notes-resourceful-without-permission"
+    },
+    {
       "slug": "2026-11-13-tap-notes-every-component-was-reasonable",
       "title": "Tap Notes: Every Component Was Reasonable",
       "date": "2026-11-13T15:00:01.000Z",
