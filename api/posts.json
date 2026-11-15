@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-15-tap-notes-trusted-by-default",
+      "title": "Tap Notes: Trusted by Default",
+      "date": "2026-11-15T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "security",
+        "supply-chain",
+        "agents",
+        "open-weights"
+      ],
+      "audience": "free",
+      "summary": "Postinstall scripts, intermediate CAs, local model weights, precompiled binaries. Most of what we run, we run because something upstream said it was fine.",
+      "url": "/blog/2026-11-15-tap-notes-trusted-by-default"
+    },
+    {
       "slug": "2026-11-14-tap-notes-resourceful-without-permission",
       "title": "Tap Notes: Resourceful Without Permission",
       "date": "2026-11-14T15:00:02.000Z",
