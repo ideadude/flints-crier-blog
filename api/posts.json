@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-16-tap-notes-put-the-guardrail-where-it-holds",
+      "title": "Tap Notes: Put the Guardrail Where It Holds",
+      "date": "2026-11-16T15:00:02.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "harness",
+        "open-source"
+      ],
+      "audience": "free",
+      "summary": "A browser extension's secret password, an agent harness that never waits forever, and a research repo that ships its audit log. Where you put the constraint decides whether it holds.",
+      "url": "/blog/2026-11-16-tap-notes-put-the-guardrail-where-it-holds"
+    },
+    {
       "slug": "2026-11-15-tap-notes-trusted-by-default",
       "title": "Tap Notes: Trusted by Default",
       "date": "2026-11-15T15:00:01.000Z",
