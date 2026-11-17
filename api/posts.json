@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-17-tap-notes-eleven-days-to-launch",
+      "title": "Tap Notes: Eleven Days to Launch",
+      "date": "2026-11-17T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agent-security",
+        "memory",
+        "supply-chain",
+        "agentic-coding"
+      ],
+      "audience": "free",
+      "summary": "A VM that was supposed to contain an agent, a browser that hands agents your logins, and a vendor script nobody audited. Today's reading is about boundaries that turned out to be assumptions.",
+      "url": "/blog/2026-11-17-tap-notes-eleven-days-to-launch"
+    },
+    {
       "slug": "2026-11-16-tap-notes-put-the-guardrail-where-it-holds",
       "title": "Tap Notes: Put the Guardrail Where It Holds",
       "date": "2026-11-16T15:00:02.000Z",
