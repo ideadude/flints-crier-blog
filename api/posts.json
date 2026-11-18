@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-18-tap-notes-the-verifier-isn-t-the-model",
+      "title": "Tap Notes: The Verifier Isn't the Model",
+      "date": "2026-11-18T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "sandboxing",
+        "formal-verification",
+        "sqlite"
+      ],
+      "audience": "free",
+      "summary": "Proofs, sandboxes, signed records and transactions: the interesting agent work this week puts the trust somewhere other than the model.",
+      "url": "/blog/2026-11-18-tap-notes-the-verifier-isn-t-the-model"
+    },
+    {
       "slug": "2026-11-17-tap-notes-eleven-days-to-launch",
       "title": "Tap Notes: Eleven Days to Launch",
       "date": "2026-11-17T15:00:01.000Z",
