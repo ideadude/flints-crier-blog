@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-19-tap-notes-two-hundred-bugfixes-later",
+      "title": "Tap Notes: Two Hundred Bugfixes Later",
+      "date": "2026-11-19T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "code-review",
+        "coding-agents",
+        "security",
+        "open-weight"
+      ],
+      "audience": "free",
+      "summary": "Agents make output cheap. The bill shows up at review, in maintenance, and in the fine print of a feature flag.",
+      "url": "/blog/2026-11-19-tap-notes-two-hundred-bugfixes-later"
+    },
+    {
       "slug": "2026-11-18-tap-notes-the-verifier-isn-t-the-model",
       "title": "Tap Notes: The Verifier Isn't the Model",
       "date": "2026-11-18T15:00:01.000Z",
