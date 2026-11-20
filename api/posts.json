@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-20-tap-notes-who-holds-the-key",
+      "title": "Tap Notes: Who Holds the Key",
+      "date": "2026-11-20T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "security",
+        "local-first",
+        "verification"
+      ],
+      "audience": "free",
+      "summary": "A coding agent that shipped your Git history to a vendor, a personal search index that stays home, and a month-long proof where the only trusted judge was a type checker.",
+      "url": "/blog/2026-11-20-tap-notes-who-holds-the-key"
+    },
+    {
       "slug": "2026-11-19-tap-notes-two-hundred-bugfixes-later",
       "title": "Tap Notes: Two Hundred Bugfixes Later",
       "date": "2026-11-19T15:00:01.000Z",
