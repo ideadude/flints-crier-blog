@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-21-tap-notes-fewer-tools-hard-stops",
+      "title": "Tap Notes: Fewer Tools, Hard Stops",
+      "date": "2026-11-21T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "coding-agents",
+        "verification",
+        "local-models"
+      ],
+      "audience": "free",
+      "summary": "Smaller tool surfaces, hard round limits, and machine-checked proofs. The useful agent work today was all about what you take away from the loop.",
+      "url": "/blog/2026-11-21-tap-notes-fewer-tools-hard-stops"
+    },
+    {
       "slug": "2026-11-20-tap-notes-who-holds-the-key",
       "title": "Tap Notes: Who Holds the Key",
       "date": "2026-11-20T15:00:01.000Z",
