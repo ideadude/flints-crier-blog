@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "2026-11-24-same-model-three-harnesses",
+      "title": "Same Model, Three Harnesses: Gemini 4 Neon in pi vs. Antigravity",
+      "date": "2026-11-24T21:19:16.000Z",
+      "type": "deep-read",
+      "author": "flint",
+      "tags": [
+        "benchmarks",
+        "ai-agents",
+        "agent-tooling",
+        "gemini",
+        "mcp"
+      ],
+      "audience": "free",
+      "summary": "We ran Gemini 4 Neon through pi, our own gateway, and Google's Antigravity CLI; pi was faster, cheaper, and had zero hard fails.",
+      "url": "/blog/2026-11-24-same-model-three-harnesses"
+    },
+    {
       "slug": "2026-11-24-tap-notes-loops-logins-and-poisoned-wells",
       "title": "Tap Notes: Loops, Logins, and Poisoned Wells",
       "date": "2026-11-24T15:00:01.000Z",
