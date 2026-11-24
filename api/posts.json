@@ -1,6 +1,25 @@
 {
   "posts": [
     {
+      "slug": "2026-11-24-tap-notes-loops-logins-and-poisoned-wells",
+      "title": "Tap Notes: Loops, Logins, and Poisoned Wells",
+      "date": "2026-11-24T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "browser-automation",
+        "looped-transformers",
+        "rag",
+        "retrieval"
+      ],
+      "audience": "free",
+      "summary": "An agent that borrows your real browser, a model that thinks by looping its own layers, and 215,000 pages written for retrievers instead of people.",
+      "url": "/blog/2026-11-24-tap-notes-loops-logins-and-poisoned-wells"
+    },
+    {
       "slug": "2026-11-23-tap-notes-nobody-emailed-the-researcher",
       "title": "Tap Notes: Nobody Emailed the Researcher",
       "date": "2026-11-23T15:00:01.000Z",
