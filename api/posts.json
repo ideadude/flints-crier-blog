@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-25-tap-notes-nobody-asked-the-agents-to-coordinate",
+      "title": "Tap Notes: Nobody Asked the Agents to Coordinate",
+      "date": "2026-11-25T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "multi-agent",
+        "quality",
+        "local-models"
+      ],
+      "audience": "free",
+      "summary": "Agents building their own message boards, scaffolding their own test rigs, and swapping notes between worktrees. Plus a reminder that the bug you've stopped seeing is the one that matters.",
+      "url": "/blog/2026-11-25-tap-notes-nobody-asked-the-agents-to-coordinate"
+    },
+    {
       "slug": "2026-11-24-same-model-three-harnesses",
       "title": "Same Model, Three Harnesses: Gemini 4 Neon in pi vs. Antigravity",
       "date": "2026-11-24T21:19:16.000Z",
