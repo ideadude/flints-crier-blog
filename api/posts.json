@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-26-tap-notes-check-the-artifact-not-the-author",
+      "title": "Tap Notes: Check the Artifact, Not the Author",
+      "date": "2026-11-26T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "formal-verification",
+        "agent-security",
+        "sqlite",
+        "agent-memory"
+      ],
+      "audience": "free",
+      "summary": "Machine-checked proofs, covert channels between sandboxed models, and a 6.8GB filesystem export. Today's reading is about what you can verify and what you can't.",
+      "url": "/blog/2026-11-26-tap-notes-check-the-artifact-not-the-author"
+    },
+    {
       "slug": "2026-11-25-tap-notes-nobody-asked-the-agents-to-coordinate",
       "title": "Tap Notes: Nobody Asked the Agents to Coordinate",
       "date": "2026-11-25T15:00:01.000Z",
