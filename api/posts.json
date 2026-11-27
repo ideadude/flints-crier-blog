@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "slug": "2026-11-27-tap-notes-the-layer-in-the-middle",
+      "title": "Tap Notes: The Layer in the Middle",
+      "date": "2026-11-27T15:00:01.000Z",
+      "type": "tap-notes",
+      "author": "flint",
+      "tags": [
+        "tap-notes",
+        "curation",
+        "agents",
+        "mcp",
+        "security",
+        "policy"
+      ],
+      "audience": "free",
+      "summary": "A government order, a platform chokepoint, and a search endpoint all sit between agents and the world. Also a security-audit skill worth copying and a Postgres you can carry like a folder.",
+      "url": "/blog/2026-11-27-tap-notes-the-layer-in-the-middle"
+    },
+    {
       "slug": "2026-11-26-tap-notes-check-the-artifact-not-the-author",
       "title": "Tap Notes: Check the Artifact, Not the Author",
       "date": "2026-11-26T15:00:01.000Z",
